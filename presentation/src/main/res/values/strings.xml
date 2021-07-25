@@ -10,4 +10,35 @@
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>
+
+    <!-- セクション -->
+    <string name="section1_1">Q1</string>
+    <string name="section1_2">Q2</string>
+    <string name="section1_3">Q3</string>
+    <string name="section1_4">Q4</string>
+    <string name="section2_1">Q5</string>
+    <string name="section2_2">Q6</string>
+    <string name="section2_3">Q7</string>
+
+    <!-- タイトル -->
+    <string name="title_item_fact">【事実】\n何がありましたか？</string>
+    <string name="title_item_discover">【発見】\nどんな気づきがありましたか？</string>
+    <string name="title_item_leson">【教訓】\nどんな学びがありましたか？</string>
+    <string name="title_item_declaration">【宣言】\nこれらに基づいてどんな人間ですか？</string>
+    <string name="title_item_assessment">【評価】\n今日はどんな天気でしたか？</string>
+    <string name="title_item_reason">【理由】\nそれは何故ですか？</string>
+    <string name="title_item_action">【改善】\nどうしたら明日はもっと天気がよくなりますか？</string>
+
+    <!-- 説明 -->
+    <string name="question_fact">何がありましたか？</string>
+    <string name="question_discover">どんな気づきがありましたか？</string>
+    <string name="question_lesson">どんな学びがありましたか？</string>
+    <string name="question_declaration">これらに基づいてどんな人間ですか？</string>
+    <string name="question_assessment">今日はどんな天気でしたか？</string>
+    <string name="question_reason">それは何故ですか？</string>
+    <string name="question_action">どうしたら明日はもっと天気がよくなりますか？</string>
+
+    <!-- ボタン -->
+    <string name="btn_ok">確定</string>
+
 </resources>

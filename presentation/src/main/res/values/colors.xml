@@ -7,4 +7,24 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Base Color-->
+    <color name="bg_color_primary">@color/red_500</color>
+    <color name="bg_color_primary_dark">@color/red_700</color>
+    <color name="bg_color_accent">@color/yellow_500</color>
+
+    <!-- Text Color -->
+    <color name="text_color_light_primary">#FFFFFFFF</color>
+    <color name="text_color_light_secondary">#B3FFFFFF</color>
+    <color name="text_color_light_disable">#80FFFFFF</color>
+    <color name="text_color_dark_primary">#DE000000</color>
+    <color name="text_color_dark_secondary">#8A000000</color>
+    <color name="text_color_dark_disable">#61000000</color>
+    <color name="text_color_error">#B00020</color>
+
+
+    <!-- Other -->
+    <color name="red_500">#F44336</color>
+    <color name="red_700">#D32F2F</color>
+    <color name="yellow_500">#FFEB3B</color>
 </resources>

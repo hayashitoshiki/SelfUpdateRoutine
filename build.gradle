@@ -67,6 +67,7 @@ subprojects {
             jvmTarget = '1.8'
         }
         buildFeatures {
+            dataBinding true
             viewBinding true
         }
     }
@@ -93,6 +94,9 @@ subprojects {
         // ktLint
         def ktLint_version = "0.41.0"
         ktlint "com.pinterest:ktlint:$ktLint_version"
+        // koin
+        def koin_version = "3.0.2"
+        implementation "io.insert-koin:koin-android:$koin_version"
     }
 
     // ktLint検出
