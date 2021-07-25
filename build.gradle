@@ -33,6 +33,7 @@ subprojects {
     }
 
     apply plugin: 'kotlin-android'
+    apply plugin: 'kotlin-kapt'
 
     android {
         compileSdkVersion 30
@@ -53,6 +54,11 @@ subprojects {
                 proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             }
         }
+        lintOptions {
+            checkReleaseBuilds false
+            abortOnError false
+            xmlReport true
+        }
         compileOptions {
             sourceCompatibility JavaVersion.VERSION_1_8
             targetCompatibility JavaVersion.VERSION_1_8
@@ -63,6 +69,12 @@ subprojects {
         buildFeatures {
             viewBinding true
         }
+    }
+
+    configurations { ktlint }
+
+    afterEvaluate {
+        check.dependsOn ktlint
     }
 
     dependencies {
@@ -77,6 +89,28 @@ subprojects {
         testImplementation 'junit:junit:4.+'
         androidTestImplementation 'androidx.test.ext:junit:1.1.3'
         androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+
+        // ktLint
+        def ktLint_version = "0.41.0"
+        ktlint "com.pinterest:ktlint:$ktLint_version"
+    }
+
+    // ktLint検出
+    task ktlint(type: JavaExec, group: "verification") {
+        description = "Check Kotlin code style."
+        main = "com.pinterest.ktlint.Main"
+        classpath = configurations.ktlint
+        args "--android", "--color", "--reporter=plain", "--reporter=checkstyle,output=${buildDir}/reports/ktlint-results.xml", "src/**/*.kt"
+        ignoreExitValue true
+    }
+
+    // ktLintフォーマット
+    task ktlintFormat(type: JavaExec, group: "formatting") {
+        description = "Fix Kotlin code style deviations."
+        main = "com.pinterest.ktlint.Main"
+        classpath = configurations.ktlint
+        args "-F", "--android", "src/**/*.kt"
+        ignoreExitValue true
     }
 }
 
