@@ -1,12 +1,12 @@
 package com.myapp.presentation.home.ui.slideshow
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.map
+import androidx.lifecycle.*
+import com.myapp.domain.dto.AllReportInputDto
+import com.myapp.domain.usecase.ReportUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
 
-class SlideshowViewModel : ViewModel() {
+class SlideshowViewModel(private val reportUseCase: ReportUseCase) : ViewModel() {
 
     // 事実
     @ExperimentalCoroutinesApi
@@ -47,5 +47,23 @@ class SlideshowViewModel : ViewModel() {
     // 改善
     @ExperimentalCoroutinesApi
     val planInputText: LiveData<String> = Dispatcher.actionTextFlow.asLiveData()
+
+    // 振り返り日記登録
+    @ExperimentalCoroutinesApi
+    fun saveReport() {
+        val section11 = factInputText.value ?: return
+        val section12 = noticeInputText.value ?: return
+        val section13 = learnInputText.value ?: return
+        val section14 = statementInputText.value ?: return
+        val section21 = assessmentInputInt.value ?: return
+        val section22 = reasonInputText.value ?: return
+        val section23 = planInputText.value ?: return
+        val allReportInputDto = AllReportInputDto(
+            section11, section12, section13, section14, section21, section22, section23
+        )
+        viewModelScope.launch {
+            reportUseCase.saveReport(allReportInputDto)
+        }
+    }
 
 }

@@ -3,11 +3,27 @@ package com.myapp.presentation.home.ui.home
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.myapp.domain.model.entity.Report
+import com.myapp.domain.usecase.ReportUseCase
+import kotlinx.coroutines.launch
 
-class HomeViewModel : ViewModel() {
+class HomeViewModel(private val reportUseCase: ReportUseCase) : ViewModel() {
 
     private val _text = MutableLiveData<String>().apply {
         value = "This is home Fragment"
     }
     val text: LiveData<String> = _text
+
+    private val _report = MutableLiveData<Report>()
+    val report: LiveData<Report> = _report
+
+    init {
+        viewModelScope.launch {
+            _report.value = reportUseCase.getDetailReport()
+        }
+    }
+
+    fun getReport() {
+    }
 }
