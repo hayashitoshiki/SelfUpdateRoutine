@@ -7,10 +7,9 @@ import kotlinx.coroutines.launch
 class DiaryAssessmentViewModel : DiaryItemViewModel() {
 
     @ExperimentalCoroutinesApi
-    override fun changeText(input: String) {
+    fun changeProgress(input: Int) {
         viewModelScope.launch {
-            val inputNumber = input.toInt()
-            Dispatcher.changeAssessment(inputNumber)
+            Dispatcher.changeAssessment(input)
         }
     }
 

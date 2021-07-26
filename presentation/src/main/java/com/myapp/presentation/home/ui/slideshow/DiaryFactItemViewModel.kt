@@ -4,12 +4,14 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 
+@ExperimentalCoroutinesApi
 class DiaryFactItemViewModel : DiaryItemViewModel() {
 
-    @ExperimentalCoroutinesApi
-    override fun changeText(input: String) {
-        viewModelScope.launch {
-            Dispatcher.changeFact(input)
+    init {
+        inputText.observeForever {
+            viewModelScope.launch {
+                Dispatcher.changeFact(it)
+            }
         }
     }
 

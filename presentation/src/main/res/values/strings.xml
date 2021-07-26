@@ -38,6 +38,7 @@
     <string name="question_reason">それは何故ですか？</string>
     <string name="question_action">どうしたら明日はもっと天気がよくなりますか？</string>
 
+    <string name="title_answer_check">下記の内容でよろしいでしょうか？</string>
     <!-- ボタン -->
     <string name="btn_ok">確定</string>
 

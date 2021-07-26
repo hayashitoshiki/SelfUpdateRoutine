@@ -12,6 +12,7 @@ import com.myapp.presentation.databinding.FragmentSlideshowBinding
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.OnItemClickListener
 import com.xwray.groupie.ViewHolder
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
@@ -31,6 +32,7 @@ class SlideshowFragment : Fragment() {
         return binding.root
     }
 
+    @ExperimentalCoroutinesApi
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?

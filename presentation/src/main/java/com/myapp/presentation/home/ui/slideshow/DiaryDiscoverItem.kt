@@ -1,8 +1,6 @@
 package com.myapp.presentation.home.ui.slideshow
 
 import android.content.Context
-import android.text.Editable
-import android.text.TextWatcher
 import androidx.lifecycle.LifecycleOwner
 import com.myapp.presentation.R
 import com.myapp.presentation.databinding.ItemDiaryTextInputBinding
@@ -24,28 +22,9 @@ class DiaryDiscoverItem(
         position: Int
     ) {
         binding.lifecycleOwner = viewLifecycleOwner
+        binding.viewModel = viewModel
         binding.txtSection.text = context.getString(R.string.section1_2)
-        binding.txtTitle.text = context.getString(R.string.title_item_discover) // 次へボタン
-        binding.edtInput.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(
-                s: CharSequence,
-                start: Int,
-                count: Int,
-                after: Int
-            ) {
-            }
+        binding.txtTitle.text = context.getString(R.string.title_item_discover)
 
-            override fun onTextChanged(
-                s: CharSequence,
-                start: Int,
-                before: Int,
-                count: Int
-            ) {
-            }
-
-            override fun afterTextChanged(s: Editable) {
-                viewModel.changeText(s.toString())
-            }
-        })
     }
 }
