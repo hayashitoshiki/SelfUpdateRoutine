@@ -15,8 +15,7 @@ interface ReportUseCase {
 
 
     /**
-     * TODO : 仮
-     * １件取得
+     * 全ての振り返り日記取得
      */
-    suspend fun getDetailReport(): Report
+    suspend fun getAllReport(): List<Report>
 }

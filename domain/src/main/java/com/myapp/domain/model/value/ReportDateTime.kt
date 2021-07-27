@@ -3,9 +3,7 @@ package com.myapp.domain.model.value
 import android.annotation.SuppressLint
 import java.text.DateFormat
 import java.text.SimpleDateFormat
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.ZoneOffset
+import java.time.*
 import java.time.format.DateTimeFormatter
 import java.util.*
 
@@ -23,6 +21,15 @@ data class ReportDateTime(val date: LocalDateTime) {
         val sectionData = df.format(systemDateTime)
             .substring(0, 10)
         return getDataString(sectionData)
+    }
+
+    fun getDate(): Date {
+        val systemDateTime = LocalDateTime.ofInstant(date.toInstant(ZoneOffset.UTC), ZoneId.systemDefault())
+
+        val zone = ZoneId.systemDefault()
+        val zonedDateTime: ZonedDateTime = ZonedDateTime.of(systemDateTime, zone)
+        val instant: Instant = zonedDateTime.toInstant()
+        return Date.from(instant)
     }
 
     /**

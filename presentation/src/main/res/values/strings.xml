@@ -12,6 +12,8 @@
     <string name="menu_slideshow">Slideshow</string>
 
     <!-- セクション -->
+    <string name="title_report_ffs">４行日記</string>
+    <string name="title_report_emotions">感情日記</string>
     <string name="section1_1">Q1</string>
     <string name="section1_2">Q2</string>
     <string name="section1_3">Q3</string>

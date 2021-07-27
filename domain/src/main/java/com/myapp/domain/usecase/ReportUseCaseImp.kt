@@ -17,7 +17,7 @@ class ReportUseCaseImp(
     }
 
     // 振り返り日記の詳細を返す
-    override suspend fun getDetailReport(): Report {
-        return localReportRepository.getFirst()
+    override suspend fun getAllReport(): List<Report> {
+        return localReportRepository.getAllReport()
     }
 }

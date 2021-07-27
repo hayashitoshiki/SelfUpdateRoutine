@@ -15,5 +15,5 @@ interface LocalReportRepository {
     /**
      * TODO : 仮　１つ目の振り返り日記取得
      */
-    suspend fun getFirst(): Report
+    suspend fun getAllReport(): List<Report>
 }

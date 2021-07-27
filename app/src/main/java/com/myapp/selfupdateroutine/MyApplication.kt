@@ -4,10 +4,12 @@ import android.app.Application
 import android.util.Log
 import androidx.room.Room
 import com.myapp.data.local.LocalReportRepositoryImp
+import com.myapp.domain.model.entity.Report
 import com.myapp.domain.repository.LocalReportRepository
 import com.myapp.domain.usecase.ReportUseCase
 import com.myapp.domain.usecase.ReportUseCaseImp
 import com.myapp.presentation.home.ui.home.HomeViewModel
+import com.myapp.presentation.home.ui.remenber.RemenberViewModel
 import com.myapp.presentation.home.ui.slideshow.SlideshowViewModel
 import com.myapp.selfupdateroutine.database.AppDatabase
 import kotlinx.coroutines.MainScope
@@ -47,6 +49,7 @@ class MyApplication : Application() {
     private val module: Module = module {
         viewModel { SlideshowViewModel(get()) }
         viewModel { HomeViewModel(get()) }
+        viewModel { (report: Report) -> RemenberViewModel(report) }
 
         // UseCase
         factory<ReportUseCase> { ReportUseCaseImp(get()) }

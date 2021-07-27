@@ -1,5 +1,7 @@
 package com.myapp.domain.model.entity
 
+import java.io.Serializable
+
 /**
  * レポート
  */
@@ -14,4 +16,4 @@ data class Report(
      * 感情日記
      */
     val emotionsReport: EmotionsReport
-)
+) : Serializable

@@ -9,7 +9,15 @@
         android:id="@+id/nav_home"
         android:name="com.myapp.presentation.home.ui.home.HomeFragment"
         android:label="@string/menu_home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_nav_home_to_nav_rememner"
+            app:destination="@id/nav_remember"
+            app:enterAnim="@anim/nav_slide_enter_anim"
+            app:exitAnim="@anim/nav_slide_exit_anim"
+            app:popEnterAnim="@anim/nav_slide_pop_enter_anim"
+            app:popExitAnim="@anim/nav_slide_pop_exit_anim" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_gallery"
@@ -22,4 +30,14 @@
         android:name="com.myapp.presentation.home.ui.slideshow.SlideshowFragment"
         android:label="@string/menu_slideshow"
         tools:layout="@layout/fragment_slideshow" />
+
+    <fragment
+        android:id="@+id/nav_remember"
+        android:name="com.myapp.presentation.home.ui.remenber.RememberFragment"
+        android:label="RememberFragment"
+        tools:layout="@layout/fragment_remenber">
+        <argument
+            android:name="report"
+            app:argType="com.myapp.domain.model.entity.Report" />
+    </fragment>
 </navigation>

@@ -1,11 +1,14 @@
 plugins {
     id 'com.android.library'
 }
+apply plugin: "androidx.navigation.safeargs.kotlin"
 
 dependencies {
     implementation 'com.google.android.material:material:1.4.0'
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.3.5'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.3.5'
+    // navigation
+    def navigation_version = "2.3.5"
+    implementation "androidx.navigation:navigation-fragment-ktx:$navigation_version"
+    implementation "androidx.navigation:navigation-ui-ktx:$navigation_version"
 
     def viewpager2_version = "1.1.0-alpha01"
     implementation "androidx.viewpager2:viewpager2:$viewpager2_version"
@@ -13,6 +16,9 @@ dependencies {
     implementation "com.xwray:groupie:$groupie_version"
     implementation "com.xwray:groupie-kotlin-android-extensions:$groupie_version"
     implementation "com.xwray:groupie-databinding:$groupie_version"
+
+    def calendarView_version = "1.7.0"
+    implementation "com.applandeo:material-calendar-view:$calendarView_version"
 
     implementation project(":domain")
 }

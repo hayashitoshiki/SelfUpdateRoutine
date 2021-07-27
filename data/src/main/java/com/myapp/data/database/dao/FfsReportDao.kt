@@ -14,7 +14,6 @@ interface FfsReportDao {
     @Insert
     suspend fun insert(ffsReportEntity: FfsReportEntity)
 
-
-    @Query("SELECT * FROM ffs_report WHERE id = :id")
-    suspend fun getReportById(id: Long): FfsReportEntity
+    @Query("SELECT * FROM ffs_report")
+    suspend fun getAll(): Array<FfsReportEntity>
 }

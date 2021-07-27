@@ -10,17 +10,12 @@ import kotlinx.coroutines.launch
 
 class HomeViewModel(private val reportUseCase: ReportUseCase) : ViewModel() {
 
-    private val _text = MutableLiveData<String>().apply {
-        value = "This is home Fragment"
-    }
-    val text: LiveData<String> = _text
-
-    private val _report = MutableLiveData<Report>()
-    val report: LiveData<Report> = _report
+    private val _report = MutableLiveData<List<Report>>()
+    val report: LiveData<List<Report>> = _report
 
     init {
         viewModelScope.launch {
-            _report.value = reportUseCase.getDetailReport()
+            _report.value = reportUseCase.getAllReport()
         }
     }
 

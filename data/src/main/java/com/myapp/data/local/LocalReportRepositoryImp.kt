@@ -1,5 +1,6 @@
 package com.myapp.data.local
 
+import android.util.Log
 import com.myapp.data.database.dao.EmotionReportDao
 import com.myapp.data.database.dao.FfsReportDao
 import com.myapp.domain.model.entity.Report
@@ -20,11 +21,24 @@ class LocalReportRepositoryImp(
     }
 
     // 全振り返り日記取得
-    override suspend fun getFirst(): Report {
-        val emotionsReportEntity = emotionReportDao.getReportById(1)
-        val ffsReportEntity = ffsReportDao.getReportById(1)
-        val emotionsReport = Converter.emotionsReportFromEmotionsReportEntity(emotionsReportEntity)
-        val ffsReport = Converter.ffsReportFromFfsReportEntity(ffsReportEntity)
-        return Report(ffsReport, emotionsReport)
+    override suspend fun getAllReport(): List<Report> {
+        Log.d("LocalReportRepositoryImp", "getAllReport")
+        val emotionsReportList = emotionReportDao.getAll()
+            .map {
+                Converter.emotionsReportFromEmotionsReportEntity(it)
+            }
+        val ffsReportList = ffsReportDao.getAll()
+            .map {
+                Converter.ffsReportFromFfsReportEntity(it)
+            }
+        val reportList = mutableListOf<Report>()
+        for (index in emotionsReportList.indices) {
+            if (ffsReportList.size > index) {
+                reportList.add(Report(ffsReportList[index], emotionsReportList[index]))
+            }
+        }
+        Log.d("LocalReportRepositoryImp", "return size = " + reportList.size)
+        return reportList
+
     }
 }

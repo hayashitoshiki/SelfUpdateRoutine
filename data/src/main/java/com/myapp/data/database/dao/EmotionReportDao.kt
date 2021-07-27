@@ -14,7 +14,6 @@ interface EmotionReportDao {
     @Insert
     suspend fun insert(emotionsReportEntity: EmotionsReportEntity)
 
-
-    @Query("SELECT * FROM emotion_report WHERE id = :id")
-    suspend fun getReportById(id: Long): EmotionsReportEntity
+    @Query("SELECT * FROM emotion_report")
+    suspend fun getAll(): Array<EmotionsReportEntity>
 }

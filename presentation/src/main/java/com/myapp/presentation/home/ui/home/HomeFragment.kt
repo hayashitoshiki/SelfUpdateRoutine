@@ -1,38 +1,29 @@
 package com.myapp.presentation.home.ui.home
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
+import androidx.navigation.NavDirections
+import androidx.navigation.fragment.findNavController
 import com.myapp.presentation.databinding.FragmentHomeBinding
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.util.*
 
 class HomeFragment : Fragment() {
 
-    private val homeViewModel: HomeViewModel by viewModel()
-    private var _binding: FragmentHomeBinding? = null
-
-    // This property is only valid between onCreateView and
-    // onDestroyView.
-    private val binding get() = _binding!!
+    private val viewModel: HomeViewModel by viewModel()
+    private lateinit var binding: FragmentHomeBinding
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
-        _binding = FragmentHomeBinding.inflate(inflater, container, false)
-        val root: View = binding.root
-
-        val textView: TextView = binding.textHome
-        homeViewModel.text.observe(viewLifecycleOwner, Observer {
-            textView.text = it
-        })
-        return root
+        binding = FragmentHomeBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(
@@ -41,25 +32,26 @@ class HomeFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
+        // TODO : 仮表示 詳細画面遷移
+        binding.calenderView.setOnDayClickListener {
+            Log.d("HomeFragment", "setOnDayClickListener")
+            val reportList = viewModel.report.value ?: return@setOnDayClickListener
+            var action: NavDirections? = null
+            val touchYear: Int = it.calendar.get(Calendar.YEAR)
+            val touchMonth: Int = it.calendar.get(Calendar.MONTH) + 1
+            val touchDay: Int = it.calendar.get(Calendar.DATE)
+            val touchDate = "%d/%02d/%d".format(touchYear, touchMonth, touchDay)
+            reportList.forEach { report ->
+                val reportDate = report.emotionsReport.dataTime.toSectionDate()
+                Log.d("HomeFragment", "touchDate = " + touchDate + ". reportDate = " + reportDate)
+                if (touchDate == reportDate) {
+                    Log.d("HomeFragment", "Date1 is equals Date2")
+                    action = HomeFragmentDirections.actionNavHomeToNavRememner(report)
+                }
+            }
+            if (action == null) return@setOnDayClickListener
+            findNavController().navigate(action!!)
 
-        // TODO : 仮表示
-        homeViewModel.report.observe(viewLifecycleOwner, {
-            val ffsReport = it.ffsReport
-            val emotionsReport = it.emotionsReport
-
-            binding.textView1.text = ffsReport.factComment
-            binding.textView2.text = ffsReport.findComment
-            binding.textView3.text = ffsReport.learnComment
-            binding.textView4.text = ffsReport.statementComment
-            binding.textView5.text = emotionsReport.heartScore.data.toString()
-            binding.textView6.text = emotionsReport.reasonComment
-            binding.textView7.text = emotionsReport.improveComment
-            binding.textView8.text = ffsReport.dataTime.toString()
-        })
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+        }
     }
 }
