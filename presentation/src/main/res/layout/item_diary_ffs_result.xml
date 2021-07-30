@@ -6,7 +6,7 @@
 
         <variable
             name="viewModel"
-            type="com.myapp.presentation.home.ui.slideshow.SlideshowViewModel" />
+            type="com.myapp.presentation.home.ui.diary.FfsResultViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -85,7 +85,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="@{viewModel.noticeInputText}"
+            android:text="@{viewModel.findInputText}"
             app:layout_constraintStart_toStartOf="@+id/txt_section1_2"
             app:layout_constraintTop_toBottomOf="@+id/txt_section1_2" />
 
@@ -152,6 +152,7 @@
             app:layout_constraintTop_toBottomOf="@+id/txt_section1_4" />
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_ok"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"

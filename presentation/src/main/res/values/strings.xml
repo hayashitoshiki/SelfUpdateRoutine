@@ -43,5 +43,6 @@
     <string name="title_answer_check">下記の内容でよろしいでしょうか？</string>
     <!-- ボタン -->
     <string name="btn_ok">確定</string>
+    <string name="btn_next">次へ</string>
 
 </resources>

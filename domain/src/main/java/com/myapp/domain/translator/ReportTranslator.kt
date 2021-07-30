@@ -2,9 +2,9 @@ package com.myapp.domain.translator
 
 import com.myapp.common.getDateTimeNow
 import com.myapp.domain.dto.AllReportInputDto
-import com.myapp.domain.model.entity.EmotionsReport
 import com.myapp.domain.model.entity.FfsReport
 import com.myapp.domain.model.entity.Report
+import com.myapp.domain.model.entity.WeatherReport
 import com.myapp.domain.model.value.HeartScore
 import com.myapp.domain.model.value.ReportDateTime
 
@@ -22,7 +22,7 @@ object ReportTranslator {
             datetime, allReportInputDto.factComment, allReportInputDto.findComment, allReportInputDto.learnComment,
             allReportInputDto.statementComment
         )
-        val emotionsReport = EmotionsReport(
+        val emotionsReport = WeatherReport(
             datetime, HeartScore(allReportInputDto.heartScore), allReportInputDto.reasonComment,
             allReportInputDto.improveComment
         )

@@ -10,7 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.myapp.presentation.databinding.FragmentGalleryBinding
-import com.myapp.presentation.home.ui.slideshow.DiaryActivity
+import com.myapp.presentation.home.ui.diary.DiaryActivity
 
 
 class GalleryFragment : Fragment() {

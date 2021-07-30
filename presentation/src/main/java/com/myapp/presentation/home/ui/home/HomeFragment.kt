@@ -42,7 +42,7 @@ class HomeFragment : Fragment() {
             val touchDay: Int = it.calendar.get(Calendar.DATE)
             val touchDate = "%d/%02d/%d".format(touchYear, touchMonth, touchDay)
             reportList.forEach { report ->
-                val reportDate = report.emotionsReport.dataTime.toSectionDate()
+                val reportDate = report.weatherReport.dataTime.toSectionDate()
                 Log.d("HomeFragment", "touchDate = " + touchDate + ". reportDate = " + reportDate)
                 if (touchDate == reportDate) {
                     Log.d("HomeFragment", "Date1 is equals Date2")

@@ -1,9 +1,9 @@
 package com.myapp.data.local
 
-import com.myapp.data.database.entity.EmotionsReportEntity
 import com.myapp.data.database.entity.FfsReportEntity
-import com.myapp.domain.model.entity.EmotionsReport
+import com.myapp.data.database.entity.WeatherReportEntity
 import com.myapp.domain.model.entity.FfsReport
+import com.myapp.domain.model.entity.WeatherReport
 import com.myapp.domain.model.value.HeartScore
 import com.myapp.domain.model.value.ReportDateTime
 
@@ -15,20 +15,20 @@ object Converter {
     /**
      * 感情日記オブジェクト -> 感情日記Entity
      */
-    fun emotionsReportEntityFromEmotionsReport(emotionsReport: EmotionsReport): EmotionsReportEntity {
-        return EmotionsReportEntity(
-            null, emotionsReport.heartScore.data, emotionsReport.reasonComment, emotionsReport.improveComment,
-            emotionsReport.dataTime.date
+    fun weatherReportEntityFromWeatherReport(weatherReport: WeatherReport): WeatherReportEntity {
+        return WeatherReportEntity(
+            null, weatherReport.heartScore.data, weatherReport.reasonComment, weatherReport.improveComment,
+            weatherReport.dataTime.date
         )
     }
 
     /**
      * 感情日記Entity -> 感情日記オブジェクト
      */
-    fun emotionsReportFromEmotionsReportEntity(emotionsReportEntity: EmotionsReportEntity): EmotionsReport {
-        return EmotionsReport(
-            ReportDateTime(emotionsReportEntity.createTime), HeartScore(emotionsReportEntity.heartScore),
-            emotionsReportEntity.reasonComment, emotionsReportEntity.improveComment
+    fun weatherReportFromWeatherReportEntity(weatherReportEntity: WeatherReportEntity): WeatherReport {
+        return WeatherReport(
+            ReportDateTime(weatherReportEntity.createTime), HeartScore(weatherReportEntity.heartScore),
+            weatherReportEntity.reasonComment, weatherReportEntity.improveComment
         )
     }
 

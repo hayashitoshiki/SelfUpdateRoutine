@@ -3,37 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/nav_home">
-
-    <fragment
-        android:id="@+id/nav_home"
-        android:name="com.myapp.presentation.home.ui.home.HomeFragment"
-        android:label="@string/menu_home"
-        tools:layout="@layout/fragment_home">
-        <action
-            android:id="@+id/action_nav_home_to_nav_rememner"
-            app:destination="@id/nav_remember"
-            app:enterAnim="@anim/nav_slide_enter_anim"
-            app:exitAnim="@anim/nav_slide_exit_anim"
-            app:popEnterAnim="@anim/nav_slide_pop_enter_anim"
-            app:popExitAnim="@anim/nav_slide_pop_exit_anim" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/nav_gallery"
-        android:name="com.myapp.presentation.home.ui.gallery.GalleryFragment"
-        android:label="@string/menu_gallery"
-        tools:layout="@layout/fragment_gallery" />
-
-    <fragment
-        android:id="@+id/nav_remember"
-        android:name="com.myapp.presentation.home.ui.remenber.RememberFragment"
-        android:label="RememberFragment"
-        tools:layout="@layout/fragment_remenber">
-        <argument
-            android:name="report"
-            app:argType="com.myapp.domain.model.entity.Report" />
-    </fragment>
+    app:startDestination="@+id/diaryFactItem">
 
     <fragment
         android:id="@+id/diaryFactItem"
@@ -66,14 +36,52 @@
         android:id="@+id/diaryStatementItem"
         android:name="com.myapp.presentation.home.ui.diary.FfsStatementFragment"
         android:label="DiaryStatementItem"
-        tools:layout="@layout/item_diary_text_input" />
+        tools:layout="@layout/item_diary_text_input">
+        <action
+            android:id="@+id/action_diaryStatementItem_to_diaryConfirmItem"
+            app:destination="@id/diaryConfirmItem" />
+    </fragment>
+    <fragment
+        android:id="@+id/diaryConfirmItem"
+        android:name="com.myapp.presentation.home.ui.diary.FfsResultFragment"
+        android:label="DiaryConfirmItem"
+        tools:layout="@layout/item_diary_ffs_result">
+        <action
+            android:id="@+id/action_diaryConfirmItem_to_diaryAssessmentItem"
+            app:destination="@id/diaryAssessmentItem" />
+    </fragment>
 
+    <fragment
+        android:id="@+id/diaryAssessmentItem"
+        android:name="com.myapp.presentation.home.ui.diary.WeatherAssessmentFragment"
+        android:label="DiaryAssessmentItem"
+        tools:layout="@layout/item_diary_number_input">
+        <action
+            android:id="@+id/action_diaryAssessmentItem_to_diaryReasonItem"
+            app:destination="@id/diaryReasonItem" />
+    </fragment>
     <fragment
         android:id="@+id/diaryReasonItem"
         android:name="com.myapp.presentation.home.ui.diary.WeatherReasonFragment"
-        android:label="DiaryReasonItem" />
+        android:label="DiaryReasonItem"
+        tools:layout="@layout/item_diary_text_input">
+        <action
+            android:id="@+id/action_diaryReasonItem_to_diaryActionItem"
+            app:destination="@id/diaryActionItem" />
+    </fragment>
     <fragment
         android:id="@+id/diaryActionItem"
         android:name="com.myapp.presentation.home.ui.diary.WeatherImproveItem"
-        android:label="DiaryActionItem" />
+        android:label="DiaryActionItem"
+        tools:layout="@layout/item_diary_text_input">
+        <action
+            android:id="@+id/action_diaryActionItem_to_diaryResultItem"
+            app:destination="@id/diaryResultItem" />
+    </fragment>
+    <fragment
+        android:id="@+id/diaryResultItem"
+        android:name="com.myapp.presentation.home.ui.diary.WeatherResultItem"
+        android:label="DiaryResultItem"
+        tools:layout="@layout/item_diary_weather_result" />
+
 </navigation>

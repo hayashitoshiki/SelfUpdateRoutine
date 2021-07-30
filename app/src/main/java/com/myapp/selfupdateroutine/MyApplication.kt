@@ -8,11 +8,10 @@ import com.myapp.domain.model.entity.Report
 import com.myapp.domain.repository.LocalReportRepository
 import com.myapp.domain.usecase.ReportUseCase
 import com.myapp.domain.usecase.ReportUseCaseImp
+import com.myapp.presentation.home.ui.diary.*
 import com.myapp.presentation.home.ui.home.HomeViewModel
 import com.myapp.presentation.home.ui.remenber.RemenberViewModel
-import com.myapp.presentation.home.ui.slideshow.SlideshowViewModel
 import com.myapp.selfupdateroutine.database.AppDatabase
-import kotlinx.coroutines.MainScope
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.GlobalContext.startKoin
@@ -26,9 +25,6 @@ class MyApplication : Application() {
         lateinit var database: AppDatabase
         const val TAG = "MyApplication"
     }
-
-    // Grovalp Scope
-    val applicationScope = MainScope()
 
     init {
         shared = this
@@ -47,7 +43,16 @@ class MyApplication : Application() {
 
     // Koinモジュール
     private val module: Module = module {
-        viewModel { SlideshowViewModel(get()) }
+        viewModel { FfsFactViewModel() }
+        viewModel { FfsFindViewModel() }
+        viewModel { FfsLearnViewModel() }
+        viewModel { FfsStatementViewModel() }
+        viewModel { FfsResultViewModel() }
+        viewModel { WeatherAssessmentViewModel() }
+        viewModel { WeatherReasonViewModel() }
+        viewModel { WeatherImproveViewModel() }
+        viewModel { WeatherResultViewModel(get()) }
+
         viewModel { HomeViewModel(get()) }
         viewModel { (report: Report) -> RemenberViewModel(report) }
 

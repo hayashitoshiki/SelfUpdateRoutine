@@ -21,7 +21,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.myapp.presentation.home.ui.slideshow.DiaryActivity"
+            android:name="com.myapp.presentation.home.ui.diary.DiaryActivity"
             android:label="@string/app_name"
             android:theme="@style/Theme.SelfUpdateRoutine.NoActionBar"></activity>
     </application>

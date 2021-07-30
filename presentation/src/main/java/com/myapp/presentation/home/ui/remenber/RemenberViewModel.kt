@@ -44,9 +44,9 @@ class RemenberViewModel(private val report: Report) : ViewModel() {
         _findComment.value = report.ffsReport.findComment
         _learnComment.value = report.ffsReport.learnComment
         _statementComment.value = report.ffsReport.statementComment
-        _heartScoreComment.value = report.emotionsReport.heartScore.data.toString()
-        _reasonComment.value = report.emotionsReport.reasonComment
-        _improveComment.value = report.emotionsReport.improveComment
+        _heartScoreComment.value = report.weatherReport.heartScore.data.toString()
+        _reasonComment.value = report.weatherReport.reasonComment
+        _improveComment.value = report.weatherReport.improveComment
         _date.value = report.ffsReport.dataTime.toSectionDate()
     }
 

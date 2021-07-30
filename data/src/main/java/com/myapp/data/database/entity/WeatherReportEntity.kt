@@ -9,7 +9,7 @@ import java.time.LocalDateTime
  * 感情日記_テーブル
  */
 @Entity(tableName = "emotion_report")
-data class EmotionsReportEntity(
+data class WeatherReportEntity(
 
     /**
      * ID

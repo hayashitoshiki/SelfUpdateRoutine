@@ -15,5 +15,5 @@ data class Report(
     /**
      * 感情日記
      */
-    val emotionsReport: EmotionsReport
+    val weatherReport: WeatherReport
 ) : Serializable

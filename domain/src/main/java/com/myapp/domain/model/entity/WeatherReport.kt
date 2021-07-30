@@ -6,7 +6,7 @@ import com.myapp.domain.model.value.ReportDateTime
 /**
  * 感情日記
  */
-class EmotionsReport(
+class WeatherReport(
     /**
      * 日付
      */
