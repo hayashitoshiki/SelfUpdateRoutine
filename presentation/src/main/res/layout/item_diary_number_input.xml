@@ -6,7 +6,7 @@
 
         <variable
             name="viewModel"
-            type="com.myapp.presentation.home.ui.diary.WeatherAssessmentViewModel" />
+            type="com.myapp.presentation.ui.diary.WeatherAssessmentViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

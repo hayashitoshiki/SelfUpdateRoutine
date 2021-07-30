@@ -8,15 +8,16 @@ import com.myapp.domain.model.entity.Report
 import com.myapp.domain.repository.LocalReportRepository
 import com.myapp.domain.usecase.ReportUseCase
 import com.myapp.domain.usecase.ReportUseCaseImp
-import com.myapp.presentation.home.ui.diary.*
-import com.myapp.presentation.home.ui.home.HomeViewModel
-import com.myapp.presentation.home.ui.remenber.RemenberViewModel
+import com.myapp.presentation.ui.diary.*
+import com.myapp.presentation.ui.home.HomeViewModel
+import com.myapp.presentation.ui.remenber.RemenberViewModel
 import com.myapp.selfupdateroutine.database.AppDatabase
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.GlobalContext.startKoin
 import org.koin.core.module.Module
 import org.koin.dsl.module
+import timber.log.Timber
 
 class MyApplication : Application() {
 
@@ -39,6 +40,14 @@ class MyApplication : Application() {
         }
         database = Room.databaseBuilder(applicationContext, AppDatabase::class.java, "app_database")
             .build()
+        configureTimber()
+    }
+
+    // Timber設定
+    private fun configureTimber() {
+        if (BuildConfig.DEBUG) {
+            Timber.plant(Timber.DebugTree())
+        }
     }
 
     // Koinモジュール

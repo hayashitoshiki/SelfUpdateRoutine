@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/nav_home"
-        android:name="com.myapp.presentation.home.ui.home.HomeFragment"
+        android:name="com.myapp.presentation.ui.home.HomeFragment"
         android:label="@string/menu_home"
         tools:layout="@layout/fragment_home">
         <action
@@ -21,13 +21,13 @@
 
     <fragment
         android:id="@+id/nav_gallery"
-        android:name="com.myapp.presentation.home.ui.gallery.GalleryFragment"
+        android:name="com.myapp.presentation.ui.gallery.GalleryFragment"
         android:label="@string/menu_gallery"
         tools:layout="@layout/fragment_gallery" />
 
     <fragment
         android:id="@+id/nav_remember"
-        android:name="com.myapp.presentation.home.ui.remenber.RememberFragment"
+        android:name="com.myapp.presentation.ui.remenber.RememberFragment"
         android:label="RememberFragment"
         tools:layout="@layout/fragment_remenber">
         <argument
@@ -37,7 +37,7 @@
 
     <fragment
         android:id="@+id/diaryFactItem"
-        android:name="com.myapp.presentation.home.ui.diary.FfsFactFragment"
+        android:name="com.myapp.presentation.ui.diary.FfsFactFragment"
         android:label="DiaryFactItem"
         tools:layout="@layout/item_diary_text_input">
         <action
@@ -46,7 +46,7 @@
     </fragment>
     <fragment
         android:id="@+id/diaryFindItem"
-        android:name="com.myapp.presentation.home.ui.diary.FfsFindFragment"
+        android:name="com.myapp.presentation.ui.diary.FfsFindFragment"
         android:label="DiaryFindItem"
         tools:layout="@layout/item_diary_text_input">
         <action
@@ -55,7 +55,7 @@
     </fragment>
     <fragment
         android:id="@+id/diaryLessonItem"
-        android:name="com.myapp.presentation.home.ui.diary.FfsLearnFragment"
+        android:name="com.myapp.presentation.ui.diary.FfsLearnFragment"
         android:label="DiaryLessonItem"
         tools:layout="@layout/item_diary_text_input">
         <action
@@ -64,16 +64,16 @@
     </fragment>
     <fragment
         android:id="@+id/diaryStatementItem"
-        android:name="com.myapp.presentation.home.ui.diary.FfsStatementFragment"
+        android:name="com.myapp.presentation.ui.diary.FfsStatementFragment"
         android:label="DiaryStatementItem"
         tools:layout="@layout/item_diary_text_input" />
 
     <fragment
         android:id="@+id/diaryReasonItem"
-        android:name="com.myapp.presentation.home.ui.diary.WeatherReasonFragment"
+        android:name="com.myapp.presentation.ui.diary.WeatherReasonFragment"
         android:label="DiaryReasonItem" />
     <fragment
         android:id="@+id/diaryActionItem"
-        android:name="com.myapp.presentation.home.ui.diary.WeatherImproveItem"
+        android:name="com.myapp.presentation.ui.diary.WeatherImproveItem"
         android:label="DiaryActionItem" />
 </navigation>

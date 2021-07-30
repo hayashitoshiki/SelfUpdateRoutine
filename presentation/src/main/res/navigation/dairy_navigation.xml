@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/diaryFactItem"
-        android:name="com.myapp.presentation.home.ui.diary.FfsFactFragment"
+        android:name="com.myapp.presentation.ui.diary.FfsFactFragment"
         android:label="DiaryFactItem"
         tools:layout="@layout/item_diary_text_input">
         <action
@@ -16,7 +16,7 @@
     </fragment>
     <fragment
         android:id="@+id/diaryFindItem"
-        android:name="com.myapp.presentation.home.ui.diary.FfsFindFragment"
+        android:name="com.myapp.presentation.ui.diary.FfsFindFragment"
         android:label="DiaryFindItem"
         tools:layout="@layout/item_diary_text_input">
         <action
@@ -25,7 +25,7 @@
     </fragment>
     <fragment
         android:id="@+id/diaryLessonItem"
-        android:name="com.myapp.presentation.home.ui.diary.FfsLearnFragment"
+        android:name="com.myapp.presentation.ui.diary.FfsLearnFragment"
         android:label="DiaryLessonItem"
         tools:layout="@layout/item_diary_text_input">
         <action
@@ -34,7 +34,7 @@
     </fragment>
     <fragment
         android:id="@+id/diaryStatementItem"
-        android:name="com.myapp.presentation.home.ui.diary.FfsStatementFragment"
+        android:name="com.myapp.presentation.ui.diary.FfsStatementFragment"
         android:label="DiaryStatementItem"
         tools:layout="@layout/item_diary_text_input">
         <action
@@ -43,7 +43,7 @@
     </fragment>
     <fragment
         android:id="@+id/diaryConfirmItem"
-        android:name="com.myapp.presentation.home.ui.diary.FfsResultFragment"
+        android:name="com.myapp.presentation.ui.diary.FfsResultFragment"
         android:label="DiaryConfirmItem"
         tools:layout="@layout/item_diary_ffs_result">
         <action
@@ -53,7 +53,7 @@
 
     <fragment
         android:id="@+id/diaryAssessmentItem"
-        android:name="com.myapp.presentation.home.ui.diary.WeatherAssessmentFragment"
+        android:name="com.myapp.presentation.ui.diary.WeatherAssessmentFragment"
         android:label="DiaryAssessmentItem"
         tools:layout="@layout/item_diary_number_input">
         <action
@@ -62,7 +62,7 @@
     </fragment>
     <fragment
         android:id="@+id/diaryReasonItem"
-        android:name="com.myapp.presentation.home.ui.diary.WeatherReasonFragment"
+        android:name="com.myapp.presentation.ui.diary.WeatherReasonFragment"
         android:label="DiaryReasonItem"
         tools:layout="@layout/item_diary_text_input">
         <action
@@ -71,7 +71,7 @@
     </fragment>
     <fragment
         android:id="@+id/diaryActionItem"
-        android:name="com.myapp.presentation.home.ui.diary.WeatherImproveItem"
+        android:name="com.myapp.presentation.ui.diary.WeatherImproveItem"
         android:label="DiaryActionItem"
         tools:layout="@layout/item_diary_text_input">
         <action
@@ -80,7 +80,7 @@
     </fragment>
     <fragment
         android:id="@+id/diaryResultItem"
-        android:name="com.myapp.presentation.home.ui.diary.WeatherResultItem"
+        android:name="com.myapp.presentation.ui.diary.WeatherResultItem"
         android:label="DiaryResultItem"
         tools:layout="@layout/item_diary_weather_result" />
 

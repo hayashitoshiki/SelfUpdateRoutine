@@ -6,7 +6,7 @@
 
         <variable
             name="viewModel"
-            type="com.myapp.presentation.home.ui.diary.FfsResultViewModel" />
+            type="com.myapp.presentation.ui.diary.FfsResultViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
