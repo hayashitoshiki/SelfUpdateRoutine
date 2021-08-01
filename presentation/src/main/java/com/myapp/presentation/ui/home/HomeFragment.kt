@@ -5,12 +5,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.myapp.domain.model.entity.Report
 import com.myapp.presentation.databinding.FragmentHomeBinding
 import com.myapp.presentation.ui.diary.DiaryActivity
+import com.myapp.presentation.utill.BaseFragment
 import com.myapp.presentation.utill.Status
 import com.myapp.presentation.utill.img
 import com.xwray.groupie.GroupAdapter
@@ -21,7 +21,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 /**
  * ホーム画面
  */
-class HomeFragment : Fragment() {
+class HomeFragment : BaseFragment() {
 
     private val viewModel: HomeViewModel by viewModel()
     private lateinit var binding: FragmentHomeBinding

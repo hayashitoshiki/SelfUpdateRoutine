@@ -5,10 +5,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import com.myapp.presentation.R
 import com.myapp.presentation.databinding.FragmentRemenberBinding
+import com.myapp.presentation.utill.BaseFragment
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
@@ -16,7 +16,7 @@ import org.koin.core.parameter.parametersOf
 /**
  * 設定画面
  */
-class RememberFragment : Fragment() {
+class RememberFragment : BaseFragment() {
 
     private lateinit var binding: FragmentRemenberBinding
 

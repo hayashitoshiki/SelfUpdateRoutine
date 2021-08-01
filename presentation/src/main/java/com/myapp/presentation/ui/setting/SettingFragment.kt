@@ -9,12 +9,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.myapp.common.getDateTimeNow
 import com.myapp.presentation.R
 import com.myapp.presentation.databinding.FragmentSettingBinding
 import com.myapp.presentation.ui.diary.AlarmNotificationReceiver
+import com.myapp.presentation.utill.BaseFragment
 import com.myapp.presentation.utill.Status
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.time.LocalDateTime
@@ -24,7 +24,7 @@ import java.util.*
 /**
  * 設定画面
  */
-class SettingFragment : Fragment() {
+class SettingFragment : BaseFragment() {
 
 
     private lateinit var binding: FragmentSettingBinding
