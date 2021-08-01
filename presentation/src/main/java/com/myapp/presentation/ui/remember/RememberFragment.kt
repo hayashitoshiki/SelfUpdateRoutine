@@ -16,12 +16,12 @@ import org.koin.core.parameter.parametersOf
 /**
  * 設定画面
  */
-class SettingFragment : Fragment() {
+class RememberFragment : Fragment() {
 
     private lateinit var binding: FragmentRemenberBinding
 
-    private val args: SettingFragmentArgs by navArgs()
-    val viewModel: SettingViewModel by inject { parametersOf(args.report) }
+    private val args: RememberFragmentArgs by navArgs()
+    val viewModel: RememberViewModel by inject { parametersOf(args.report) }
 
 
     override fun onCreateView(

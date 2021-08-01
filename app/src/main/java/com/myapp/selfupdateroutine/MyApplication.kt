@@ -4,14 +4,22 @@ import android.app.Application
 import android.util.Log
 import androidx.room.Room
 import com.myapp.data.local.LocalReportRepositoryImp
+import com.myapp.data.local.LocalSettingRepositoryImp
+import com.myapp.data.local.preferences.UserSharedPreferences
 import com.myapp.domain.model.entity.Report
 import com.myapp.domain.repository.LocalReportRepository
+import com.myapp.domain.repository.LocalSettingRepository
 import com.myapp.domain.usecase.ReportUseCase
 import com.myapp.domain.usecase.ReportUseCaseImp
+import com.myapp.domain.usecase.SettingUseCase
+import com.myapp.domain.usecase.SettingUseCaseImp
 import com.myapp.presentation.ui.diary.*
 import com.myapp.presentation.ui.home.HomeViewModel
 import com.myapp.presentation.ui.remember.RememberViewModel
+import com.myapp.presentation.ui.setting.SettingViewModel
 import com.myapp.selfupdateroutine.database.AppDatabase
+import com.myapp.selfupdateroutine.preferences.PreferenceManager
+import com.myapp.selfupdateroutine.preferences.UserSharedPreferencesImp
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.GlobalContext.startKoin
@@ -52,7 +60,7 @@ class MyApplication : Application() {
 
     // Koinモジュール
     private val module: Module = module {
-        viewModel { FfsFactViewModel() }
+        viewModel { FfsFactViewModel(get()) }
         viewModel { FfsFindViewModel() }
         viewModel { FfsLearnViewModel() }
         viewModel { FfsStatementViewModel() }
@@ -63,12 +71,18 @@ class MyApplication : Application() {
         viewModel { WeatherResultViewModel(get()) }
 
         viewModel { HomeViewModel(get()) }
+        viewModel { SettingViewModel(get()) }
         viewModel { (report: Report) -> RememberViewModel(report) }
 
         // UseCase
         factory<ReportUseCase> { ReportUseCaseImp(get()) }
+        factory<SettingUseCase> { SettingUseCaseImp(get()) }
 
         // Repository
         factory<LocalReportRepository> { LocalReportRepositoryImp(database.emotionReportDao(), database.ffsReportDao()) }
+        factory<LocalSettingRepository> { LocalSettingRepositoryImp(get()) }
+        factory<UserSharedPreferences> { UserSharedPreferencesImp(get()) }
+        single { PreferenceManager(applicationContext) }
+
     }
 }

@@ -6,7 +6,7 @@
 
         <variable
             name="viewModel"
-            type="com.myapp.presentation.ui.remenber.RemenberViewModel" />
+            type="com.myapp.presentation.ui.remember.RememberViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

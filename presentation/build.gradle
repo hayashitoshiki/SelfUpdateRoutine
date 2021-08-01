@@ -21,4 +21,5 @@ dependencies {
     implementation "com.applandeo:material-calendar-view:$calendarView_version"
 
     implementation project(":domain")
+    implementation project(":common")
 }

@@ -1,7 +1,7 @@
 package com.myapp.data.local
 
-import com.myapp.data.database.dao.FfsReportDao
-import com.myapp.data.database.dao.WeatherReportDao
+import com.myapp.data.local.database.dao.FfsReportDao
+import com.myapp.data.local.database.dao.WeatherReportDao
 import com.myapp.domain.model.entity.Report
 import com.myapp.domain.repository.LocalReportRepository
 

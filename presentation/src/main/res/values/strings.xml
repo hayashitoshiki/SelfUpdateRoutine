@@ -8,8 +8,7 @@
     <string name="action_settings">Settings</string>
 
     <string name="menu_home">Home</string>
-    <string name="menu_gallery">Gallery</string>
-    <string name="menu_slideshow">Slideshow</string>
+    <string name="menu_setting">設定</string>
 
     <!-- セクション -->
     <string name="title_report_ffs">４行日記</string>
@@ -30,6 +29,12 @@
     <string name="title_item_assessment">【評価】\n今日はどんな天気でしたか？</string>
     <string name="title_item_reason">【理由】\nそれは何故ですか？</string>
     <string name="title_item_action">【改善】\nどうしたら明日はもっと天気がよくなりますか？</string>
+
+    <!-- サブタイトル -->
+    <string name="title_sub_setting">変更前の時間</string>
+
+    <!-- その他 -->
+    <string name="txt_time_punctuation">：</string>
 
     <!-- 説明 -->
     <string name="question_fact">何がありましたか？</string>

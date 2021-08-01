@@ -42,10 +42,11 @@ class FfsFactFragment : DiaryBaseFragment() {
         )
         val calendar: Calendar = Calendar.getInstance()
             .apply {
+                val date = viewModel.setAlarmDate()
                 this.add(Calendar.DAY_OF_MONTH, 1)
-                this.set(Calendar.HOUR_OF_DAY, 22)
-                this.set(Calendar.MINUTE, 0)
-                this.set(Calendar.SECOND, 0)
+                this.set(Calendar.HOUR_OF_DAY, date.hour)
+                this.set(Calendar.MINUTE, date.minute)
+                this.set(Calendar.SECOND, date.second)
             }
         alarmManager.setExactAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent

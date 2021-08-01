@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.myapp.domain.model.entity.Report
 
-class SettingViewModel(private val report: Report) : ViewModel() {
+class RememberViewModel(private val report: Report) : ViewModel() {
 
     // 事実
     private val _factComment = MutableLiveData("")

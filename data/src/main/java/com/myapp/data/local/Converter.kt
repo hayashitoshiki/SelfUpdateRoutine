@@ -1,7 +1,7 @@
 package com.myapp.data.local
 
-import com.myapp.data.database.entity.FfsReportEntity
-import com.myapp.data.database.entity.WeatherReportEntity
+import com.myapp.data.local.database.entity.FfsReportEntity
+import com.myapp.data.local.database.entity.WeatherReportEntity
 import com.myapp.domain.model.entity.FfsReport
 import com.myapp.domain.model.entity.WeatherReport
 import com.myapp.domain.model.value.HeartScore

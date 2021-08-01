@@ -4,10 +4,10 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.myapp.chatmemo.database.DataBaseConverter
-import com.myapp.data.database.dao.FfsReportDao
-import com.myapp.data.database.dao.WeatherReportDao
-import com.myapp.data.database.entity.FfsReportEntity
-import com.myapp.data.database.entity.WeatherReportEntity
+import com.myapp.data.local.database.dao.FfsReportDao
+import com.myapp.data.local.database.dao.WeatherReportDao
+import com.myapp.data.local.database.entity.FfsReportEntity
+import com.myapp.data.local.database.entity.WeatherReportEntity
 
 /**
  * DB定義
