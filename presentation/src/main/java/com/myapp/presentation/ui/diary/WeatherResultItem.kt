@@ -1,5 +1,6 @@
 package com.myapp.presentation.ui.diary
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,12 +9,14 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import com.myapp.presentation.R
 import com.myapp.presentation.databinding.ItemDiaryWeatherResultBinding
+import com.myapp.presentation.ui.MainActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.coroutines.CoroutineContext
+
 
 /**
  * 振り返り_天気比喩振り返り確認画面
@@ -38,6 +41,8 @@ class WeatherResultItem : Fragment(), CoroutineScope {
                 launch {
                     viewModel.saveReport()
                 }.join()
+                val intent = Intent(context, MainActivity::class.java)
+                startActivity(intent)
                 requireActivity().finish()
             }
         }

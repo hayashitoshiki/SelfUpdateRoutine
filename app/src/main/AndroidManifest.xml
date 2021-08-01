@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.myapp.selfupdateroutine">
 
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+
     <application
         android:name="com.myapp.selfupdateroutine.MyApplication"
         android:allowBackup="true"
@@ -24,6 +26,10 @@
             android:name="com.myapp.presentation.ui.diary.DiaryActivity"
             android:label="@string/app_name"
             android:theme="@style/Theme.SelfUpdateRoutine.NoActionBar"></activity>
+
+        <receiver
+            android:name="com.myapp.presentation.ui.diary.AlarmNotificationReceiver"
+            android:exported="false" />
     </application>
 
 </manifest>

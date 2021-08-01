@@ -1,4 +1,4 @@
-package com.myapp.presentation.ui.remenber
+package com.myapp.presentation.ui.remember
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,12 +13,15 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
 
-class RememberFragment : Fragment() {
+/**
+ * 設定画面
+ */
+class SettingFragment : Fragment() {
 
     private lateinit var binding: FragmentRemenberBinding
 
-    private val args: RememberFragmentArgs by navArgs()
-    val viewModel: RemenberViewModel by inject { parametersOf(args.report) }
+    private val args: SettingFragmentArgs by navArgs()
+    val viewModel: SettingViewModel by inject { parametersOf(args.report) }
 
 
     override fun onCreateView(

@@ -10,7 +10,7 @@ import com.myapp.domain.usecase.ReportUseCase
 import com.myapp.domain.usecase.ReportUseCaseImp
 import com.myapp.presentation.ui.diary.*
 import com.myapp.presentation.ui.home.HomeViewModel
-import com.myapp.presentation.ui.remenber.RemenberViewModel
+import com.myapp.presentation.ui.remember.RememberViewModel
 import com.myapp.selfupdateroutine.database.AppDatabase
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -63,7 +63,7 @@ class MyApplication : Application() {
         viewModel { WeatherResultViewModel(get()) }
 
         viewModel { HomeViewModel(get()) }
-        viewModel { (report: Report) -> RemenberViewModel(report) }
+        viewModel { (report: Report) -> RememberViewModel(report) }
 
         // UseCase
         factory<ReportUseCase> { ReportUseCaseImp(get()) }
