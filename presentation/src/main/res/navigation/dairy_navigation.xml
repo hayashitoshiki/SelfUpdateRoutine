@@ -71,7 +71,7 @@
     </fragment>
     <fragment
         android:id="@+id/diaryActionItem"
-        android:name="com.myapp.presentation.ui.diary.WeatherImproveItem"
+        android:name="com.myapp.presentation.ui.diary.WeatherImproveFragment"
         android:label="DiaryActionItem"
         tools:layout="@layout/item_diary_text_input">
         <action
@@ -80,7 +80,7 @@
     </fragment>
     <fragment
         android:id="@+id/diaryResultItem"
-        android:name="com.myapp.presentation.ui.diary.WeatherResultItem"
+        android:name="com.myapp.presentation.ui.diary.WeatherResultFragment"
         android:label="DiaryResultItem"
         tools:layout="@layout/item_diary_weather_result" />
 

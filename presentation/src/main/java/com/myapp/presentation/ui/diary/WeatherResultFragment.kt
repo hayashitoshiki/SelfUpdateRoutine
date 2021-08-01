@@ -21,7 +21,7 @@ import kotlin.coroutines.CoroutineContext
 /**
  * 振り返り_天気比喩振り返り確認画面
  */
-class WeatherResultItem : Fragment(), CoroutineScope {
+class WeatherResultFragment : Fragment(), CoroutineScope {
 
     private val job = SupervisorJob()
     override val coroutineContext: CoroutineContext = Dispatchers.Main + job

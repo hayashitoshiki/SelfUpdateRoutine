@@ -4,7 +4,6 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.myapp.presentation.R
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.take
@@ -23,7 +22,7 @@ class WeatherAssessmentViewModel : DiaryBaseViewModel() {
             .take(1)
             .launchIn(viewModelScope)
         assessmentValue.observeForever {
-            GlobalScope.launch {
+            viewModelScope.launch {
                 DiaryDispatcher.changeAssessment(it)
             }
 

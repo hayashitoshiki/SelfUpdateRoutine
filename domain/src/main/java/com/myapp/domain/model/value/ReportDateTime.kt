@@ -24,6 +24,17 @@ data class ReportDateTime(val date: LocalDateTime) {
             .substring(0, 10)
     }
 
+    /**
+     * カード表示用の日時文字列を返す
+     * @return MM月dd日
+     */
+    fun toMdDate(): String {
+        val systemDateTime = LocalDateTime.ofInstant(date.toInstant(ZoneOffset.UTC), ZoneId.systemDefault())
+        val df = DateTimeFormatter.ofPattern("M月d日")
+        return df.format(systemDateTime)
+    }
+
+
     // 日付取得
     @SuppressLint("SimpleDateFormat")
     private fun getDataNow(): String {

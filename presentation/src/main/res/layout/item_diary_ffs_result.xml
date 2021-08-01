@@ -74,7 +74,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:text="@string/question_discover"
+            android:text="@string/question_find"
             android:textColor="@color/text_color_dark_primary"
             android:textStyle="bold"
             app:layout_constraintStart_toEndOf="@+id/txt_section1_2"
@@ -105,7 +105,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:text="@string/question_lesson"
+            android:text="@string/question_learn"
             android:textColor="@color/text_color_dark_primary"
             android:textStyle="bold"
             app:layout_constraintStart_toEndOf="@+id/txt_section1_3"
@@ -136,7 +136,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:text="@string/question_declaration"
+            android:text="@string/question_statement"
             android:textColor="@color/text_color_dark_primary"
             android:textStyle="bold"
             app:layout_constraintStart_toEndOf="@+id/txt_section1_4"
@@ -160,7 +160,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/txt_answer4" />
-
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

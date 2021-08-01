@@ -22,6 +22,13 @@
     <string name="section2_3">Q7</string>
 
     <!-- タイトル -->
+    <string name="title_item_short_fact">【事実】</string>
+    <string name="title_item_short_find">【発見】</string>
+    <string name="title_item_short_learn">【教訓】</string>
+    <string name="title_item_short_statement">【宣言】</string>
+    <string name="title_item_short_assessment">【天気】</string>
+    <string name="title_item_short_reason">【理由】</string>
+    <string name="title_item_short_improve">【改善】</string>
     <string name="title_item_fact">【事実】\n何がありましたか？</string>
     <string name="title_item_discover">【発見】\nどんな気づきがありましたか？</string>
     <string name="title_item_leson">【教訓】\nどんな学びがありましたか？</string>
@@ -29,6 +36,8 @@
     <string name="title_item_assessment">【評価】\n今日はどんな天気でしたか？</string>
     <string name="title_item_reason">【理由】\nそれは何故ですか？</string>
     <string name="title_item_action">【改善】\nどうしたら明日はもっと天気がよくなりますか？</string>
+    <string name="title_answer_check">下記の内容でよろしいでしょうか？</string>
+    <string name="title_daly_card">今日の振り返り</string>
 
     <!-- サブタイトル -->
     <string name="title_sub_setting">変更前の時間</string>
@@ -38,16 +47,20 @@
 
     <!-- 説明 -->
     <string name="question_fact">何がありましたか？</string>
-    <string name="question_discover">どんな気づきがありましたか？</string>
-    <string name="question_lesson">どんな学びがありましたか？</string>
-    <string name="question_declaration">これらに基づいてどんな人間ですか？</string>
+    <string name="question_find">どんな気づきがありましたか？</string>
+    <string name="question_learn">どんな学びがありましたか？</string>
+    <string name="question_statement">これらに基づいてどんな人間ですか？</string>
     <string name="question_assessment">今日はどんな天気でしたか？</string>
     <string name="question_reason">それは何故ですか？</string>
-    <string name="question_action">どうしたら明日はもっと天気がよくなりますか？</string>
+    <string name="question_improve">どうしたら明日はもっと天気がよくなりますか？</string>
 
-    <string name="title_answer_check">下記の内容でよろしいでしょうか？</string>
     <!-- ボタン -->
     <string name="btn_ok">確定</string>
     <string name="btn_next">次へ</string>
+    <string name="bth_daly_input">日記入力へ</string>
+    <!-- ラジオボタン -->
+    <string name="radio_btn_daly_diary">今日の日記</string>
+
+    <string name="txt_no_daly_diary">まだ今日の日記が入力されていません。</string>
 
 </resources>

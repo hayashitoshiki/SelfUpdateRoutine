@@ -2,7 +2,6 @@ package com.myapp.presentation.ui.diary
 
 import androidx.lifecycle.viewModelScope
 import com.myapp.domain.usecase.SettingUseCase
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.take
@@ -19,7 +18,7 @@ class FfsFactViewModel(private val settingUseCase: SettingUseCase) : DiaryBaseVi
             .take(1)
             .launchIn(viewModelScope)
         inputText.observeForever {
-            GlobalScope.launch {
+            viewModelScope.launch {
                 DiaryDispatcher.changeFact(it)
             }
         }

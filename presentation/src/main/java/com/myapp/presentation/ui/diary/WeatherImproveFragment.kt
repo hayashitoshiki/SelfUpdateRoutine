@@ -9,7 +9,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 /**
  * 振り返り_改善案画面
  */
-class WeatherImproveItem : DiaryBaseFragment() {
+class WeatherImproveFragment : DiaryBaseFragment() {
 
     override val viewModel: WeatherImproveViewModel by viewModel()
 

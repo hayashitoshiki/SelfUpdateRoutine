@@ -19,6 +19,8 @@ dependencies {
 
     def calendarView_version = "1.7.0"
     implementation "com.applandeo:material-calendar-view:$calendarView_version"
+    def cardView_version = "1.0.0"
+    implementation "androidx.cardview:cardview:$cardView_version"
 
     implementation project(":domain")
     implementation project(":common")

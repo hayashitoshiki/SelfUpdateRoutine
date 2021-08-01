@@ -74,6 +74,6 @@
         android:label="DiaryReasonItem" />
     <fragment
         android:id="@+id/diaryActionItem"
-        android:name="com.myapp.presentation.ui.diary.WeatherImproveItem"
+        android:name="com.myapp.presentation.ui.diary.WeatherImproveFragment"
         android:label="DiaryActionItem" />
 </navigation>
