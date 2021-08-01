@@ -9,7 +9,7 @@
 ・デイリー閲覧URL表示機能
 
 ## 言語
-Kotli
+Kotlin
 
 ## アーキテクチャ
 MVVM(+ 一部Fluxもどき) + Clean Architecture
