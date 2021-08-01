@@ -24,6 +24,10 @@ class HomeViewModel(private val reportUseCase: ReportUseCase) : ViewModel() {
     init {
         viewModelScope.launch {
             _report.value = reportUseCase.getAllReport()
+            if (_report.value == null || _report.value!!.isEmpty()) {
+                _dalyReport.value = Status.Failure(IllegalAccessError("今日のデータが登録されていません。"))
+                return@launch
+            }
             val report = _report.value?.last()
             if (report != null && report.ffsReport.dataTime.date.isToday()) {
                 _dalyReport.value = Status.Success(report)
