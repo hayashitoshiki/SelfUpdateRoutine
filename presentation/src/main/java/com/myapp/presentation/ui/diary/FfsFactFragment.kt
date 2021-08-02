@@ -26,6 +26,7 @@ class FfsFactFragment : DiaryBaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.txtSection.text = requireContext().getString(R.string.section1_1)
         binding.txtTitle.text = requireContext().getString(R.string.title_item_fact)
+        binding.edtInput.hint = requireContext().getString(R.string.hint_item_fact)
         binding.btnOk.setOnClickListener {
             setAlarm()
             findNavController().navigate(R.id.action_diaryFactItem_to_diaryFindItem)

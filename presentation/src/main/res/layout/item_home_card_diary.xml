@@ -25,8 +25,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="8dp"
                 android:text="@{viewModel.report.ffsReport.dataTime.toMdDate()}"
+                android:textSize="@dimen/sub_title_text"
+                android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -34,18 +36,20 @@
                 android:id="@+id/img"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
+                android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 app:imageResource="@{viewModel.heartScoreImg}"
-                app:layout_constraintStart_toStartOf="@+id/txt_date"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/txt_date" />
 
             <TextView
                 android:id="@+id/txt_title_statement"
-                android:text="@string/title_item_short_statement"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
-                app:layout_constraintStart_toStartOf="@+id/img"
+                android:text="@string/title_item_short_statement"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/img" />
 
             <TextView

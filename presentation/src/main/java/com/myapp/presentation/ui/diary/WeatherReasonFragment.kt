@@ -20,6 +20,7 @@ class WeatherReasonFragment : DiaryBaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.txtSection.text = requireContext().getString(R.string.section2_2)
         binding.txtTitle.text = requireContext().getString(R.string.title_item_reason)
+        binding.edtInput.hint = requireContext().getString(R.string.hint_item_reason)
         binding.btnOk.setOnClickListener {
             findNavController().navigate(R.id.action_diaryReasonItem_to_diaryActionItem)
         }

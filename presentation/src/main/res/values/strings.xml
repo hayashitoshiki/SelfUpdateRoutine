@@ -30,14 +30,22 @@
     <string name="title_item_short_reason">【理由】</string>
     <string name="title_item_short_improve">【改善】</string>
     <string name="title_item_fact">【事実】\n何がありましたか？</string>
-    <string name="title_item_discover">【発見】\nどんな気づきがありましたか？</string>
-    <string name="title_item_leson">【教訓】\nどんな学びがありましたか？</string>
+    <string name="title_item_find">【発見】\nどんな気づきがありましたか？</string>
+    <string name="title_item_learn">【教訓】\nどんな学びがありましたか？</string>
     <string name="title_item_declaration">【宣言】\nこれらに基づいてどんな人間ですか？</string>
     <string name="title_item_assessment">【評価】\n今日はどんな天気でしたか？</string>
     <string name="title_item_reason">【理由】\nそれは何故ですか？</string>
     <string name="title_item_action">【改善】\nどうしたら明日はもっと天気がよくなりますか？</string>
     <string name="title_answer_check">下記の内容でよろしいでしょうか？</string>
     <string name="title_daly_card">今日の振り返り</string>
+
+    <!-- ヒント文言 -->
+    <string name="hint_item_fact">例）綺麗な夕焼けを見た</string>
+    <string name="hint_item_find">例）出会いは意識と運がもたらす</string>
+    <string name="hint_item_learn">例）運は自ら引き寄せるものだ</string>
+    <string name="hint_item_statement">例）私は、大望をかなえている野心家です</string>
+    <string name="hint_item_reason">例）なかなかタスクが進まなかった</string>
+    <string name="hint_item_improve">例）優先順位を考える</string>
 
     <!-- サブタイトル -->
     <string name="title_sub_setting">変更前の時間</string>

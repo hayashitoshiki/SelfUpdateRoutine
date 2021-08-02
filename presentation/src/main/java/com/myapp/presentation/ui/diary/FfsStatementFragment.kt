@@ -20,6 +20,7 @@ class FfsStatementFragment : DiaryBaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.txtSection.text = requireContext().getString(R.string.section1_4)
         binding.txtTitle.text = requireContext().getString(R.string.title_item_declaration)
+        binding.edtInput.hint = requireContext().getString(R.string.hint_item_statement)
         binding.btnOk.setOnClickListener {
             findNavController().navigate(R.id.action_diaryStatementItem_to_diaryConfirmItem)
         }

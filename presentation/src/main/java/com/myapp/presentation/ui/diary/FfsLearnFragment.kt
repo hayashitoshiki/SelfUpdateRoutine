@@ -19,7 +19,8 @@ class FfsLearnFragment : DiaryBaseFragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
         binding.txtSection.text = requireContext().getString(R.string.section1_3)
-        binding.txtTitle.text = requireContext().getString(R.string.title_item_leson)
+        binding.txtTitle.text = requireContext().getString(R.string.title_item_learn)
+        binding.edtInput.hint = requireContext().getString(R.string.hint_item_learn)
         binding.btnOk.setOnClickListener {
             findNavController().navigate(R.id.action_diaryLessonItem_to_diaryStatementItem)
         }

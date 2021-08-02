@@ -51,10 +51,12 @@
 
         <TextView
             android:id="@+id/txt_answer5"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
             android:text="@{viewModel.assessmentInputText}"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/txt_section2_1"
             app:layout_constraintTop_toBottomOf="@+id/txt_section2_1" />
 
@@ -82,10 +84,12 @@
 
         <TextView
             android:id="@+id/txt_answer6"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
             android:text="@{viewModel.reasonInputText}"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/txt_section2_2"
             app:layout_constraintTop_toBottomOf="@+id/txt_section2_2" />
 
@@ -113,10 +117,12 @@
 
         <TextView
             android:id="@+id/txt_answer7"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
             android:text="@{viewModel.improveInputText}"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/txt_section2_3"
             app:layout_constraintTop_toBottomOf="@+id/txt_section2_3" />
 
