@@ -9,10 +9,10 @@
 ・デイリー閲覧URL表示機能
 
 ## 言語
-Kotli
+Kotlin
 
 ## アーキテクチャ
-MVVM(+一部Fluxもどき) + Clean Architecture
+MVVM(+ 一部Fluxもどき) + Clean Architecture
 
 ## 主な使用技術
  #### ネイティブ(ライブラリ)
@@ -46,10 +46,10 @@ https://github.com/hayashitoshiki/SelfUpdateRoutine/tree/master/app/src/main
 https://github.com/hayashitoshiki/SelfUpdateRoutine/tree/master/presentation/src/main
 
 #### 業務ロジック(domain)
-https://github.com/hayashitoshiki/SelfUpdateRoutine/tree/master/domain/src/main/java/com/myapp/chatmemo/domain
+https://github.com/hayashitoshiki/SelfUpdateRoutine/tree/master/domain/src/main/java/com/myapp/domain
 
 #### データアクセス(data)
-https://github.com/hayashitoshiki/SelfUpdateRoutine/tree/master/data/src/main/java/com/myapp/chatmemo/data
+https://github.com/hayashitoshiki/SelfUpdateRoutine/tree/master/data/src/main/java/com/myapp/data
 
 #### 共通処理(commone)
 https://github.com/hayashitoshiki/SelfUpdateRoutine/tree/master/common/src/main/java/com/myapp/common
