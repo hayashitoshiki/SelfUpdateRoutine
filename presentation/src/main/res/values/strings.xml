@@ -7,8 +7,10 @@
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
 
-    <string name="menu_home">Home</string>
+    <!-- メニュー -->
+    <string name="menu_home">ホーム</string>
     <string name="menu_setting">設定</string>
+    <string name="menu_remember">詳細</string>
 
     <!-- セクション -->
     <string name="title_report_ffs">４行日記</string>
@@ -60,7 +62,7 @@
     <string name="question_statement">これらに基づいてどんな人間ですか？</string>
     <string name="question_assessment">今日はどんな天気でしたか？</string>
     <string name="question_reason">それは何故ですか？</string>
-    <string name="question_improve">どうしたら明日はもっと天気がよくなりますか？</string>
+    <string name="question_improve">どうしたら明日は晴れますか？</string>
 
     <!-- ボタン -->
     <string name="btn_ok">確定</string>

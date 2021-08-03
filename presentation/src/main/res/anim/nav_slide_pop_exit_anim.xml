@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <set xmlns:android="http://schemas.android.com/apk/res/android">
-    <translate
-        android:duration="@integer/config_navAnimTime"
-        android:fromXDelta="0"
-        android:interpolator="@android:anim/accelerate_interpolator"
-        android:toXDelta="50%p" />
+    <rotate
+        android:duration="@android:integer/config_shortAnimTime"
+        android:toDegrees="30"
+        android:interpolator="@android:anim/decelerate_interpolator"
+        android:pivotX="50%"
+        android:pivotY="90%"
+        android:fromDegrees="0" />
     <alpha
-        android:duration="@integer/config_navAnimTime"
+        android:duration="@android:integer/config_shortAnimTime"
         android:fromAlpha="1.0"
         android:toAlpha="0.0" />
 </set>

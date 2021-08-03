@@ -28,52 +28,11 @@
     <fragment
         android:id="@+id/nav_remember"
         android:name="com.myapp.presentation.ui.remember.RememberFragment"
-        android:label="RememberFragment"
+        android:label="@string/menu_remember"
         tools:layout="@layout/fragment_remenber">
         <argument
             android:name="report"
             app:argType="com.myapp.domain.model.entity.Report" />
     </fragment>
 
-    <fragment
-        android:id="@+id/diaryFactItem"
-        android:name="com.myapp.presentation.ui.diary.FfsFactFragment"
-        android:label="DiaryFactItem"
-        tools:layout="@layout/item_diary_text_input">
-        <action
-            android:id="@+id/action_diaryFactItem_to_diaryFindItem"
-            app:destination="@id/diaryFindItem" />
-    </fragment>
-    <fragment
-        android:id="@+id/diaryFindItem"
-        android:name="com.myapp.presentation.ui.diary.FfsFindFragment"
-        android:label="DiaryFindItem"
-        tools:layout="@layout/item_diary_text_input">
-        <action
-            android:id="@+id/action_diaryFindItem_to_diaryLessonItem"
-            app:destination="@id/diaryLessonItem" />
-    </fragment>
-    <fragment
-        android:id="@+id/diaryLessonItem"
-        android:name="com.myapp.presentation.ui.diary.FfsLearnFragment"
-        android:label="DiaryLessonItem"
-        tools:layout="@layout/item_diary_text_input">
-        <action
-            android:id="@+id/action_diaryLessonItem_to_diaryStatementItem"
-            app:destination="@id/diaryStatementItem" />
-    </fragment>
-    <fragment
-        android:id="@+id/diaryStatementItem"
-        android:name="com.myapp.presentation.ui.diary.FfsStatementFragment"
-        android:label="DiaryStatementItem"
-        tools:layout="@layout/item_diary_text_input" />
-
-    <fragment
-        android:id="@+id/diaryReasonItem"
-        android:name="com.myapp.presentation.ui.diary.WeatherReasonFragment"
-        android:label="DiaryReasonItem" />
-    <fragment
-        android:id="@+id/diaryActionItem"
-        android:name="com.myapp.presentation.ui.diary.WeatherImproveFragment"
-        android:label="DiaryActionItem" />
 </navigation>
