@@ -71,6 +71,6 @@
     <!-- ラジオボタン -->
     <string name="radio_btn_daly_diary">今日の日記</string>
 
-    <string name="txt_no_daly_diary">まだ今日の日記が入力されていません。</string>
+    <string name="txt_no_daly_diary">今日の日記が入力されていません。</string>
 
 </resources>

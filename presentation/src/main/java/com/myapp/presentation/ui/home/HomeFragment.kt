@@ -69,7 +69,7 @@ class HomeFragment : BaseFragment() {
                     findNavController().navigate(action)
                 }
             }
-            val item = DiaryCardItem(viewModel, lister)
+            val item = DiaryCardItem(viewModel, viewLifecycleOwner, lister)
             items.add(item)
         }
         binding.listDiary.adapter = adapter
