@@ -60,7 +60,7 @@ class MyApplication : Application() {
 
     // Koinモジュール
     private val module: Module = module {
-        viewModel { FfsFactViewModel(get()) }
+        viewModel { FfsFactViewModel() }
         viewModel { FfsFindViewModel() }
         viewModel { FfsLearnViewModel() }
         viewModel { FfsStatementViewModel() }

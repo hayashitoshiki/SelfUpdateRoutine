@@ -1,15 +1,10 @@
 package com.myapp.presentation.ui.diary
 
-import android.app.AlarmManager
-import android.app.PendingIntent
-import android.content.Context.ALARM_SERVICE
-import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.navigation.fragment.findNavController
 import com.myapp.presentation.R
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.util.*
 
 
 /**
@@ -28,29 +23,7 @@ class FfsFactFragment : DiaryBaseFragment() {
         binding.txtTitle.text = requireContext().getString(R.string.title_item_fact)
         binding.edtInput.hint = requireContext().getString(R.string.hint_item_fact)
         binding.btnOk.setOnClickListener {
-            setAlarm()
             findNavController().navigate(R.id.action_diaryFactItem_to_diaryFindItem)
         }
-    }
-
-
-    // 通知バーアラーム表示設定(次の日の設定)
-    private fun setAlarm() {
-        val alarmManager = requireActivity().getSystemService(ALARM_SERVICE) as AlarmManager
-        val intent = Intent(context, AlarmNotificationReceiver::class.java)
-        val pendingIntent = PendingIntent.getBroadcast(
-            context, AlarmNotificationReceiver.NOTIFICATION_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT
-        )
-        val calendar: Calendar = Calendar.getInstance()
-            .apply {
-                val date = viewModel.setAlarmDate()
-                this.add(Calendar.DAY_OF_MONTH, 1)
-                this.set(Calendar.HOUR_OF_DAY, date.hour)
-                this.set(Calendar.MINUTE, date.minute)
-                this.set(Calendar.SECOND, date.second)
-            }
-        alarmManager.setExactAndAllowWhileIdle(
-            AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent
-        )
     }
 }

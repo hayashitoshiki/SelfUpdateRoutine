@@ -1,5 +1,6 @@
 package com.myapp.presentation.ui.diary
 
+import android.app.AlarmManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -8,14 +9,19 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Build
-import android.util.Log
 import androidx.core.app.NotificationCompat
+import com.myapp.domain.usecase.SettingUseCase
 import com.myapp.presentation.R
+import org.koin.java.KoinJavaComponent.inject
+import timber.log.Timber
+import java.util.*
 
 /**
  * 通知バー表示
  */
 class AlarmNotificationReceiver : BroadcastReceiver() {
+
+    private val settingUseCase by inject<SettingUseCase>(SettingUseCase::class.java)
 
     companion object {
         const val TAG = "AlarmReceiver"
@@ -29,13 +35,15 @@ class AlarmNotificationReceiver : BroadcastReceiver() {
         context: Context,
         intent: Intent
     ) {
-        Log.d(TAG, "Received intent : $intent")
+        Timber.tag(TAG)
+            .d("Received intent : $intent")
         notificationManager = context.getSystemService(
             Context.NOTIFICATION_SERVICE
         ) as NotificationManager
 
         createNotificationChannel()
         deliverNotification(context)
+        setNextAlarm(context)
     }
 
     // 通史表示
@@ -77,5 +85,25 @@ class AlarmNotificationReceiver : BroadcastReceiver() {
                 notificationChannel
             )
         }
+    }
+
+    // 次の日にアラーム設定
+    private fun setNextAlarm(context: Context) {
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(context, AlarmNotificationReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(
+            context, NOTIFICATION_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT
+        )
+        val calendar: Calendar = Calendar.getInstance()
+            .apply {
+                val date = settingUseCase.getAlarmDate()
+                this.add(Calendar.DAY_OF_MONTH, 1)
+                this.set(Calendar.HOUR_OF_DAY, date.hour)
+                this.set(Calendar.MINUTE, date.minute)
+                this.set(Calendar.SECOND, date.second)
+            }
+        alarmManager.setExactAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent
+        )
     }
 }
