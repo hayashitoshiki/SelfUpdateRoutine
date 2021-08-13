@@ -1,12 +1,12 @@
 package com.myapp.domain.translator
 
-import com.myapp.common.getDateTimeNow
 import com.myapp.domain.dto.AllReportInputDto
 import com.myapp.domain.model.entity.FfsReport
 import com.myapp.domain.model.entity.Report
 import com.myapp.domain.model.entity.WeatherReport
 import com.myapp.domain.model.value.HeartScore
 import com.myapp.domain.model.value.ReportDateTime
+import java.time.LocalDateTime
 
 /**
  * Dto -> DomainModel コンバーター
@@ -17,7 +17,7 @@ object ReportTranslator {
      * 振り返り日記Dto -> 振り返り日記オブジェクト
      */
     fun allReportConvert(allReportInputDto: AllReportInputDto): Report {
-        val datetime = ReportDateTime(getDateTimeNow())
+        val datetime = ReportDateTime(LocalDateTime.now())
         val ffsReport = FfsReport(
             datetime, allReportInputDto.factComment, allReportInputDto.findComment, allReportInputDto.learnComment,
             allReportInputDto.statementComment

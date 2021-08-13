@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
+
+        <import type="com.myapp.domain.model.value.AlarmMode" />
 
         <variable
             name="viewModel"
             type="com.myapp.presentation.ui.setting.SettingViewModel" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:tools="http://schemas.android.com/tools"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".ui.setting.SettingFragment">
@@ -88,6 +91,41 @@
             app:layout_constraintStart_toEndOf="@+id/textView3"
             app:layout_constraintTop_toTopOf="@+id/np_minutes" />
 
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_radio_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/np_minutes">
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/radioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="@{viewModel.alarmMode.equals(AlarmMode.NORMAL)}"
+                android:onClick="@{()->viewModel.setAlarmMode(AlarmMode.NORMAL)}"
+                android:text="中"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0" />
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:checked="@{viewModel.alarmMode.equals(AlarmMode.HARD)}"
+                android:onClick="@{()->viewModel.setAlarmMode(AlarmMode.HARD)}"
+                android:text="高"
+                app:layout_constraintBottom_toBottomOf="@+id/radioButton"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/radioButton"
+                app:layout_constraintTop_toTopOf="@+id/radioButton" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_ok"
             android:layout_width="wrap_content"
@@ -96,7 +134,7 @@
             android:text="@string/btn_ok"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/np_minutes" />
+            app:layout_constraintTop_toBottomOf="@+id/layout_radio_button" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

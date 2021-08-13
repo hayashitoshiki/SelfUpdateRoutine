@@ -17,6 +17,31 @@ public class PreferenceManager {
     }
 
     /**
+     * Int型格納
+     *
+     * @param key   キー
+     * @param value 格納する値
+     */
+    protected void setInt(PreferenceKey.IntKey key, int value) {
+        SharedPreferences preferences = context.getSharedPreferences("selfUpdateRoutine", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt(key.name(), value);
+        editor.apply();
+    }
+
+    /**
+     * Int型取得
+     *
+     * @param key キー
+     * @return キーに紐づくInt型オブジェクト
+     */
+    protected int getInt(PreferenceKey.IntKey key) {
+        int defaultValue = 0;
+        SharedPreferences preferences = context.getSharedPreferences("selfUpdateRoutine", Context.MODE_PRIVATE);
+        return preferences.getInt(key.name(), defaultValue);
+    }
+
+    /**
      * Long型格納
      *
      * @param key   キー
@@ -33,7 +58,7 @@ public class PreferenceManager {
      * Long型取得
      *
      * @param key キー
-     * @return キーに紐づくString型オブジェクト
+     * @return キーに紐づくLong型オブジェクト
      */
     protected long getLong(PreferenceKey.LongKey key) {
         long defaultValue = 0L;

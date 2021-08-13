@@ -9,10 +9,7 @@ import com.myapp.data.local.preferences.UserSharedPreferences
 import com.myapp.domain.model.entity.Report
 import com.myapp.domain.repository.LocalReportRepository
 import com.myapp.domain.repository.LocalSettingRepository
-import com.myapp.domain.usecase.ReportUseCase
-import com.myapp.domain.usecase.ReportUseCaseImp
-import com.myapp.domain.usecase.SettingUseCase
-import com.myapp.domain.usecase.SettingUseCaseImp
+import com.myapp.domain.usecase.*
 import com.myapp.presentation.ui.diary.*
 import com.myapp.presentation.ui.home.HomeViewModel
 import com.myapp.presentation.ui.remember.RememberViewModel
@@ -75,8 +72,9 @@ class MyApplication : Application() {
         viewModel { (report: Report) -> RememberViewModel(report) }
 
         // UseCase
-        factory<ReportUseCase> { ReportUseCaseImp(get()) }
+        factory<ReportUseCase> { ReportUseCaseImp(get(), get()) }
         factory<SettingUseCase> { SettingUseCaseImp(get()) }
+        factory<AlarmNotificationUseCase> { AlarmNotificationUseCaseImp(get()) }
 
         // Repository
         factory<LocalReportRepository> { LocalReportRepositoryImp(database.emotionReportDao(), database.ffsReportDao()) }

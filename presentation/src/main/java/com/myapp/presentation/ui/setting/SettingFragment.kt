@@ -10,7 +10,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.fragment.findNavController
-import com.myapp.common.getDateTimeNow
 import com.myapp.presentation.R
 import com.myapp.presentation.databinding.FragmentSettingBinding
 import com.myapp.presentation.ui.diary.AlarmNotificationReceiver
@@ -18,7 +17,7 @@ import com.myapp.presentation.utill.BaseFragment
 import com.myapp.presentation.utill.Status
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.time.LocalDateTime
-import java.util.*
+import java.time.OffsetDateTime
 
 
 /**
@@ -92,19 +91,10 @@ class SettingFragment : BaseFragment() {
         val pendingIntent = PendingIntent.getBroadcast(
             context, AlarmNotificationReceiver.NOTIFICATION_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT
         )
-        val calendar: Calendar = Calendar.getInstance()
-            .apply {
-                val now = getDateTimeNow()
-                if (!date.isAfter(now)) {
-                    this.add(Calendar.DAY_OF_MONTH, 1)
-                }
-                this.set(Calendar.HOUR_OF_DAY, date.hour)
-                this.set(Calendar.MINUTE, date.minute)
-                this.set(Calendar.SECOND, date.second)
-            }
-        alarmManager.setExactAndAllowWhileIdle(
-            AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent
-        )
+        val alarmTimeMilli = date.toEpochSecond(OffsetDateTime.now().offset) * 1000
+        val clockInfo = AlarmManager.AlarmClockInfo(alarmTimeMilli, null)
+        alarmManager.setAlarmClock(clockInfo, pendingIntent)
+
         findNavController().popBackStack()
     }
 
