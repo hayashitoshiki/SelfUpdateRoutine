@@ -18,4 +18,14 @@ interface AlarmNotificationUseCase {
      * @return 次回通知バーを出す時間
      */
     fun getNextAlarmDateTime(): LocalDateTime
+
+    /**
+     * 通知表示するか判定
+     *
+     * アラーム通知時刻になった時、
+     * ・既に振り返りレポートが登録されていたら通知しない
+     * ・まだ登録されていなかったら通知する
+     * @return 通知するかの判定結果
+     */
+    fun checkAlarmNotificationEnable(): Boolean
 }

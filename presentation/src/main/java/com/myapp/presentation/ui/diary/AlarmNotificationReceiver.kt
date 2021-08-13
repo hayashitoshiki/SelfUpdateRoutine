@@ -24,7 +24,6 @@ class AlarmNotificationReceiver : BroadcastReceiver() {
     private val alarmNotificationUseCase by inject<AlarmNotificationUseCase>(AlarmNotificationUseCase::class.java)
 
     companion object {
-        const val TAG = "AlarmReceiver"
         const val NOTIFICATION_ID = 0
         const val CHANNEL_ID = "primary_notification_channel"
         const val CHANNEL_NAME = "Stand up notification"
@@ -36,12 +35,14 @@ class AlarmNotificationReceiver : BroadcastReceiver() {
         context: Context,
         intent: Intent
     ) {
-        Timber.tag(TAG)
-            .d("Received intent : $intent")
+        Timber.tag(this.javaClass.simpleName)
+            .d("通知バー用BroadcastReceiver実行")
         notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        createNotificationChannel()
-        deliverNotification(context)
+        if (alarmNotificationUseCase.checkAlarmNotificationEnable()) {
+            createNotificationChannel()
+            deliverNotification(context)
+        }
         setNextAlarm(context)
     }
 
