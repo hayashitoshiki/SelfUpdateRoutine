@@ -1,6 +1,7 @@
 package com.myapp.presentation.utill
 
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import com.myapp.domain.model.value.HeartScore
 import com.myapp.presentation.R
 
@@ -14,4 +15,15 @@ val HeartScore.img: Int
         in 61..80 -> R.drawable.ic_cloudy_and_sunny_96dp
         in 81..100 -> R.drawable.ic_sunny_96dp
         else -> R.drawable.ic_cloudy_96dp
+    }
+
+@get: StringRes
+val HeartScore.text: Int
+    get() = when (this.data) {
+        in 0..20 -> R.string.weather_rain
+        in 21..40 -> R.string.weather_rain_and_cloudy
+        in 41..60 -> R.string.weather_cloudy
+        in 61..80 -> R.string.weather_cloudy_and_sunny
+        in 81..100 -> R.string.weather_sunny
+        else -> R.string.weather_cloudy
     }

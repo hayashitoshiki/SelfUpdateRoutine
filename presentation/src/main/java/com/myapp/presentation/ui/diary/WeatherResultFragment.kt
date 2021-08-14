@@ -5,26 +5,22 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import com.myapp.presentation.R
 import com.myapp.presentation.databinding.ItemDiaryWeatherResultBinding
 import com.myapp.presentation.ui.MainActivity
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
+import com.myapp.presentation.utill.Status
+import es.dmoral.toasty.Toasty
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import kotlin.coroutines.CoroutineContext
 
 
 /**
  * 振り返り_天気比喩振り返り確認画面
  */
-class WeatherResultFragment : Fragment(), CoroutineScope {
+class WeatherResultFragment : Fragment() {
 
-    private val job = SupervisorJob()
-    override val coroutineContext: CoroutineContext = Dispatchers.Main + job
     private lateinit var binding: ItemDiaryWeatherResultBinding
     private val viewModel: WeatherResultViewModel by viewModel()
 
@@ -36,17 +32,45 @@ class WeatherResultFragment : Fragment(), CoroutineScope {
         binding = DataBindingUtil.inflate(inflater, R.layout.item_diary_weather_result, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
-        binding.btnOk.setOnClickListener {
-            launch {
-                launch {
-                    viewModel.saveReport()
-                }.join()
-                val intent = Intent(context, MainActivity::class.java)
-                startActivity(intent)
-                requireActivity().finish()
-            }
-        }
         return binding.root
     }
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?
+    ) {
+        super.onViewCreated(view, savedInstanceState)
+
+        viewModel.saveState.observe(viewLifecycleOwner, { onStateChanged(it) })
+
+        binding.btnOk.setOnClickListener {
+            viewModel.saveReport()
+        }
+    }
+
+    // 保存State変更通知
+    private fun onStateChanged(state: Status<*>) = when (state) {
+        is Status.Loading -> {
+        }
+        is Status.Success -> {
+            backMainActivity()
+        }
+        is Status.Failure -> {
+            Toasty.error(requireContext(), state.throwable.message!!, Toast.LENGTH_SHORT, true)
+                .show()
+        }
+        is Status.Non -> {
+        }
+    }
+
+    // メイン画面へ戻る
+    private fun backMainActivity() {
+        Toasty.success(requireContext(), "日記を保存しました！", Toast.LENGTH_SHORT, true)
+            .show()
+        val intent = Intent(context, MainActivity::class.java)
+        startActivity(intent)
+        requireActivity().finish()
+    }
+
 
 }

@@ -3,6 +3,7 @@ package com.myapp.presentation.ui.diary
 import androidx.lifecycle.*
 import com.myapp.domain.dto.AllReportInputDto
 import com.myapp.domain.usecase.ReportUseCase
+import com.myapp.presentation.utill.Status
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -50,6 +51,10 @@ class WeatherResultViewModel(private val reportUseCase: ReportUseCase) : ViewMod
     private val _improveInputText = MutableLiveData("")
     val improveInputText: LiveData<String> = _improveInputText
 
+    // 保存アクション結果
+    private val _saveState = MutableLiveData<Status<*>>()
+    val saveState: LiveData<Status<*>> = _saveState
+
     init {
         DiaryDispatcher.factTextFlow.onEach { _factInputText.value = it }
             .launchIn(viewModelScope)
@@ -69,18 +74,40 @@ class WeatherResultViewModel(private val reportUseCase: ReportUseCase) : ViewMod
 
     // 振り返り日記登録
     fun saveReport() {
-        val section11 = factInputText.value ?: return
-        val section12 = findInputText.value ?: return
-        val section13 = learnInputText.value ?: return
-        val section14 = statementInputText.value ?: return
-        val section21 = assessmentInputInt.value ?: return
-        val section22 = reasonInputText.value ?: return
-        val section23 = improveInputText.value ?: return
+        val section11 = factInputText.value ?: run {
+            _saveState.value = Status.Failure(IllegalAccessError("事実データが入っていません"))
+            return
+        }
+        val section12 = findInputText.value ?: run {
+            _saveState.value = Status.Failure(IllegalAccessError("発見データが入っていません"))
+            return
+        }
+        val section13 = learnInputText.value ?: run {
+            _saveState.value = Status.Failure(IllegalAccessError("学びデータが入っていません"))
+            return
+        }
+        val section14 = statementInputText.value ?: run {
+            _saveState.value = Status.Failure(IllegalAccessError("宣言データが入っていません"))
+            return
+        }
+        val section21 = assessmentInputInt.value ?: run {
+            _saveState.value = Status.Failure(IllegalAccessError("評価データが入っていません"))
+            return
+        }
+        val section22 = reasonInputText.value ?: run {
+            _saveState.value = Status.Failure(IllegalAccessError("理由データが入っていません"))
+            return
+        }
+        val section23 = improveInputText.value ?: run {
+            _saveState.value = Status.Failure(IllegalAccessError("改善データが入っていません"))
+            return
+        }
         val allReportInputDto = AllReportInputDto(
             section11, section12, section13, section14, section21, section22, section23
         )
         viewModelScope.launch {
             reportUseCase.saveReport(allReportInputDto)
+            _saveState.value = Status.Success(null)
         }
     }
 

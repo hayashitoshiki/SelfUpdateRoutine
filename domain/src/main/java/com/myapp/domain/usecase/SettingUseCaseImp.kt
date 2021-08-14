@@ -3,6 +3,7 @@ package com.myapp.domain.usecase
 import com.myapp.domain.dto.NextAlarmTimeInputDto
 import com.myapp.domain.model.value.AlarmMode
 import com.myapp.domain.repository.LocalSettingRepository
+import timber.log.Timber
 import java.time.LocalDateTime
 import java.time.LocalTime
 
@@ -28,7 +29,15 @@ class SettingUseCaseImp(private val localSettingRepository: LocalSettingReposito
         val nowDateTime = LocalDateTime.now()
         val nowDate = nowDateTime.toLocalDate()
         var nextAlertTime = nowDateTime.with(LocalTime.of(dto.hour, dto.minute, dto.second))
-        if (nextAlertTime.isAfter(nowDateTime) && !lastSaveDate.isEqual(nowDate)) {
+        Timber.tag(this.javaClass.simpleName)
+            .d("*******************")
+        Timber.tag(this.javaClass.simpleName)
+            .d("アラーム登録日時= %s", lastSaveDate)
+        Timber.tag(this.javaClass.simpleName)
+            .d("アラーム登録日時= %s", nowDate)
+        Timber.tag(this.javaClass.simpleName)
+            .d("*******************")
+        if ((nextAlertTime.isAfter(nowDateTime) && lastSaveDate.isEqual(nowDate)) || nextAlertTime.isBefore(nowDateTime)) {
             nextAlertTime = nextAlertTime.plusDays(1)
         }
         localSettingRepository.saveAlarmDate(nextAlertTime)

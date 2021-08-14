@@ -16,6 +16,8 @@ dependencies {
     implementation "com.xwray:groupie:$groupie_version"
     implementation "com.xwray:groupie-kotlin-android-extensions:$groupie_version"
     implementation "com.xwray:groupie-databinding:$groupie_version"
+    def toasty_version = "1.5.0"
+    implementation "com.github.GrenderG:Toasty:$toasty_version"
 
     def calendarView_version = "1.7.0"
     implementation "com.applandeo:material-calendar-view:$calendarView_version"

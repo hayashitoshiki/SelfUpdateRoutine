@@ -64,6 +64,13 @@
     <string name="question_reason">それは何故ですか？</string>
     <string name="question_improve">どうしたら明日は晴れますか？</string>
 
+    <!-- 天気の種類 -->
+    <string name="weather_rain">雨</string>
+    <string name="weather_rain_and_cloudy">雨時々曇り</string>
+    <string name="weather_cloudy">曇り</string>
+    <string name="weather_cloudy_and_sunny">曇り時々晴れ</string>
+    <string name="weather_sunny">晴れ</string>
+
     <!-- ボタン -->
     <string name="btn_ok">確定</string>
     <string name="btn_next">次へ</string>

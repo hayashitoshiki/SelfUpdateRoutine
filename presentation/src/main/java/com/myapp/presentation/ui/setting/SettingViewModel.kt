@@ -47,10 +47,22 @@ class SettingViewModel(private val settingUseCase: SettingUseCase) : ViewModel()
 
     // 時間更新
     fun updateDate() {
-        val hour = hourDate.value ?: return
-        val minute = minutesDate.value ?: return
-        val second = secondsDate.value ?: return
-        val mode = alarmMode.value ?: return
+        val hour = hourDate.value ?: run {
+            _updateState.value = Status.Failure(IllegalAccessError("時間データが入っていません"))
+            return
+        }
+        val minute = minutesDate.value ?: run {
+            _updateState.value = Status.Failure(IllegalAccessError("分データが入っていません"))
+            return
+        }
+        val second = secondsDate.value ?: run {
+            _updateState.value = Status.Failure(IllegalAccessError("秒データが入っていません"))
+            return
+        }
+        val mode = alarmMode.value ?: run {
+            _updateState.value = Status.Failure(IllegalAccessError("アラートモードデータが入っていません"))
+            return
+        }
         val nextAlarmTimeInputDto = NextAlarmTimeInputDto(hour, minute, second, mode)
         val date = settingUseCase.updateAlarmDate(nextAlarmTimeInputDto)
         _updateState.value = Status.Success(date)
