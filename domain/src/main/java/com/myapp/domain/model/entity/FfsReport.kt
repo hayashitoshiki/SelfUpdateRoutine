@@ -5,7 +5,7 @@ import com.myapp.domain.model.value.ReportDateTime
 /**
  * FFS式４行日記
  */
-class FfsReport(
+data class FfsReport(
     /**
      * 日付
      */

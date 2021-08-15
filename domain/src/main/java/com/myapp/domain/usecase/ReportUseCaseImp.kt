@@ -9,13 +9,13 @@ import com.myapp.domain.translator.ReportTranslator
 // 今日の振り返り機能
 class ReportUseCaseImp(
     private val localReportRepository: LocalReportRepository,
-    private val localSettingReportRepository: LocalSettingRepository
+    private val localSettingRepository: LocalSettingRepository
 ) : ReportUseCase {
 
     // 振り返り日記を登録する
     override suspend fun saveReport(allReportInputDto: AllReportInputDto) {
         val report = ReportTranslator.allReportConvert(allReportInputDto)
-        localSettingReportRepository.setLastReportSaveDateTime(report.ffsReport.dataTime.date)
+        localSettingRepository.setLastReportSaveDateTime(report.ffsReport.dataTime.date)
         localReportRepository.saveReport(report)
     }
 
