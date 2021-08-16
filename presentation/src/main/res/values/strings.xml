@@ -11,6 +11,7 @@
     <string name="menu_home">ホーム</string>
     <string name="menu_setting">設定</string>
     <string name="menu_remember">詳細</string>
+    <string name="menu_constitution_list">ミッションステートメント</string>
 
     <!-- セクション -->
     <string name="title_report_ffs">４行日記</string>
@@ -52,8 +53,13 @@
     <!-- サブタイトル -->
     <string name="title_sub_setting">変更前の時間</string>
 
+    <string name="title_sub_dai">理想の葬儀</string>
+    <string name="title_sub_mission_statement">人生の目標</string>
+    <string name="title_sub_constitution">憲法</string>
+
     <!-- その他 -->
     <string name="txt_time_punctuation">：</string>
+    <string name="list_disc">・</string>
 
     <!-- 説明 -->
     <string name="question_fact">何がありましたか？</string>

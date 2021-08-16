@@ -10,6 +10,7 @@ import com.myapp.domain.model.entity.Report
 import com.myapp.domain.repository.LocalReportRepository
 import com.myapp.domain.repository.LocalSettingRepository
 import com.myapp.domain.usecase.*
+import com.myapp.presentation.ui.constitution.ConstitutionListViewModel
 import com.myapp.presentation.ui.diary.*
 import com.myapp.presentation.ui.home.HomeViewModel
 import com.myapp.presentation.ui.remember.RememberViewModel
@@ -66,6 +67,8 @@ class MyApplication : Application() {
         viewModel { WeatherReasonViewModel() }
         viewModel { WeatherImproveViewModel() }
         viewModel { WeatherResultViewModel(get()) }
+        viewModel { ConstitutionListViewModel(get()) }
+
 
         viewModel { HomeViewModel(get()) }
         viewModel { SettingViewModel(get()) }
@@ -75,6 +78,7 @@ class MyApplication : Application() {
         factory<ReportUseCase> { ReportUseCaseImp(get(), get()) }
         factory<SettingUseCase> { SettingUseCaseImp(get()) }
         factory<AlarmNotificationUseCase> { AlarmNotificationUseCaseImp(get()) }
+        factory<MissionStatementUseCase> { MissionStatementUseCaseImp() }
 
         // Repository
         factory<LocalReportRepository> { LocalReportRepositoryImp(database.emotionReportDao(), database.ffsReportDao()) }
