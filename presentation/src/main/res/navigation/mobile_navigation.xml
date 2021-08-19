@@ -36,8 +36,22 @@
     </fragment>
     <fragment
         android:id="@+id/nav_constitution"
-        android:name="com.myapp.presentation.ui.constitution.ConstitutionListFragment"
+        android:name="com.myapp.presentation.ui.mission_statement.MissionStatementListFragment"
         android:label="@string/menu_constitution_list"
-        tools:layout="@layout/fragment_constitution_list" />
+        tools:layout="@layout/fragment_mission_statement_list">
+        <action
+            android:id="@+id/action_nav_constitution_to_nav_constitution_setting"
+            app:destination="@id/nav_constitution_setting" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_constitution_setting"
+        android:name="com.myapp.presentation.ui.mission_statement.MissionStatementSettingFragment"
+        android:label="@string/menu_constitution_setting"
+        tools:layout="@layout/fragment_mission_statement_setting">
+        <argument
+            android:name="missionStatement"
+            app:argType="com.myapp.domain.model.entity.MissionStatement"
+            app:nullable="true" />
+    </fragment>
 
 </navigation>

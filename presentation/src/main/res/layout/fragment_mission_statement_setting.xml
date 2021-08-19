@@ -8,7 +8,7 @@
 
         <variable
             name="viewModel"
-            type="com.myapp.presentation.ui.constitution.ConstitutionListViewModel" />
+            type="com.myapp.presentation.ui.mission_statement.MissionStatementSettingViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -53,15 +53,23 @@
             app:layout_constraintStart_toStartOf="@+id/list_funeral"
             app:layout_constraintTop_toBottomOf="@+id/list_funeral" />
 
-        <TextView
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/txt_value_mission_statement"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="@{viewModel.purposeLife}"
             app:layout_constraintEnd_toEndOf="@+id/txt_title_mission_statement"
             app:layout_constraintStart_toStartOf="@+id/txt_title_mission_statement"
-            app:layout_constraintTop_toBottomOf="@+id/txt_title_mission_statement" />
+            app:layout_constraintTop_toBottomOf="@+id/txt_title_mission_statement">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edit_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_purpose_life"
+                android:inputType="textEmailAddress"
+                android:text="@={viewModel.purposeLife}" />
+        </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
             android:id="@+id/txt_title_constitution"
@@ -85,5 +93,16 @@
             app:layout_constraintEnd_toEndOf="@+id/txt_title_constitution"
             app:layout_constraintStart_toStartOf="@+id/txt_title_constitution"
             app:layout_constraintTop_toBottomOf="@+id/txt_title_constitution" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_change"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:text="@string/btn_update"
+            android:enabled="@{viewModel.isEnableConfirmButton() }"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/list_constitution" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

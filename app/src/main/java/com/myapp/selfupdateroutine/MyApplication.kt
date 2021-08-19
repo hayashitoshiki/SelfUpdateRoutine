@@ -3,16 +3,22 @@ package com.myapp.selfupdateroutine
 import android.app.Application
 import android.util.Log
 import androidx.room.Room
+import com.myapp.data.local.LocalMissionStatementRepositoryImp
 import com.myapp.data.local.LocalReportRepositoryImp
 import com.myapp.data.local.LocalSettingRepositoryImp
 import com.myapp.data.local.preferences.UserSharedPreferences
+import com.myapp.domain.model.entity.MissionStatement
 import com.myapp.domain.model.entity.Report
+import com.myapp.domain.repository.LocalMissionStatementRepository
 import com.myapp.domain.repository.LocalReportRepository
 import com.myapp.domain.repository.LocalSettingRepository
 import com.myapp.domain.usecase.*
-import com.myapp.presentation.ui.constitution.ConstitutionListViewModel
 import com.myapp.presentation.ui.diary.*
 import com.myapp.presentation.ui.home.HomeViewModel
+import com.myapp.presentation.ui.mission_statement.ConstitutionInputItemViewModel
+import com.myapp.presentation.ui.mission_statement.FuneralInputItemViewModel
+import com.myapp.presentation.ui.mission_statement.MissionStatementListViewModel
+import com.myapp.presentation.ui.mission_statement.MissionStatementSettingViewModel
 import com.myapp.presentation.ui.remember.RememberViewModel
 import com.myapp.presentation.ui.setting.SettingViewModel
 import com.myapp.selfupdateroutine.database.AppDatabase
@@ -44,7 +50,10 @@ class MyApplication : Application() {
             androidContext(applicationContext)
             modules(module)
         }
-        database = Room.databaseBuilder(applicationContext, AppDatabase::class.java, "app_database")
+        database = Room.databaseBuilder(
+            applicationContext, AppDatabase::class.java, "app_database"
+        )
+            .addMigrations(AppDatabase.MIGRATION_2_3)
             .build()
         configureTimber()
     }
@@ -67,8 +76,11 @@ class MyApplication : Application() {
         viewModel { WeatherReasonViewModel() }
         viewModel { WeatherImproveViewModel() }
         viewModel { WeatherResultViewModel(get()) }
-        viewModel { ConstitutionListViewModel(get()) }
 
+        viewModel { MissionStatementListViewModel(get()) }
+        viewModel { (missionStatement: MissionStatement?) -> MissionStatementSettingViewModel(missionStatement, get()) }
+        viewModel { (index: Int, id: Long, text: String) -> FuneralInputItemViewModel(index, id, text) }
+        viewModel { (index: Int, id: Long, text: String) -> ConstitutionInputItemViewModel(index, id, text) }
 
         viewModel { HomeViewModel(get()) }
         viewModel { SettingViewModel(get()) }
@@ -78,11 +90,16 @@ class MyApplication : Application() {
         factory<ReportUseCase> { ReportUseCaseImp(get(), get()) }
         factory<SettingUseCase> { SettingUseCaseImp(get()) }
         factory<AlarmNotificationUseCase> { AlarmNotificationUseCaseImp(get()) }
-        factory<MissionStatementUseCase> { MissionStatementUseCaseImp() }
+        factory<MissionStatementUseCase> { MissionStatementUseCaseImp(get()) }
 
         // Repository
         factory<LocalReportRepository> { LocalReportRepositoryImp(database.emotionReportDao(), database.ffsReportDao()) }
         factory<LocalSettingRepository> { LocalSettingRepositoryImp(get()) }
+        factory<LocalMissionStatementRepository> {
+            LocalMissionStatementRepositoryImp(
+                database.funeralDao(), database.purposeLifeDao(), database.constitutionDao()
+            )
+        }
         factory<UserSharedPreferences> { UserSharedPreferencesImp(get()) }
         single { PreferenceManager(applicationContext) }
 

@@ -1,4 +1,4 @@
-package com.myapp.presentation.ui.constitution
+package com.myapp.presentation.utill
 
 import com.myapp.presentation.R
 import com.myapp.presentation.databinding.ItemDiscBinding

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <import type="com.myapp.presentation.utill.Status" />
+
+        <variable
+            name="viewModel"
+            type="com.myapp.presentation.ui.mission_statement.MissionStatementListViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/layout_main"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginBottom="8dp"
+            android:orientation="vertical"
+            android:visibility="@{viewModel.status instanceof Status.Success? View.VISIBLE : View.INVISIBLE}"
+            app:layout_constraintBottom_toTopOf="@+id/btn_change"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/txt_title_funeral"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:text="@string/title_sub_dai"
+                android:textColor="@color/text_color_dark_primary"
+                android:textSize="@dimen/title_text"
+                android:textStyle="bold|italic"
+                android:visibility="@{viewModel.isEnableFuneralList()? View.VISIBLE : View.GONE}" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/list_funeral"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:overScrollMode="never"
+                android:visibility="@{viewModel.isEnableFuneralList()? View.VISIBLE : View.GONE}" />
+
+            <TextView
+                android:id="@+id/txt_title_mission_statement"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/title_sub_mission_statement"
+                android:textColor="@color/text_color_dark_primary"
+                android:textSize="@dimen/title_text"
+                android:textStyle="bold|italic"
+                android:visibility="@{viewModel.isEnablePurposeLife()? View.VISIBLE : View.GONE}" />
+
+            <TextView
+                android:id="@+id/txt_value_mission_statement"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@{viewModel.purposeLife}"
+                android:visibility="@{viewModel.isEnablePurposeLife()? View.VISIBLE : View.GONE}" />
+
+            <TextView
+                android:id="@+id/txt_title_constitution"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/title_sub_constitution"
+                android:textColor="@color/text_color_dark_primary"
+                android:textSize="@dimen/title_text"
+                android:textStyle="bold|italic"
+                android:visibility="@{viewModel.isEnableConstitutionList()? View.VISIBLE : View.GONE}" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/list_constitution"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:overScrollMode="never"
+                android:visibility="@{viewModel.isEnableConstitutionList()? View.VISIBLE : View.GONE}" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/txt_not_found_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/txt_no_mission_statement"
+            android:visibility="@{viewModel.status instanceof Status.Failure? View.VISIBLE : View.INVISIBLE}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_change"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:text="編集"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

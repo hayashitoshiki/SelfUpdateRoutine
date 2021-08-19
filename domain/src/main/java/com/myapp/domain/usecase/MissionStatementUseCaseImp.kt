@@ -1,13 +1,36 @@
 package com.myapp.domain.usecase
 
+import com.myapp.domain.dto.MissionStatementInputDto
 import com.myapp.domain.model.entity.MissionStatement
+import com.myapp.domain.repository.LocalMissionStatementRepository
+import com.myapp.domain.translator.MissionStatementTranslator
 
-class MissionStatementUseCaseImp : MissionStatementUseCase {
-    private val funeralList = listOf("弔辞：感謝されること", "人：優しい人間")
-    private val purposeLife = "世界一楽しく生きること"
-    private val constitutionList = listOf("迷ったときは楽しい方向へ", "常に楽しいを見つける努力を")
-    private val missionStatement = MissionStatement(funeralList, purposeLife, constitutionList)
-    override fun getMissionStatement(): MissionStatement {
-        return missionStatement // TODO : ミッションステートメント追加機能実施後、Repository連携
+// ミッションステートメント機能ロジック
+class MissionStatementUseCaseImp(private val localMissionStatementRepository: LocalMissionStatementRepository) :
+    MissionStatementUseCase {
+
+    // ミッションステートメント取得
+    override suspend fun getMissionStatement(): MissionStatement? {
+        return localMissionStatementRepository.getMissionStatement()
     }
+
+    // ミッションステートメント作成
+    override suspend fun createMissionStatement(dto: MissionStatementInputDto) {
+        val missionStatement = MissionStatementTranslator.missionStatementFromMissionStatementDto(dto)
+        localMissionStatementRepository.saveMissionStatement(missionStatement)
+    }
+
+    // ミッションステートメント更新
+    override suspend fun updateMissionStatement(
+        missionStatement: MissionStatement,
+        dto: MissionStatementInputDto
+    ) {
+        missionStatement.also {
+            it.funeralList = dto.funeralList
+            it.purposeLife = dto.purposeLife
+            it.constitutionList = dto.constitutionList
+        }
+        localMissionStatementRepository.saveMissionStatement(missionStatement)
+    }
+
 }

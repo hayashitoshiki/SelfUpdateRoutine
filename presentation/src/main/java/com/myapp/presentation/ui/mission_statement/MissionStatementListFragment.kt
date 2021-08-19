@@ -1,12 +1,14 @@
-package com.myapp.presentation.ui.constitution
+package com.myapp.presentation.ui.mission_statement
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.myapp.presentation.databinding.FragmentConstitutionListBinding
+import com.myapp.presentation.databinding.FragmentMissionStatementListBinding
 import com.myapp.presentation.utill.BaseFragment
+import com.myapp.presentation.utill.DiscItem
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.ViewHolder
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -15,17 +17,18 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  * ミッションステートメント一覧画面
  *
  */
-class ConstitutionListFragment : BaseFragment() {
+class MissionStatementListFragment : BaseFragment() {
 
-    private val viewModel: ConstitutionListViewModel by viewModel()
-    private lateinit var binding: FragmentConstitutionListBinding
+    private val viewModel: MissionStatementListViewModel by viewModel()
+    private var _binding: FragmentMissionStatementListBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentConstitutionListBinding.inflate(inflater, container, false)
+        _binding = FragmentMissionStatementListBinding.inflate(inflater, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
         return binding.root
@@ -52,6 +55,11 @@ class ConstitutionListFragment : BaseFragment() {
             it.adapter = adapter
             it.layoutManager = layoutManager
         }
+        binding.btnChange.setOnClickListener {
+            val data = viewModel.missionStatement
+            val action = MissionStatementListFragmentDirections.actionNavConstitutionToNavConstitutionSetting(data)
+            findNavController().navigate(action)
+        }
     }
 
     // 理想の葬儀リスト設定
@@ -66,5 +74,10 @@ class ConstitutionListFragment : BaseFragment() {
         val items = data.map { DiscItem(it) }
         val adapter = binding.listConstitution.adapter as GroupAdapter<*>
         adapter.update(items)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
