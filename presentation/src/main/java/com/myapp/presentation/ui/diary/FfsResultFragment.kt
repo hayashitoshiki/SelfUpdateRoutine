@@ -17,8 +17,8 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  */
 class FfsResultFragment : Fragment() {
 
-    private lateinit var binding: ItemDiaryFfsResultBinding
-
+    private var _binding: ItemDiaryFfsResultBinding? = null
+    private val binding get() = _binding!!
     private val viewModel: FfsResultViewModel by viewModel()
 
     override fun onCreateView(
@@ -26,7 +26,7 @@ class FfsResultFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = DataBindingUtil.inflate(inflater, R.layout.item_diary_ffs_result, container, false)
+        _binding = DataBindingUtil.inflate(inflater, R.layout.item_diary_ffs_result, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
         binding.btnOk.setOnClickListener {
@@ -42,6 +42,11 @@ class FfsResultFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
 }

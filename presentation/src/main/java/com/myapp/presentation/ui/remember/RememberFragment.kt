@@ -18,7 +18,8 @@ import org.koin.core.parameter.parametersOf
  */
 class RememberFragment : BaseFragment() {
 
-    private lateinit var binding: FragmentRemenberBinding
+    private var _binding: FragmentRemenberBinding? = null
+    private val binding get() = _binding!!
 
     private val args: RememberFragmentArgs by navArgs()
     val viewModel: RememberViewModel by inject { parametersOf(args.report) }
@@ -29,7 +30,7 @@ class RememberFragment : BaseFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_remenber, container, false)
+        _binding = DataBindingUtil.inflate(inflater, R.layout.fragment_remenber, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
         return binding.root
@@ -41,5 +42,10 @@ class RememberFragment : BaseFragment() {
         savedInstanceState: Bundle?
     ) {
         super.onViewCreated(view, savedInstanceState)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

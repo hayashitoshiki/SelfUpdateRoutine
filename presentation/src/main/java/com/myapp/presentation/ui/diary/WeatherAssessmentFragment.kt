@@ -17,8 +17,8 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  */
 class WeatherAssessmentFragment : Fragment() {
 
-    private lateinit var binding: ItemDiaryNumberInputBinding
-
+    private var _binding: ItemDiaryNumberInputBinding? = null
+    private val binding get() = _binding!!
     private val viewModel: WeatherAssessmentViewModel by viewModel()
 
     override fun onCreateView(
@@ -26,7 +26,7 @@ class WeatherAssessmentFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = DataBindingUtil.inflate(inflater, R.layout.item_diary_number_input, container, false)
+        _binding = DataBindingUtil.inflate(inflater, R.layout.item_diary_number_input, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
         binding.txtSection.text = requireContext().getString(R.string.section2_1)
@@ -51,6 +51,11 @@ class WeatherAssessmentFragment : Fragment() {
 
         })
         return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
 }

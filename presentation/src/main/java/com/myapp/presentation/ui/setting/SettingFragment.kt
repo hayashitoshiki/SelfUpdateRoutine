@@ -28,8 +28,8 @@ import java.time.OffsetDateTime
  */
 class SettingFragment : BaseFragment() {
 
-
-    private lateinit var binding: FragmentSettingBinding
+    private var _binding: FragmentSettingBinding? = null
+    private val binding get() = _binding!!
     val viewModel: SettingViewModel by viewModel()
 
     override fun onCreateView(
@@ -37,7 +37,7 @@ class SettingFragment : BaseFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_setting, container, false)
+        _binding = DataBindingUtil.inflate(inflater, R.layout.fragment_setting, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
         return binding.root
@@ -108,6 +108,11 @@ class SettingFragment : BaseFragment() {
         Toasty.success(requireContext(), "アラーム設定を更新しました！", Toast.LENGTH_SHORT, true)
             .show()
         findNavController().popBackStack()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
 }

@@ -21,7 +21,8 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  */
 class WeatherResultFragment : Fragment() {
 
-    private lateinit var binding: ItemDiaryWeatherResultBinding
+    private var _binding: ItemDiaryWeatherResultBinding? = null
+    private val binding get() = _binding!!
     private val viewModel: WeatherResultViewModel by viewModel()
 
     override fun onCreateView(
@@ -29,7 +30,7 @@ class WeatherResultFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = DataBindingUtil.inflate(inflater, R.layout.item_diary_weather_result, container, false)
+        _binding = DataBindingUtil.inflate(inflater, R.layout.item_diary_weather_result, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
         return binding.root
@@ -72,5 +73,9 @@ class WeatherResultFragment : Fragment() {
         requireActivity().finish()
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 
 }

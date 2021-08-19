@@ -17,8 +17,8 @@ import com.myapp.presentation.utill.BaseFragment
  */
 abstract class DiaryBaseFragment : BaseFragment() {
 
-    lateinit var binding: ItemDiaryTextInputBinding
-
+    private var _binding: ItemDiaryTextInputBinding? = null
+    protected val binding get() = _binding!!
     abstract val viewModel: DiaryBaseViewModel
 
     override fun onCreateView(
@@ -26,7 +26,7 @@ abstract class DiaryBaseFragment : BaseFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = DataBindingUtil.inflate(inflater, R.layout.item_diary_text_input, container, false)
+        _binding = DataBindingUtil.inflate(inflater, R.layout.item_diary_text_input, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
         return binding.root
@@ -50,5 +50,10 @@ abstract class DiaryBaseFragment : BaseFragment() {
             binding.root.requestFocus()
             v?.onTouchEvent(event) ?: true
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
