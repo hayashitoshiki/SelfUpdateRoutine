@@ -1,9 +1,9 @@
-package com.myapp.data.local.database.dao
+package com.myapp.data.local.database.dao.report
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import com.myapp.data.local.database.entity.WeatherReportEntity
+import com.myapp.data.local.database.entity.report.WeatherReportEntity
 
 /**
  * 感情日記用クエリ管理

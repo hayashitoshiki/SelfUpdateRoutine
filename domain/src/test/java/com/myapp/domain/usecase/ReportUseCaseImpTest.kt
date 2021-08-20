@@ -5,13 +5,17 @@ import com.myapp.domain.repository.LocalReportRepository
 import com.myapp.domain.repository.LocalSettingRepository
 import com.myapp.domain.translator.ReportTranslator
 import io.mockk.*
-import junit.framework.Assert.assertEquals
 import kotlinx.coroutines.runBlocking
 import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import java.time.LocalDateTime
 
+/**
+ * レポート関連機能 ロジック仕様
+ *
+ */
 class ReportUseCaseImpTest {
 
     // mock

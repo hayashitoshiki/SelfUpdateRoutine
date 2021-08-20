@@ -13,6 +13,10 @@ import org.junit.Test
 import java.time.LocalDateTime
 import java.time.LocalTime
 
+/**
+ * アラーム関連機能 ロジック仕様
+ *
+ */
 class AlarmNotificationUseCaseImpTest {
 
     // mock

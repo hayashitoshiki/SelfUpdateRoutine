@@ -1,10 +1,10 @@
-package com.myapp.data.local.database.dao
+package com.myapp.data.local.database.dao.mission_statement
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
-import com.myapp.data.local.database.entity.PurposeLifeEntity
+import com.myapp.data.local.database.entity.mission_statement.PurposeLifeEntity
 
 /**
  * 人生の目的用クエリ管理

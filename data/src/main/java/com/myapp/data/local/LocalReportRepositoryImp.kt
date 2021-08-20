@@ -1,7 +1,7 @@
 package com.myapp.data.local
 
-import com.myapp.data.local.database.dao.FfsReportDao
-import com.myapp.data.local.database.dao.WeatherReportDao
+import com.myapp.data.local.database.dao.report.FfsReportDao
+import com.myapp.data.local.database.dao.report.WeatherReportDao
 import com.myapp.domain.model.entity.Report
 import com.myapp.domain.repository.LocalReportRepository
 
@@ -21,13 +21,9 @@ class LocalReportRepositoryImp(
     // 全振り返り日記取得
     override suspend fun getAllReport(): List<Report> {
         val emotionsReportList = weatherReportDao.getAll()
-            .map {
-                Converter.weatherReportFromWeatherReportEntity(it)
-            }
+            .map { Converter.weatherReportFromWeatherReportEntity(it) }
         val ffsReportList = ffsReportDao.getAll()
-            .map {
-                Converter.ffsReportFromFfsReportEntity(it)
-            }
+            .map { Converter.ffsReportFromFfsReportEntity(it) }
         val reportList = mutableListOf<Report>()
         for (index in emotionsReportList.indices) {
             if (ffsReportList.size > index) {

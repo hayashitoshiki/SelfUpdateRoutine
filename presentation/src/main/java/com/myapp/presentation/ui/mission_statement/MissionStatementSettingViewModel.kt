@@ -139,11 +139,10 @@ class MissionStatementSettingViewModel(
             return
         }
         viewModelScope.launch {
+            val dto = MissionStatementInputDto(funeral, purposeLife, constitutionList)
             missionStatement?.let {
-                val dto = MissionStatementInputDto(funeral, purposeLife, constitutionList)
                 missionStatementUseCase.updateMissionStatement(it, dto)
             } ?: run {
-                val dto = MissionStatementInputDto(funeral, purposeLife, constitutionList)
                 missionStatementUseCase.createMissionStatement(dto)
             }
             _confirmStatus.value = Status.Success(missionStatement)

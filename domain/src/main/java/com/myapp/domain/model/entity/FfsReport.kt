@@ -4,30 +4,17 @@ import com.myapp.domain.model.value.ReportDateTime
 
 /**
  * FFS式４行日記
+ *
+ * @property dataTime 日付
+ * @property factComment 事象
+ * @property findComment 発見
+ * @property learnComment 学び
+ * @property statementComment 宣言
  */
 data class FfsReport(
-    /**
-     * 日付
-     */
     val dataTime: ReportDateTime,
-
-    /**
-     * 事象
-     */
     val factComment: String,
-
-    /**
-     * 発見
-     */
     val findComment: String,
-
-    /**
-     * 学び
-     */
     val learnComment: String,
-
-    /**
-     * 宣言
-     */
     val statementComment: String
 )

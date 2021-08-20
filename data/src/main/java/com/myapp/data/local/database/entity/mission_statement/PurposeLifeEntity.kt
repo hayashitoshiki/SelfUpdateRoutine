@@ -1,4 +1,4 @@
-package com.myapp.data.local.database.entity
+package com.myapp.data.local.database.entity.mission_statement
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

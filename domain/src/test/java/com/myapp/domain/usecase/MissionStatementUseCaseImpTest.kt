@@ -119,7 +119,7 @@ class MissionStatementUseCaseImpTest {
      */
     @ExperimentalCoroutinesApi
     @Test
-    fun createeMissionStatement() = testScope.runBlockingTest {
+    fun createMissionStatement() = testScope.runBlockingTest {
         useCase = MissionStatementUseCaseImp(localMissionStatementRepository)
         useCase.createMissionStatement(createDto)
         coVerify(exactly = 1) { (localMissionStatementRepository).saveMissionStatement(missionStatement) }
@@ -142,9 +142,9 @@ class MissionStatementUseCaseImpTest {
         useCase = MissionStatementUseCaseImp(localMissionStatementRepository)
         useCase.updateMissionStatement(missionStatement, dto)
         val result = missionStatement.also {
-            it.funeralList = dto.funeralList
-            it.purposeLife = dto.purposeLife
-            it.constitutionList = dto.constitutionList
+            it._funeralList = dto.funeralList
+            it._purposeLife = dto.purposeLife
+            it._constitutionList = dto.constitutionList
         }
         coVerify(exactly = 1) { (localMissionStatementRepository).saveMissionStatement(result) }
     }

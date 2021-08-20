@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
  */
 class MissionStatementListViewModel(private val missionStatementUseCase: MissionStatementUseCase) : ViewModel() {
 
+    // 登録済みのミッションステートメント
     var missionStatement: MissionStatement? = null
 
     // 理想の葬式
@@ -52,7 +53,7 @@ class MissionStatementListViewModel(private val missionStatementUseCase: Mission
 
     private fun updateMissionStatement() = viewModelScope.launch {
         missionStatementUseCase.getMissionStatement()
-            ?.also {
+            ?.let {
                 _funeralList.value = it.funeralList
                 _purposeLife.value = it.purposeLife
                 _constitutionList.value = it.constitutionList

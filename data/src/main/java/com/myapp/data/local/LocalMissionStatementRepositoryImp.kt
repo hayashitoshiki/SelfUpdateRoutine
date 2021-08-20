@@ -1,12 +1,9 @@
 package com.myapp.data.local
 
 import com.myapp.common.getDateTimeNow
-import com.myapp.data.local.database.dao.ConstitutionDao
-import com.myapp.data.local.database.dao.FuneralDao
-import com.myapp.data.local.database.dao.PurposeLifeDao
-import com.myapp.data.local.database.entity.ConstitutionEntity
-import com.myapp.data.local.database.entity.FuneralEntity
-import com.myapp.data.local.database.entity.PurposeLifeEntity
+import com.myapp.data.local.database.dao.mission_statement.ConstitutionDao
+import com.myapp.data.local.database.dao.mission_statement.FuneralDao
+import com.myapp.data.local.database.dao.mission_statement.PurposeLifeDao
 import com.myapp.domain.model.entity.MissionStatement
 import com.myapp.domain.repository.LocalMissionStatementRepository
 
@@ -16,54 +13,36 @@ class LocalMissionStatementRepositoryImp(
     private val constitutionDao: ConstitutionDao
 ) : LocalMissionStatementRepository {
 
+    // ミッションステートメント保存
     override suspend fun saveMissionStatement(missionStatement: MissionStatement) {
         funeralDao.deleteAll()
-        funeralEntityListFromMissionStatement(missionStatement).forEach {
-            funeralDao.insert(it)
-        }
+        Converter.funeralEntityListFromMissionStatement(missionStatement)
+            .forEach {
+                funeralDao.insert(it)
+            }
         purposeLifeDao.get()
             ?.also {
                 it.text = missionStatement.purposeLife
                 it.updateAt = getDateTimeNow()
                 purposeLifeDao.update(it)
             } ?: run {
-            purposeLifeEntityFromMissionStatement(missionStatement).also {
-                purposeLifeDao.insert(it)
-            }
+            val purposeEntity = Converter.purposeLifeEntityFromMissionStatement(missionStatement)
+            purposeLifeDao.insert(purposeEntity)
         }
         constitutionDao.deleteAll()
-        constitutionEntityListFromMissionStatement(missionStatement).forEach {
-            constitutionDao.insert(it)
-        }
+        Converter.constitutionEntityListFromMissionStatement(missionStatement)
+            .forEach {
+                constitutionDao.insert(it)
+            }
     }
 
+    // ミッションステートメント取得
     override suspend fun getMissionStatement(): MissionStatement? {
-        val purposeList = funeralDao.getAll()
-            .map { it.text }
-        val purposeLife = purposeLifeDao.get()?.text ?: ""
+        val funeralList = funeralDao.getAll()
+        val purposeLife = purposeLifeDao.get()
         val constitutionList = constitutionDao.getAll()
-            .map { it.text }
-        return if (purposeList.isEmpty() && purposeLife == "" && constitutionList.isEmpty()) {
-            null
-        } else {
-            MissionStatement(purposeList, purposeLife, constitutionList)
-        }
+        return Converter.missionStatementFromEntity(funeralList, purposeLife, constitutionList)
     }
 
-    private fun funeralEntityListFromMissionStatement(missionStatement: MissionStatement): List<FuneralEntity> {
-        return missionStatement.funeralList.map {
-            FuneralEntity(0, it, getDateTimeNow())
-        }
-    }
-
-    private fun constitutionEntityListFromMissionStatement(missionStatement: MissionStatement): List<ConstitutionEntity> {
-        return missionStatement.constitutionList.map {
-            ConstitutionEntity(0, it, getDateTimeNow())
-        }
-    }
-
-    private fun purposeLifeEntityFromMissionStatement(missionStatement: MissionStatement): PurposeLifeEntity {
-        return PurposeLifeEntity(1, missionStatement.purposeLife, getDateTimeNow(), getDateTimeNow())
-    }
 
 }

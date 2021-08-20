@@ -3,9 +3,7 @@ package com.myapp.domain.usecase
 import com.myapp.domain.dto.NextAlarmTimeInputDto
 import com.myapp.domain.model.value.AlarmMode
 import com.myapp.domain.repository.LocalSettingRepository
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.mockk
+import io.mockk.*
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -13,6 +11,10 @@ import org.junit.Test
 import java.time.LocalDateTime
 import java.time.LocalTime
 
+/**
+ * 設定関連機能 ロジック仕様
+ *
+ */
 class SettingUseCaseImpTest {
 
     // mock
@@ -22,6 +24,7 @@ class SettingUseCaseImpTest {
     // region TestData
 
     private val nowDateTime = LocalDateTime.now()
+        .with(LocalTime.of(21, 0, 0, 0))
     private val yesterdayDateTime = nowDateTime.minusDays(1)
     private val todayAlarmDate = nowDateTime.with(LocalTime.of(20, 0, 0, 0))
     private val alarmModeNormal = AlarmMode.NORMAL
@@ -31,6 +34,7 @@ class SettingUseCaseImpTest {
 
     @Before
     fun setUp() {
+        setNowDateByAfter()
         localSettingRepository = mockk<LocalSettingRepository>().also {
             coEvery { it.getAlarmDate() } returns todayAlarmDate
             coEvery { it.getAlarmMode() } returns alarmModeNormal
@@ -40,12 +44,25 @@ class SettingUseCaseImpTest {
         settingUseCaseImp = SettingUseCaseImp(localSettingRepository)
     }
 
+    private fun setNowDateByBefore() {
+        mockkStatic(LocalDateTime::class)
+        every {
+            LocalDateTime.now()
+        } returns nowDateTime.with(LocalTime.of(17, 0, 0, 0))
+    }
+
+    private fun setNowDateByAfter() {
+        mockkStatic(LocalDateTime::class)
+        every {
+            LocalDateTime.now()
+        } returns nowDateTime.with(LocalTime.of(21, 0, 0, 0))
+    }
+
     // region Mockデータ設定
 
     // 最終レポート記録時間が今日
     private fun setLastReportByToday() {
         coEvery { localSettingRepository.getLastReportSaveDateTime() } returns todayAlarmDate
-
     }
 
     // 最終レポート記録時間が昨日
@@ -95,7 +112,7 @@ class SettingUseCaseImpTest {
      *
      * 条件：最後にレポートを登録した日付が今日
      * 期待結果：
-     * ・dtoを元にア明日の日付でラーム時間が正しく変換されること
+     * ・dtoを元に明日の日付でアラーム時間が正しく変換されること
      * ・変換されたデータが登録されること
      * ・変換されたデータが返却されること
      */
@@ -117,12 +134,13 @@ class SettingUseCaseImpTest {
      * ・最後にレポートを登録した日付が昨日
      * ・設定した時間より現在の時間が前
      * 期待結果：
-     * ・dtoを元にア今日の日付でラーム時間が正しく変換されること
+     * ・dtoを元に今日の日付でアラーム時間が正しく変換されること
      * ・変換されたデータが登録されること
      * ・変換されたデータが返却されること
      */
     @Test
     fun updateAlarmDateByReportYesterday() {
+        setNowDateByBefore()
         setLastReportByYesterday()
         val result = settingUseCaseImp.updateAlarmDate(dto)
         val act = nowDateTime.with(LocalTime.of(dto.hour, dto.minute, dto.second))
@@ -138,15 +156,17 @@ class SettingUseCaseImpTest {
      * ・最後にレポートを登録した日付が昨日
      * ・設定した時間より現在の時間が後
      * 期待結果：
-     * ・dtoを元にア明日の日付でラーム時間が正しく変換されること
+     * ・dtoを元に明日の日付でアラーム時間が正しく変換されること
      * ・変換されたデータが登録されること
      * ・変換されたデータが返却されること
      */
     @Test
     fun updateAlarmDateByReportYesterdayAndNotAlarmTime() {
+        setNowDateByAfter()
         setLastReportByYesterday()
         val result = settingUseCaseImp.updateAlarmDate(dto)
         val act = nowDateTime.with(LocalTime.of(dto.hour, dto.minute, dto.second))
+            .plusDays(1)
         coVerify(exactly = 1) { (localSettingRepository).saveAlarmDate(act) }
         coVerify(exactly = 1) { (localSettingRepository).saveAlarmMode(dto.mode) }
         assertEquals(act, result)

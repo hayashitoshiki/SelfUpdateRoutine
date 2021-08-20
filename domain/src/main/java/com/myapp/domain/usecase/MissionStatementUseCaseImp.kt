@@ -26,9 +26,9 @@ class MissionStatementUseCaseImp(private val localMissionStatementRepository: Lo
         dto: MissionStatementInputDto
     ) {
         missionStatement.also {
-            it.funeralList = dto.funeralList
-            it.purposeLife = dto.purposeLife
-            it.constitutionList = dto.constitutionList
+            it._funeralList = dto.funeralList
+            it._purposeLife = dto.purposeLife
+            it._constitutionList = dto.constitutionList
         }
         localMissionStatementRepository.saveMissionStatement(missionStatement)
     }

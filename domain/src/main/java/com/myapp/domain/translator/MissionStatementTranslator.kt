@@ -6,7 +6,7 @@ import com.myapp.domain.model.entity.MissionStatement
 /**
  * ミッションステートメント用　Dto -> DomainModel コンバーター
  */
-object MissionStatementTranslator {
+internal object MissionStatementTranslator {
 
     /**
      * dto ->ミッションステートメントオブジェクト変換

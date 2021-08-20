@@ -3,17 +3,21 @@ package com.myapp.domain.repository
 import com.myapp.domain.model.entity.Report
 
 /**
- * ローカルデータへの振り返り日記のCRUD処理
+ * ローカルデータへのレポートのCRUD処理
  */
 interface LocalReportRepository {
 
     /**
-     * 振り返り日記保存
+     * レポート保存
+     *
+     * @param report 保存するレポート
      */
     suspend fun saveReport(report: Report)
 
     /**
-     * TODO : 仮　１つ目の振り返り日記取得
+     * 全レポート取得
+     *
+     * @return 取得した全レポート
      */
     suspend fun getAllReport(): List<Report>
 }

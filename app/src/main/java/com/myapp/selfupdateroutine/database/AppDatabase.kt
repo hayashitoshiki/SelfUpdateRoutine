@@ -6,8 +6,16 @@ import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.myapp.chatmemo.database.DataBaseConverter
-import com.myapp.data.local.database.dao.*
-import com.myapp.data.local.database.entity.*
+import com.myapp.data.local.database.dao.mission_statement.ConstitutionDao
+import com.myapp.data.local.database.dao.mission_statement.FuneralDao
+import com.myapp.data.local.database.dao.mission_statement.PurposeLifeDao
+import com.myapp.data.local.database.dao.report.FfsReportDao
+import com.myapp.data.local.database.dao.report.WeatherReportDao
+import com.myapp.data.local.database.entity.mission_statement.ConstitutionEntity
+import com.myapp.data.local.database.entity.mission_statement.FuneralEntity
+import com.myapp.data.local.database.entity.mission_statement.PurposeLifeEntity
+import com.myapp.data.local.database.entity.report.FfsReportEntity
+import com.myapp.data.local.database.entity.report.WeatherReportEntity
 
 /**
  * DB定義

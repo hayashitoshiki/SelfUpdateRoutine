@@ -9,12 +9,15 @@ import com.myapp.domain.model.value.ReportDateTime
 import java.time.LocalDateTime
 
 /**
- * Dto -> DomainModel コンバーター
+ * レポート用 Dto -> DomainModel コンバーター
  **/
-object ReportTranslator {
+internal object ReportTranslator {
 
     /**
-     * 振り返り日記Dto -> 振り返り日記オブジェクト
+     * レポートDto -> レポートオブジェクト
+     *
+     * @param allReportInputDto レポートDto
+     * @return レポートオブジェクト
      */
     fun allReportConvert(allReportInputDto: AllReportInputDto): Report {
         val datetime = ReportDateTime(LocalDateTime.now())

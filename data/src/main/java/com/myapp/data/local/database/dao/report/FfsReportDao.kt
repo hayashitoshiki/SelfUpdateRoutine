@@ -1,9 +1,9 @@
-package com.myapp.data.local.database.dao
+package com.myapp.data.local.database.dao.report
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import com.myapp.data.local.database.entity.FfsReportEntity
+import com.myapp.data.local.database.entity.report.FfsReportEntity
 
 /**
  * FFS式日記用クエリ管理
