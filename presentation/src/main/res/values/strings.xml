@@ -45,6 +45,10 @@
     <string name="title_item_alarm_time">アラーム時間</string>
     <string name="title_item_alarm_mode">アラームモード</string>
     <string name="title_item_next_alarm">次回のアラーム時間</string>
+    <string name="title_daily_mission">今日の目標</string>
+    <string name="title_report_list">日記一覧</string>
+    <string name="title_home_head">内省化補正日記</string>
+    <string name="title_home_sub">未来へ向けた</string>
 
     <!-- ヒント文言 -->
     <string name="hint_item_fact">例）綺麗な夕焼けを見た</string>
@@ -59,7 +63,7 @@
     <string name="title_sub_setting">変更前の時間</string>
 
     <string name="title_sub_dai">理想の葬儀</string>
-    <string name="title_sub_mission_statement">人生の目標</string>
+    <string name="title_sub_mission_statement">人生の目的</string>
     <string name="title_sub_constitution">憲法</string>
 
     <!-- その他 -->
@@ -99,5 +103,6 @@
 
     <string name="txt_no_daly_diary">今日の日記が入力されていません。</string>
     <string name="txt_no_mission_statement">ミッションステートメントが登録されていません。</string>
+    <string name="txt_no_report_list">日記がまだ登録されていません。</string>
 
 </resources>

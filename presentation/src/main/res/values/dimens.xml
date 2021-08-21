@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
@@ -12,4 +12,7 @@
     <dimen name="sub_title_text">17sp</dimen>
     <dimen name="card_text_title">14sp</dimen>
     <dimen name="card_text_main">12sp</dimen>
+
+    <!-- fabSize="normal"のときのサイズ(FABサイズ調整) -->
+    <dimen name="design_fab_size_normal" tools:override="true">48dp</dimen>
 </resources>

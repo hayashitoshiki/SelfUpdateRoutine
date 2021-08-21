@@ -2,16 +2,20 @@ package com.myapp.presentation.ui.home
 
 import androidx.lifecycle.*
 import com.myapp.domain.model.entity.Report
+import com.myapp.domain.usecase.MissionStatementUseCase
 import com.myapp.domain.usecase.ReportUseCase
-import com.myapp.presentation.utils.Status
 import com.myapp.presentation.utils.img
 import com.myapp.presentation.utils.isToday
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 
 /**
  * ホーム画面　画面ロジック
  */
-class HomeViewModel(private val reportUseCase: ReportUseCase) : ViewModel() {
+class HomeViewModel(
+    private val reportUseCase: ReportUseCase,
+    private val missionStatementUseCase: MissionStatementUseCase
+) : ViewModel() {
 
     // 事実
     private val _factComment = MutableLiveData("")
@@ -45,9 +49,13 @@ class HomeViewModel(private val reportUseCase: ReportUseCase) : ViewModel() {
     private val _report = MutableLiveData<List<Report>>()
     val report: LiveData<List<Report>> = _report
 
-    // 今日の振り返りレポート
-    private val _dalyReport = MutableLiveData<Status<Report>>(Status.Loading)
-    val dalyReport: LiveData<Status<Report>> = _dalyReport
+    // メインコンテナの表示タイプ
+    private val _mainContainerType = MutableLiveData<HomeFragmentMainContainerType<Report>>()
+    val mainContainerType: LiveData<HomeFragmentMainContainerType<Report>> = _mainContainerType
+
+    // 人生の目的
+    private val _missionStatement = MutableLiveData("")
+    val missionStatement: LiveData<String> = _missionStatement
 
     init {
         viewModelScope.launch {
@@ -55,14 +63,10 @@ class HomeViewModel(private val reportUseCase: ReportUseCase) : ViewModel() {
             _report.value = reportList
 
             if (reportList.isEmpty()) {
-                _dalyReport.value = Status.Failure(IllegalAccessError("今日のデータが登録されていません。"))
+                _mainContainerType.value = HomeFragmentMainContainerType.NotReport
                 return@launch
             }
             val report = reportList.last()
-            if (!report.ffsReport.dataTime.date.isToday()) {
-                _dalyReport.value = Status.Failure(IllegalAccessError("今日のデータが登録されていません。"))
-                return@launch
-            }
             _factComment.value = report.ffsReport.factComment
             _findComment.value = report.ffsReport.findComment
             _learnComment.value = report.ffsReport.learnComment
@@ -70,7 +74,18 @@ class HomeViewModel(private val reportUseCase: ReportUseCase) : ViewModel() {
             _assessmentInputInt.value = report.weatherReport.heartScore.img
             _reasonComment.value = report.weatherReport.reasonComment
             _improveComment.value = report.weatherReport.improveComment
-            _dalyReport.value = Status.Success(report)
+            if (LocalDateTime.now().hour < 18) {
+                _mainContainerType.value = HomeFragmentMainContainerType.Vision(report)
+                missionStatementUseCase.getMissionStatement()?.purposeLife?.let {
+                    _missionStatement.value = it
+                }
+            } else if (!report.ffsReport.dataTime.date.isToday()) {
+                _mainContainerType.value = HomeFragmentMainContainerType.NotReport
+                return@launch
+            } else {
+                _mainContainerType.value = HomeFragmentMainContainerType.Report(report)
+            }
+
         }
     }
 }

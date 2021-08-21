@@ -82,7 +82,7 @@ class MyApplication : Application() {
         viewModel { (index: Int, id: Long, text: String) -> FuneralInputItemViewModel(index, id, text) }
         viewModel { (index: Int, id: Long, text: String) -> ConstitutionInputItemViewModel(index, id, text) }
 
-        viewModel { HomeViewModel(get()) }
+        viewModel { HomeViewModel(get(), get()) }
         viewModel { SettingViewModel(get()) }
         viewModel { (report: Report) -> RememberViewModel(report) }
 

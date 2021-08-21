@@ -7,7 +7,7 @@
 
         <import type="android.view.View" />
 
-        <import type="com.myapp.presentation.utils.Status" />
+        <import type="com.myapp.presentation.ui.home.HomeFragmentMainContainerType" />
 
         <variable
             name="viewModel"
@@ -19,26 +19,64 @@
         android:layout_height="match_parent"
         tools:context=".ui.home.HomeFragment">
 
+        <TextView
+            android:id="@+id/txt_sub_title"
+            android:text="@string/title_home_sub"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="16dp"
+            android:textSize="@dimen/header_text"
+            android:textColor="@color/text_color_dark_disable"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/txt_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:text="@string/title_home_head"
+            android:textColor="@color/text_color_dark_primary"
+            android:textSize="32dp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@+id/txt_sub_title"
+            app:layout_constraintTop_toBottomOf="@+id/txt_sub_title" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            app:fabSize="normal"
+            android:layout_marginEnd="24dp"
+            android:layout_marginBottom="8dp"
+            android:src="@drawable/ic_content_detail_24"
+            app:layout_constraintBottom_toBottomOf="@+id/txt_title"
+            app:layout_constraintEnd_toEndOf="parent" />
+
         <androidx.cardview.widget.CardView
             android:id="@+id/layout_daly_card"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_margin="16dp"
-            android:visibility="@{viewModel.dalyReport instanceof Status.Success? View.VISIBLE : View.INVISIBLE}"
-            app:cardElevation="8dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="16dp"
+            android:visibility="@{viewModel.mainContainerType instanceof HomeFragmentMainContainerType.Report ? View.VISIBLE : View.INVISIBLE}"
             app:cardCornerRadius="10dp"
+            app:cardElevation="8dp"
             app:cardUseCompatPadding="true"
-            app:layout_constraintBottom_toTopOf="@+id/btn_daly_diary"
+            app:layout_constraintBottom_toTopOf="@+id/txt_title_report_list"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toBottomOf="@+id/txt_title">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
                 <TextView
-                    android:id="@+id/txt_title"
+                    android:id="@+id/txt_daily_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -60,19 +98,19 @@
                     android:textColor="@color/text_color_dark_primary"
                     android:textSize="@dimen/sub_title_text"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/txt_title" />
+                    app:layout_constraintTop_toBottomOf="@+id/txt_daily_title" />
 
                 <TextView
                     android:id="@+id/txt_answer1_1"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
-                    android:layout_marginEnd="4dp"
                     android:layout_marginTop="4dp"
-                    android:textSize="@dimen/card_text_main"
+                    android:layout_marginEnd="4dp"
                     android:ellipsize="end"
                     android:maxLines="2"
                     android:text="@{viewModel.factComment}"
+                    android:textSize="@dimen/card_text_main"
                     app:layout_constraintEnd_toStartOf="@+id/line_horizontal_center"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/txt_question1_1" />
@@ -96,9 +134,9 @@
                     android:layout_marginStart="4dp"
                     android:layout_marginTop="4dp"
                     android:layout_marginEnd="4dp"
-                    android:text="@{viewModel.findComment}"
                     android:ellipsize="end"
                     android:maxLines="2"
+                    android:text="@{viewModel.findComment}"
                     app:layout_constraintEnd_toStartOf="@+id/line_horizontal_center"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/txt_question1_2" />
@@ -122,9 +160,9 @@
                     android:layout_marginStart="4dp"
                     android:layout_marginTop="4dp"
                     android:layout_marginEnd="4dp"
-                    android:text="@{viewModel.learnComment}"
                     android:ellipsize="end"
                     android:maxLines="2"
+                    android:text="@{viewModel.learnComment}"
                     android:textSize="@dimen/card_text_main"
                     app:layout_constraintEnd_toStartOf="@+id/line_horizontal_center"
                     app:layout_constraintStart_toStartOf="parent"
@@ -149,9 +187,9 @@
                     android:layout_marginStart="4dp"
                     android:layout_marginTop="4dp"
                     android:layout_marginEnd="4dp"
-                    android:text="@{viewModel.statementComment}"
                     android:ellipsize="end"
                     android:maxLines="2"
+                    android:text="@{viewModel.statementComment}"
                     android:textSize="@dimen/card_text_main"
                     app:layout_constraintEnd_toStartOf="@+id/line_horizontal_center"
                     app:layout_constraintStart_toStartOf="parent"
@@ -168,7 +206,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/txt_title" />
+                    app:layout_constraintTop_toBottomOf="@+id/txt_daily_title" />
 
 
                 <TextView
@@ -181,7 +219,7 @@
                     android:textColor="@color/text_color_dark_primary"
                     android:textSize="@dimen/sub_title_text"
                     app:layout_constraintStart_toEndOf="@+id/line_horizontal_center"
-                    app:layout_constraintTop_toBottomOf="@+id/txt_title" />
+                    app:layout_constraintTop_toBottomOf="@+id/txt_daily_title" />
 
                 <ImageView
                     android:id="@+id/txtAnswer21"
@@ -209,9 +247,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:layout_marginEnd="4dp"
-                    android:text="@{viewModel.reasonComment}"
                     android:ellipsize="end"
                     android:maxLines="2"
+                    android:text="@{viewModel.reasonComment}"
                     android:textSize="@dimen/card_text_main"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="@+id/txt_question2_2"
@@ -234,9 +272,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:layout_marginEnd="4dp"
-                    android:text="@{viewModel.improveComment}"
                     android:ellipsize="end"
                     android:maxLines="2"
+                    android:text="@{viewModel.improveComment}"
                     android:textSize="@dimen/card_text_main"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="@+id/txt_question2_3"
@@ -248,21 +286,21 @@
             android:id="@+id/layout_no_daly_card"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_margin="16dp"
-            android:visibility="@{viewModel.dalyReport instanceof Status.Failure? View.VISIBLE : View.INVISIBLE}"
-            app:cardElevation="8dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="16dp"
+            android:visibility="@{viewModel.mainContainerType instanceof HomeFragmentMainContainerType.NotReport? View.VISIBLE : View.INVISIBLE}"
             app:cardCornerRadius="10dp"
+            app:cardElevation="8dp"
             app:cardUseCompatPadding="true"
-            app:layout_constraintBottom_toTopOf="@+id/btn_daly_diary"
+            app:layout_constraintBottom_toTopOf="@+id/txt_title_report_list"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toBottomOf="@+id/txt_title">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                tools:layout_editor_absoluteX="-3dp"
-                tools:layout_editor_absoluteY="0dp">
+                android:layout_height="match_parent">
 
                 <TextView
                     android:id="@+id/message"
@@ -291,22 +329,107 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.cardview.widget.CardView>
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_daly_diary"
+        <androidx.cardview.widget.CardView
+            android:id="@+id/layout_vision_card"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="16dp"
+            android:visibility="@{viewModel.mainContainerType instanceof HomeFragmentMainContainerType.Vision? View.VISIBLE : View.INVISIBLE}"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="8dp"
+            app:cardUseCompatPadding="true"
+            app:layout_constraintBottom_toTopOf="@+id/txt_title_report_list"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txt_title">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/txt_title_life_vision"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="0dp"
+                    android:text="@string/title_sub_mission_statement"
+                    android:textSize="@dimen/title_text"
+                    android:textStyle="bold"
+                    android:layout_margin="16dp"
+                    android:textColor="@color/text_color_dark_primary"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_chainStyle="packed"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/txt_value_life_vision"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@{viewModel.missionStatement}"
+                    android:textSize="@dimen/sub_title_text"
+                    app:layout_constraintEnd_toEndOf="@+id/txt_title_life_vision"
+                    app:layout_constraintStart_toStartOf="@+id/txt_title_life_vision"
+                    app:layout_constraintTop_toBottomOf="@+id/txt_title_life_vision" />
+
+                <TextView
+                    android:id="@+id/txt_title_daily_vision"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/title_daily_mission"
+                    android:textColor="@color/text_color_dark_primary"
+                    android:textSize="@dimen/title_text"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="@+id/txt_value_life_vision"
+                    app:layout_constraintStart_toStartOf="@+id/txt_value_life_vision"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/txt_value_daily_vision"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@{viewModel.improveComment}"
+                    android:textSize="@dimen/sub_title_text"
+                    app:layout_constraintEnd_toEndOf="@+id/txt_title_daily_vision"
+                    app:layout_constraintStart_toStartOf="@+id/txt_title_daily_vision"
+                    app:layout_constraintTop_toBottomOf="@+id/txt_title_daily_vision" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.cardview.widget.CardView>
+
+        <TextView
+            android:id="@+id/txt_title_report_list"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginBottom="4dp"
-            android:text="@string/radio_btn_daly_diary"
+            android:layout_marginStart="16dp"
+            android:text="@string/title_report_list"
+            android:textColor="@color/text_color_dark_primary"
+            android:textSize="@dimen/sub_title_text"
             app:layout_constraintBottom_toTopOf="@+id/list_diary"
             app:layout_constraintStart_toStartOf="parent" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/list_diary"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="192dp"
+            android:visibility="@{!viewModel.report.isEmpty()? View.VISIBLE : View.INVISIBLE}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/txt_not_found_report_list"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/txt_no_report_list"
+            android:visibility="@{viewModel.report.isEmpty()? View.VISIBLE : View.GONE}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txt_title_report_list" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
