@@ -1,4 +1,4 @@
-package com.myapp.presentation.utill
+package com.myapp.presentation.utils
 
 /**
  * UIのステータス管理

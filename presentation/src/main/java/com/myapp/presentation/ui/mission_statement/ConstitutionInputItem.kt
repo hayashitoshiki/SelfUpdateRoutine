@@ -1,7 +1,7 @@
 package com.myapp.presentation.ui.mission_statement
 
 import com.myapp.presentation.databinding.ItemInputTextBinding
-import com.myapp.presentation.utill.BaseInputTextItem
+import com.myapp.presentation.utils.BaseInputTextItem
 
 /**
  * ミッションステートメント_憲法リストアイテム

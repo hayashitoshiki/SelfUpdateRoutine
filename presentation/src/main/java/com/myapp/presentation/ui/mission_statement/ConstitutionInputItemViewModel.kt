@@ -1,7 +1,7 @@
 package com.myapp.presentation.ui.mission_statement
 
 import androidx.lifecycle.viewModelScope
-import com.myapp.presentation.utill.BaseInputTextItemViewModel
+import com.myapp.presentation.utils.BaseInputTextItemViewModel
 import kotlinx.coroutines.launch
 
 /**

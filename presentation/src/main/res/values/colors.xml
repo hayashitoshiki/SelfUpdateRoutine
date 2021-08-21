@@ -22,7 +22,13 @@
     <color name="text_color_dark_disable">#61000000</color>
     <color name="text_color_error">#B00020</color>
 
+    <!-- disable -->
+    <color name="bg_color_primary_disable">#99F44336</color>
+    <color name="bg_color_primary_dark_disable">#4DD32F2F</color>
+    <color name="bg_color_accent_disable">#998b6e60</color>
+    <color name="white_disable">#99FFFFFF</color>
     <color name="bg_disable">#C5C5C5</color>
+
     <!-- Other -->
     <color name="red_500">#F44336</color>
     <color name="red_700">#D32F2F</color>

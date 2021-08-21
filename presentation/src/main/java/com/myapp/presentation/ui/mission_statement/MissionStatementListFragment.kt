@@ -7,8 +7,8 @@ import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.myapp.presentation.databinding.FragmentMissionStatementListBinding
-import com.myapp.presentation.utill.BaseFragment
-import com.myapp.presentation.utill.DiscItem
+import com.myapp.presentation.utils.BaseFragment
+import com.myapp.presentation.utils.DiscItem
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.ViewHolder
 import org.koin.androidx.viewmodel.ext.android.viewModel

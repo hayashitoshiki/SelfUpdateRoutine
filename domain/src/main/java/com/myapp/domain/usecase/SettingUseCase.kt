@@ -19,7 +19,7 @@ interface SettingUseCase {
     /**
      * アラーム設定更新
      *
-     * Dtoを元に次回のアラーム時間とおアラームモードを設定。
+     * Dtoを元に次回のアラーム時間とアラームモードを設定。
      * 設定後、設定したアラーム時間を返す
      *
      * @param dto アラーム設定オブジェクト生成用Dto
@@ -33,4 +33,12 @@ interface SettingUseCase {
      * @return アラームモード
      */
     fun getAlarmMode(): AlarmMode
+
+    /**
+     * 次回のアラーム時刻取得
+     *
+     * @param dto アラーム設定オブジェクト生成用Dto
+     * @return 次回のアラーム時刻
+     */
+    fun getNextAlarmDate(dto: NextAlarmTimeInputDto): LocalDateTime
 }

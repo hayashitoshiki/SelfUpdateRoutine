@@ -3,7 +3,7 @@ package com.myapp.presentation.ui.diary
 import androidx.lifecycle.*
 import com.myapp.domain.dto.AllReportInputDto
 import com.myapp.domain.usecase.ReportUseCase
-import com.myapp.presentation.utill.Status
+import com.myapp.presentation.utils.Status
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch

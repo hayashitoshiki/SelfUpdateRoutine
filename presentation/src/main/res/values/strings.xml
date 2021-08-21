@@ -42,6 +42,9 @@
     <string name="title_item_action">【改善】\nどうしたら明日はもっと天気がよくなりますか？</string>
     <string name="title_answer_check">下記の内容でよろしいでしょうか？</string>
     <string name="title_daly_card">今日の振り返り</string>
+    <string name="title_item_alarm_time">アラーム時間</string>
+    <string name="title_item_alarm_mode">アラームモード</string>
+    <string name="title_item_next_alarm">次回のアラーム時間</string>
 
     <!-- ヒント文言 -->
     <string name="hint_item_fact">例）綺麗な夕焼けを見た</string>
@@ -71,6 +74,8 @@
     <string name="question_assessment">今日はどんな天気でしたか？</string>
     <string name="question_reason">それは何故ですか？</string>
     <string name="question_improve">どうしたら明日は晴れますか？</string>
+    <string name="explanation_alarm_mode_normal">予定時刻に１回だけ通知されます</string>
+    <string name="explanation_alarm_mode_hard">予定時刻を過ると繰り返し通知されます</string>
 
     <!-- 天気の種類 -->
     <string name="weather_rain">雨</string>
@@ -89,6 +94,8 @@
 
     <!-- ラジオボタン -->
     <string name="radio_btn_daly_diary">今日の日記</string>
+    <string name="radio_btn_alarm_mode_normal">中</string>
+    <string name="radio_btn_alarm_mode_hard">高</string>
 
     <string name="txt_no_daly_diary">今日の日記が入力されていません。</string>
     <string name="txt_no_mission_statement">ミッションステートメントが登録されていません。</string>

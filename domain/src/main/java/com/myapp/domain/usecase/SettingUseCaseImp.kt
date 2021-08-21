@@ -23,6 +23,14 @@ class SettingUseCaseImp(private val localSettingRepository: LocalSettingReposito
     override fun updateAlarmDate(
         dto: NextAlarmTimeInputDto
     ): LocalDateTime {
+        val nextAlertTime = getNextAlarmDate(dto)
+        localSettingRepository.saveAlarmDate(nextAlertTime)
+        localSettingRepository.saveAlarmMode(dto.mode)
+        return nextAlertTime
+    }
+
+    // 次回のアラーム時間取得
+    override fun getNextAlarmDate(dto: NextAlarmTimeInputDto): LocalDateTime {
         val lastSaveDateTime = localSettingRepository.getLastReportSaveDateTime()
         val lastSaveDate = lastSaveDateTime.toLocalDate()
         val nowDateTime = LocalDateTime.now()
@@ -31,8 +39,7 @@ class SettingUseCaseImp(private val localSettingRepository: LocalSettingReposito
         if (lastSaveDate.isEqual(nowDate) || (!lastSaveDate.isEqual(nowDate) && nextAlertTime.isBefore(nowDateTime))) {
             nextAlertTime = nextAlertTime.plusDays(1)
         }
-        localSettingRepository.saveAlarmDate(nextAlertTime)
-        localSettingRepository.saveAlarmMode(dto.mode)
         return nextAlertTime
+
     }
 }

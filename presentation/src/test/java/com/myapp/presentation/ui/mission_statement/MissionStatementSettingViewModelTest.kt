@@ -5,7 +5,7 @@ import androidx.lifecycle.Observer
 import com.myapp.domain.dto.MissionStatementInputDto
 import com.myapp.domain.model.entity.MissionStatement
 import com.myapp.domain.usecase.MissionStatementUseCase
-import com.myapp.presentation.utill.Status
+import com.myapp.presentation.utils.Status
 import com.nhaarman.mockito_kotlin.mock
 import io.mockk.coEvery
 import io.mockk.coVerify

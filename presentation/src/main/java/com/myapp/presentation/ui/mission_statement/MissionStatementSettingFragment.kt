@@ -9,8 +9,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.myapp.presentation.databinding.FragmentMissionStatementSettingBinding
-import com.myapp.presentation.utill.BaseFragment
-import com.myapp.presentation.utill.Status
+import com.myapp.presentation.utils.BaseFragment
+import com.myapp.presentation.utils.Status
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.ViewHolder
 import es.dmoral.toasty.Toasty

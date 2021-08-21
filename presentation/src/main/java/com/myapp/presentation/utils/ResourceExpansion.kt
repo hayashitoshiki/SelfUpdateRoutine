@@ -1,11 +1,19 @@
-package com.myapp.presentation.utill
+package com.myapp.presentation.utils
+
+/**
+ * Resource拡張用ファイル
+ */
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import com.myapp.domain.model.value.AlarmMode
 import com.myapp.domain.model.value.HeartScore
 import com.myapp.presentation.R
 
 
+/**
+ * 今日の天気画像
+ */
 @get: DrawableRes
 val HeartScore.img: Int
     get() = when (this.data) {
@@ -17,6 +25,9 @@ val HeartScore.img: Int
         else -> R.drawable.ic_cloudy_96dp
     }
 
+/**
+ * 今日の天気テキスト
+ */
 @get: StringRes
 val HeartScore.text: Int
     get() = when (this.data) {
@@ -26,4 +37,25 @@ val HeartScore.text: Int
         in 61..80 -> R.string.weather_cloudy_and_sunny
         in 81..100 -> R.string.weather_sunny
         else -> R.string.weather_cloudy
+    }
+
+/**
+ * アラームモードの説明
+ */
+@get: StringRes
+val AlarmMode.explanation: Int
+    get() = when (this) {
+        AlarmMode.NORMAL -> R.string.explanation_alarm_mode_normal
+        AlarmMode.HARD -> R.string.explanation_alarm_mode_hard
+    }
+
+
+/**
+ * アラームモードの説明
+ */
+@get: StringRes
+val AlarmMode.text: Int
+    get() = when (this) {
+        AlarmMode.NORMAL -> R.string.radio_btn_alarm_mode_normal
+        AlarmMode.HARD -> R.string.radio_btn_alarm_mode_hard
     }

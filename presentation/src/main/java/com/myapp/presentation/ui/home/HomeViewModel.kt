@@ -3,9 +3,9 @@ package com.myapp.presentation.ui.home
 import androidx.lifecycle.*
 import com.myapp.domain.model.entity.Report
 import com.myapp.domain.usecase.ReportUseCase
-import com.myapp.presentation.utill.Status
-import com.myapp.presentation.utill.img
-import com.myapp.presentation.utill.isToday
+import com.myapp.presentation.utils.Status
+import com.myapp.presentation.utils.img
+import com.myapp.presentation.utils.isToday
 import kotlinx.coroutines.launch
 
 /**

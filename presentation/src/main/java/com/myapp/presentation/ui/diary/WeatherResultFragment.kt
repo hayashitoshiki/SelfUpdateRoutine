@@ -11,7 +11,7 @@ import androidx.fragment.app.Fragment
 import com.myapp.presentation.R
 import com.myapp.presentation.databinding.ItemDiaryWeatherResultBinding
 import com.myapp.presentation.ui.MainActivity
-import com.myapp.presentation.utill.Status
+import com.myapp.presentation.utils.Status
 import es.dmoral.toasty.Toasty
 import org.koin.androidx.viewmodel.ext.android.viewModel
 

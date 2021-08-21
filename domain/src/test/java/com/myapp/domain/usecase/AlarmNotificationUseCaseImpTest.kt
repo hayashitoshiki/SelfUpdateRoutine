@@ -27,6 +27,7 @@ class AlarmNotificationUseCaseImpTest {
 
     private val nowDateTime = LocalDateTime.now()
         .with(LocalTime.of(21, 0, 0, 0))
+    private val nowDateTimeByBefore = nowDateTime.with(LocalTime.of(15, 0, 0, 0))
     private val tomorrowFirstDateTime = nowDateTime.plusDays(1)
         .with(LocalTime.of(0, 0, 0, 0))
     private val yesterdayDateTime = nowDateTime.minusDays(1)
@@ -82,6 +83,14 @@ class AlarmNotificationUseCaseImpTest {
         } returns tomorrowFirstDateTime
     }
 
+    // アラーム時間外の時間で今日の日時を返却
+    private fun setNowTimeByBeforeAlertTime() {
+        mockkStatic(LocalDateTime::class)
+        every {
+            LocalDateTime.now()
+        } returns nowDateTimeByBefore
+    }
+
     // endregion
 
 
@@ -107,6 +116,25 @@ class AlarmNotificationUseCaseImpTest {
         setLastReportTimeByYesterday()
         val result = alarmNotificationUseCaseImp.getNextAlarmDateTime()
         assertEquals(tomorrowAlarmDate, result)
+    }
+
+    /**
+     * まだ今日の記録をつけていない場合
+     *
+     * 条件：
+     * ・まだ今日の記録をつけていない
+     * ・アラーム時間より前
+     * ・アラートモードが中
+     *
+     * 期待結果：当日の日程でアラーム設定時間を返却
+     */
+    @Test
+    fun getNextAlarmByNotReportAndNormalAndBeforeTime() {
+        setNowTimeByBeforeAlertTime()
+        setNormalMode()
+        setLastReportTimeByYesterday()
+        val result = alarmNotificationUseCaseImp.getNextAlarmDateTime()
+        assertEquals(todayAlarmDate, result)
     }
 
     /**

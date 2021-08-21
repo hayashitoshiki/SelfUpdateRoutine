@@ -4,7 +4,7 @@ import androidx.lifecycle.*
 import com.myapp.domain.dto.MissionStatementInputDto
 import com.myapp.domain.model.entity.MissionStatement
 import com.myapp.domain.usecase.MissionStatementUseCase
-import com.myapp.presentation.utill.Status
+import com.myapp.presentation.utils.Status
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch

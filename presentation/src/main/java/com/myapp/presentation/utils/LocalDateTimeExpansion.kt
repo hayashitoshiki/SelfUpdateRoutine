@@ -1,8 +1,17 @@
-package com.myapp.presentation.utill
+package com.myapp.presentation.utils
+
+/**
+ * LocalDateTime拡張定義用ファイル
+ */
 
 import com.myapp.common.getDateTimeNow
 import java.time.LocalDateTime
 
+/**
+ * 今日であるか判定
+ *
+ * @return 判定結果
+ */
 fun LocalDateTime.isToday(): Boolean {
     val today = getDateTimeNow()
     if (today.year != this.year) {

@@ -32,6 +32,9 @@ class AlarmNotificationUseCaseImp(private val localSettingRepository: LocalSetti
         } else if (nowDateTime.hour == 0) {
             LocalDateTime.now()
                 .with(LocalTime.of(minTime.hour, minTime.minute, minTime.second, minTime.nano))
+        } else if (nowTime.isBefore(minTime) && lastSaveDate.isBefore(nowDate)) {
+            LocalDateTime.now()
+                .with(LocalTime.of(minTime.hour, minTime.minute, minTime.second, minTime.nano))
         } else {
             val nextAlert = LocalDateTime.now()
                 .with(LocalTime.of(minTime.hour, minTime.minute, minTime.second, minTime.nano))

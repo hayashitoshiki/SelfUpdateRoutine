@@ -8,7 +8,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.navigation.fragment.navArgs
 import com.myapp.presentation.R
 import com.myapp.presentation.databinding.FragmentRemenberBinding
-import com.myapp.presentation.utill.BaseFragment
+import com.myapp.presentation.utils.BaseFragment
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf

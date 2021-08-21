@@ -1,4 +1,4 @@
-package com.myapp.presentation.utill
+package com.myapp.presentation.utils
 
 import android.content.Context
 import android.os.Bundle

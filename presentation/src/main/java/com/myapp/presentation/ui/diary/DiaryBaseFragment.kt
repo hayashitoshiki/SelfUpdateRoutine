@@ -10,7 +10,7 @@ import android.view.inputmethod.InputMethodManager
 import androidx.databinding.DataBindingUtil
 import com.myapp.presentation.R
 import com.myapp.presentation.databinding.ItemDiaryTextInputBinding
-import com.myapp.presentation.utill.BaseFragment
+import com.myapp.presentation.utils.BaseFragment
 
 /**
  * 振り返り画面_テキスト入力系画面 BaseFragment

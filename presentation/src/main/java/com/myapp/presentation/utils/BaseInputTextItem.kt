@@ -1,4 +1,4 @@
-package com.myapp.presentation.utill
+package com.myapp.presentation.utils
 
 import com.myapp.presentation.R
 import com.myapp.presentation.databinding.ItemInputTextBinding

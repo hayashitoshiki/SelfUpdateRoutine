@@ -1,5 +1,6 @@
 package com.myapp.presentation.ui.setting
 
+import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
@@ -14,8 +15,10 @@ import androidx.navigation.fragment.findNavController
 import com.myapp.presentation.R
 import com.myapp.presentation.databinding.FragmentSettingBinding
 import com.myapp.presentation.ui.diary.AlarmNotificationReceiver
-import com.myapp.presentation.utill.BaseFragment
-import com.myapp.presentation.utill.Status
+import com.myapp.presentation.utils.BaseFragment
+import com.myapp.presentation.utils.Status
+import com.myapp.presentation.utils.observeAtOnce
+import com.myapp.presentation.utils.text
 import es.dmoral.toasty.Toasty
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
@@ -43,6 +46,7 @@ class SettingFragment : BaseFragment() {
         return binding.root
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?
@@ -50,27 +54,39 @@ class SettingFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.updateState.observe(viewLifecycleOwner, { onUpdateDateStateChanged(it) })
+        viewModel.beforeDate.observeAtOnce(viewLifecycleOwner, { initTimePicker(it) })
+        viewModel.alarmModeExplanation.observe(viewLifecycleOwner, { binding.txtModeExplanation.text = getString(it) })
+        viewModel.alarmMode.observe(viewLifecycleOwner, {
+            binding.modeDiffValue.text = getString(viewModel.beforeAlarmMode.text) + " -> " + getString(it.text)
+        })
 
-        binding.npHour.apply {
-            this.minValue = 0
-            this.maxValue = 23
-            this.wrapSelectorWheel = false
-        }
-        binding.npMinutes.apply {
-            this.minValue = 0
-            this.maxValue = 59
-            this.wrapSelectorWheel = false
-        }
-        binding.npSeconds.apply {
-            this.minValue = 0
-            this.maxValue = 59
-            this.wrapSelectorWheel = false
+        binding.timePicker.also {
+            it.setIs24HourView(true)
+            it.setOnTimeChangedListener { timePicker, hourOfDay, minute ->
+                if (hourOfDay < 18) {
+                    timePicker.hour = 18
+                }
+                if (timePicker.hour != viewModel.hourDate.value) {
+                    viewModel.hourDate.value = timePicker.hour
+                }
+                if (minute != viewModel.minutesDate.value) {
+                    viewModel.minutesDate.value = minute
+                }
+            }
         }
 
         // 確定ボタン
         binding.btnOk.setOnClickListener {
             viewModel.updateDate()
         }
+    }
+
+    // TimPicker初期値設定
+    private fun initTimePicker(dataStr: String) {
+        binding.timePicker.hour = dataStr.substring(0, 2)
+            .toInt()
+        binding.timePicker.minute = dataStr.substring(3, 5)
+            .toInt()
     }
 
     // アラーム設定ステータス監視
@@ -87,7 +103,6 @@ class SettingFragment : BaseFragment() {
         is Status.Non -> {
         }
     }
-
 
     // 通知バーアラーム表示設定(次の日の設定)
     private fun setAlarmAndBack(date: LocalDateTime) {
