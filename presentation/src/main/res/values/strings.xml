@@ -13,6 +13,8 @@
     <string name="menu_remember">詳細</string>
     <string name="menu_constitution_list">ミッションステートメント</string>
     <string name="menu_constitution_setting">ミッションステートメント編集</string>
+    <string name="menu_constitution_statement_list">宣言</string>
+    <string name="menu_constitution_learn_list">格言</string>
 
     <!-- セクション -->
     <string name="title_report_ffs">４行日記</string>

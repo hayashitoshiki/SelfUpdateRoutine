@@ -15,4 +15,8 @@
 
     <!-- fabSize="normal"のときのサイズ(FABサイズ調整) -->
     <dimen name="design_fab_size_normal" tools:override="true">48dp</dimen>
+    <dimen name="design_fab_size_mini" tools:override="true">32dp</dimen>
+
+    <dimen name="standard_55">55dp</dimen>
+    <dimen name="standard_105">105dp</dimen>
 </resources>

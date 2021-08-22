@@ -17,6 +17,12 @@
             app:exitAnim="@anim/nav_slide_exit_anim"
             app:popEnterAnim="@anim/nav_slide_pop_enter_anim"
             app:popExitAnim="@anim/nav_slide_pop_exit_anim" />
+        <action
+            android:id="@+id/action_nav_home_to_nav_statement_list"
+            app:destination="@id/nav_statement_list" />
+        <action
+            android:id="@+id/action_nav_home_to_nav_learn_list"
+            app:destination="@id/nav_learn_list" />
     </fragment>
 
     <fragment
@@ -52,6 +58,25 @@
             android:name="missionStatement"
             app:argType="com.myapp.domain.model.entity.MissionStatement"
             app:nullable="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_statement_list"
+        android:name="com.myapp.presentation.ui.home.StatementListFragment"
+        android:label="@string/menu_constitution_statement_list"
+        tools:layout="@layout/fragment_report_detail_list_base">
+        <argument
+            android:name="statementList"
+            app:argType="com.myapp.presentation.ui.home.ReportDetailList" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_learn_list"
+        android:name="com.myapp.presentation.ui.home.LearnListFragment"
+        android:label="@string/menu_constitution_learn_list"
+        tools:layout="@layout/fragment_report_detail_list_base">
+        <argument
+            android:name="statementList"
+            app:argType="com.myapp.presentation.ui.home.ReportDetailList" />
     </fragment>
 
 </navigation>

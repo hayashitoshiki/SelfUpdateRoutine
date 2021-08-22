@@ -57,7 +57,23 @@ class HomeViewModel(
     private val _missionStatement = MutableLiveData("")
     val missionStatement: LiveData<String> = _missionStatement
 
+    // Fabボタン表示非表示制御
+    private val _isFabVisibility = MediatorLiveData<Boolean>()
+    val isFabVisibility: LiveData<Boolean> = _isFabVisibility
+
+    // レポートリスト表示非表示制御
+    private val _isReportListVisibility = MediatorLiveData<Boolean>()
+    val isReportListVisibility: LiveData<Boolean> = _isReportListVisibility
+
+    // レポート未登録メッセージ表示非表示制御
+    private val _isNotReportListVisibility = MediatorLiveData<Boolean>()
+    val isNotReportListVisibility: LiveData<Boolean> = _isNotReportListVisibility
+
     init {
+        _isFabVisibility.addSource(_report) { _isFabVisibility.value = _report.value?.isNotEmpty() }
+        _isReportListVisibility.addSource(_report) { _isReportListVisibility.value = _report.value?.isNotEmpty() }
+        _isNotReportListVisibility.addSource(_report) { _isNotReportListVisibility.value = _report.value?.isEmpty() }
+
         viewModelScope.launch {
             val reportList = reportUseCase.getAllReport()
             _report.value = reportList
@@ -85,7 +101,6 @@ class HomeViewModel(
             } else {
                 _mainContainerType.value = HomeFragmentMainContainerType.Report(report)
             }
-
         }
     }
 }

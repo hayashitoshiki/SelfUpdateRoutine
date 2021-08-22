@@ -78,6 +78,7 @@ class HomeViewModelTest {
     private fun setMockObserver() {
         val observerString = mock<Observer<String>>()
         val observerInt = mock<Observer<Int>>()
+        val observerBoolean = mock<Observer<Boolean>>()
         val observerReport = mock<Observer<List<Report>>>()
         val observerHomeFragmentMainContainerType = mock<Observer<HomeFragmentMainContainerType<*>>>()
         viewModel.factComment.observeForever(observerString)
@@ -90,6 +91,9 @@ class HomeViewModelTest {
         viewModel.report.observeForever(observerReport)
         viewModel.mainContainerType.observeForever(observerHomeFragmentMainContainerType)
         viewModel.missionStatement.observeForever(observerString)
+        viewModel.isFabVisibility.observeForever(observerBoolean)
+        viewModel.isReportListVisibility.observeForever(observerBoolean)
+        viewModel.isNotReportListVisibility.observeForever(observerBoolean)
     }
 
     private fun setMissionStatement() {
@@ -254,6 +258,88 @@ class HomeViewModelTest {
         setMockObserver()
         val result = viewModel.mainContainerType.value is HomeFragmentMainContainerType.Report
         Assert.assertEquals(true, result)
+    }
+
+    // endregion
+
+    // region Fabボタンロジック
+
+    /**
+     * 初期表示
+     *
+     * 条件：まだレポートが登録されていない
+     * 期待結果：
+     * ・fabボタンが表示されないこと
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun fabByNotReport() = testScope.runBlockingTest {
+        setReportListByEmpty()
+        setMissionStatementByNull()
+        viewModel = HomeViewModel(reportUseCase, missionStatementUseCase)
+        setMockObserver()
+        Assert.assertEquals(false, viewModel.isFabVisibility.value)
+    }
+
+    /**
+     * 初期表示
+     *
+     * 条件：まだレポートが登録されていない
+     * 期待結果：
+     * ・fabボタンが表示されないこと
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun fabByReport() = testScope.runBlockingTest {
+        setReportListByNotToday()
+        setNowTimeByBefore18()
+        setMissionStatement()
+        viewModel = HomeViewModel(reportUseCase, missionStatementUseCase)
+        setMockObserver()
+        Assert.assertEquals(true, viewModel.isFabVisibility.value)
+    }
+
+    // endregion
+
+    // region
+
+    /**
+     * 初期表示
+     *
+     * 条件：まだレポートが登録されていない
+     * 期待結果：
+     * ・レポートリストが表示されないこと
+     * ・レポートリスト未登録メッセージが表示されること
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun reportListByNotReport() = testScope.runBlockingTest {
+        setReportListByEmpty()
+        setMissionStatementByNull()
+        viewModel = HomeViewModel(reportUseCase, missionStatementUseCase)
+        setMockObserver()
+        Assert.assertEquals(false, viewModel.isReportListVisibility.value)
+        Assert.assertEquals(true, viewModel.isNotReportListVisibility.value)
+    }
+
+    /**
+     * 初期表示
+     *
+     * 条件：レポートが登録されている
+     * 期待結果：
+     * ・レポートリストが表示されること
+     * ・レポートリスト未登録メッセージが表示されないこと
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun reportListByReport() = testScope.runBlockingTest {
+        setReportListByNotToday()
+        setNowTimeByBefore18()
+        setMissionStatement()
+        viewModel = HomeViewModel(reportUseCase, missionStatementUseCase)
+        setMockObserver()
+        Assert.assertEquals(true, viewModel.isReportListVisibility.value)
+        Assert.assertEquals(false, viewModel.isNotReportListVisibility.value)
     }
 
     // endregion

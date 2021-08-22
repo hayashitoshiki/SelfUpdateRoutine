@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.myapp.domain.model.entity.Report
+import com.myapp.presentation.R
 import com.myapp.presentation.databinding.FragmentHomeBinding
 import com.myapp.presentation.ui.diary.DiaryActivity
 import com.myapp.presentation.utils.BaseFragment
@@ -15,6 +16,8 @@ import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.ViewHolder
 import com.xwray.groupie.databinding.BindableItem
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import timber.log.Timber
+
 
 /**
  * ホーム画面
@@ -24,6 +27,7 @@ class HomeFragment : BaseFragment() {
     private val viewModel: HomeViewModel by viewModel()
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
+    private var isFABOpen = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -55,6 +59,63 @@ class HomeFragment : BaseFragment() {
             val intent = Intent(context, DiaryActivity::class.java)
             startActivity(intent)
         }
+
+        // Fabボタン
+        binding.fab.setOnClickListener {
+            if (!isFABOpen) {
+                showFABMenu()
+            } else {
+                closeFABMenu()
+            }
+        }
+
+        // Fab_宣言一覧ボタン
+        binding.fabStatement.setOnClickListener {
+            viewModel.report.value?.let { reportList ->
+                val statementList = reportList.map { report ->
+                    ReportDetail(report.ffsReport.statementComment, report.ffsReport.dataTime)
+                }
+                val data = ReportDetailList(statementList)
+                val action = HomeFragmentDirections.actionNavHomeToNavStatementList(data)
+                findNavController().navigate(action)
+                isFABOpen = false
+            } ?: run {
+                Timber.tag(this.javaClass.simpleName)
+                    .d("レポートリストが登録されていないのに宣言一覧画面を表示しようとしています")
+            }
+        }
+
+        // Fab_格言一覧ボタン
+        binding.fabLearn.setOnClickListener {
+            viewModel.report.value?.let { reportList ->
+                val statementList = reportList.map { report ->
+                    ReportDetail(report.ffsReport.learnComment, report.ffsReport.dataTime)
+                }
+                val data = ReportDetailList(statementList)
+                val action = HomeFragmentDirections.actionNavHomeToNavLearnList(data)
+                findNavController().navigate(action)
+                isFABOpen = false
+            } ?: run {
+                Timber.tag(this.javaClass.simpleName)
+                    .d("レポートリストが登録されていないのに宣言一覧画面を表示しようとしています")
+            }
+        }
+    }
+
+    private fun showFABMenu() {
+        isFABOpen = true
+        binding.fabStatement.animate()
+            .translationY(resources.getDimension(R.dimen.standard_55))
+        binding.fabLearn.animate()
+            .translationY(resources.getDimension(R.dimen.standard_105))
+    }
+
+    private fun closeFABMenu() {
+        isFABOpen = false
+        binding.fabStatement.animate()
+            .translationY(0.toFloat())
+        binding.fabLearn.animate()
+            .translationY(0.toFloat())
     }
 
     // レポートリスト設定
