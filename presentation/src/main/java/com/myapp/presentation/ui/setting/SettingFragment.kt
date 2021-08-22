@@ -63,8 +63,11 @@ class SettingFragment : BaseFragment() {
         binding.timePicker.also {
             it.setIs24HourView(true)
             it.setOnTimeChangedListener { timePicker, hourOfDay, minute ->
-                if (hourOfDay < 18) {
+                if (hourOfDay in 0..14) {
                     timePicker.hour = 18
+                }
+                if (hourOfDay in 15..17) {
+                    timePicker.hour = 23
                 }
                 if (timePicker.hour != viewModel.hourDate.value) {
                     viewModel.hourDate.value = timePicker.hour

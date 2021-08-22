@@ -11,10 +11,12 @@ import android.graphics.Color
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.myapp.domain.usecase.AlarmNotificationUseCase
+import com.myapp.domain.usecase.SettingUseCase
 import com.myapp.presentation.R
 import org.koin.java.KoinJavaComponent.inject
 import timber.log.Timber
 import java.time.OffsetDateTime
+import java.util.*
 
 /**
  * 通知バー表示
@@ -22,6 +24,7 @@ import java.time.OffsetDateTime
 class AlarmNotificationReceiver : BroadcastReceiver() {
 
     private val alarmNotificationUseCase by inject<AlarmNotificationUseCase>(AlarmNotificationUseCase::class.java)
+    private val settingUseCase by inject<SettingUseCase>(SettingUseCase::class.java)
 
     companion object {
         const val NOTIFICATION_ID = 0
@@ -86,8 +89,20 @@ class AlarmNotificationReceiver : BroadcastReceiver() {
         val intent = Intent(context, AlarmNotificationReceiver::class.java)
         val pendingIntent = PendingIntent.getBroadcast(context, NOTIFICATION_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT)
         val nextAlertTime = alarmNotificationUseCase.getNextAlarmDateTime()
-        val alarmTimeMilli = nextAlertTime.toEpochSecond(OffsetDateTime.now().offset) * 1000
-        val clockInfo = AlarmManager.AlarmClockInfo(alarmTimeMilli, null)
-        alarmManager.setAlarmClock(clockInfo, pendingIntent)
+        val settingAlarmTime = settingUseCase.getAlarmDate()
+        if (nextAlertTime.toLocalTime() == settingAlarmTime.toLocalTime()) {
+            val calendar: Calendar = Calendar.getInstance()
+                .apply {
+                    this.set(Calendar.DAY_OF_MONTH, nextAlertTime.dayOfMonth)
+                    this.set(Calendar.HOUR_OF_DAY, nextAlertTime.hour)
+                    this.set(Calendar.MINUTE, nextAlertTime.minute)
+                    this.set(Calendar.SECOND, nextAlertTime.second)
+                }
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
+        } else {
+            val alarmTimeMilli = nextAlertTime.toEpochSecond(OffsetDateTime.now().offset) * 1000
+            val clockInfo = AlarmManager.AlarmClockInfo(alarmTimeMilli, null)
+            alarmManager.setAlarmClock(clockInfo, pendingIntent)
+        }
     }
 }
