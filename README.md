@@ -1,18 +1,24 @@
 # SelfUpdateRoutine
 ### 自己成長補助アプリ  
-内省化やインプットを強制させることを目的とした補助アプリ
+内省資質型による内省資質型のための内省化強化補助アプリ  
+~~内省化やインプットを強制させることを目的とした補助アプリ~~
 
 ## 機能
-・内省化強制機能  
+・振り返り記録機能  
 ・過去の振り返り観覧機能  
+・ミッションステートメント設定機能  
 〜〜追加予定〜〜  
-・デイリー閲覧URL表示機能
+・デイリー閲覧URL表示機能  
+・深掘りメモ機能
 
 ## 言語
 Kotlin
 
 ## アーキテクチャ
-MVVM(+ 一部Fluxもどき) + Clean Architecture
+全体  
+・Clean Architecture  
+Presentation層  
+・MVVMベース(MVVMをベースにMVPとfluxの思想を一部取込) ＋ 一部疑似Flux  
 
 ## 主な使用技術
  #### ネイティブ(ライブラリ)
@@ -31,11 +37,16 @@ MVVM(+ 一部Fluxもどき) + Clean Architecture
   * CardView
   * Groupie
   * ViewPager2
+* 開発補助
+  * Timber
+  * LeakCanary
+  * ktLint
 #### バックエンド
 なし　
 
 ## 画面イメージ
-<img src="https://github.com/hayashitoshiki/SelfUpdateRoutine/blob/master/picture/home.png" width="200">  
+<img src="https://github.com/hayashitoshiki/SelfUpdateRoutine/blob/master/picture/home.png" width="200">　
+<img src="https://github.com/hayashitoshiki/SelfUpdateRoutine/blob/master/picture/setting.png" width="200">  
 
 ## 主なソース
 
