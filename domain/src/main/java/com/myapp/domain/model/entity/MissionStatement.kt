@@ -17,7 +17,7 @@ data class MissionStatement(
     internal var _purposeLife: String,
     internal var _constitutionList: List<String>
 ) : Serializable {
-    val funeralList: List<String> = _funeralList
-    val purposeLife: String = _purposeLife
-    val constitutionList: List<String> = _constitutionList
+    val funeralList: List<String> get() = _funeralList
+    val purposeLife: String get() = _purposeLife
+    val constitutionList: List<String> get() = _constitutionList
 }

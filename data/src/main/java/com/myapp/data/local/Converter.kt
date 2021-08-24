@@ -82,21 +82,8 @@ object Converter {
      * @return 理想の葬儀Entityリスト
      */
     fun funeralEntityListFromMissionStatement(missionStatement: MissionStatement): List<FuneralEntity> {
-        return missionStatement.funeralList.map {
-            FuneralEntity(0, it, getDateTimeNow())
-        }
-    }
-
-    /**
-     * ミッションステートメントオブジェクト -> 人生の目的Entity
-     *
-     * @param missionStatement ミッションステートメント
-     * @return 人生の目的Entity
-     */
-    fun constitutionEntityListFromMissionStatement(missionStatement: MissionStatement): List<ConstitutionEntity> {
-        return missionStatement.constitutionList.map {
-            ConstitutionEntity(0, it, getDateTimeNow())
-        }
+        return missionStatement.funeralList.filter { it.isNotEmpty() }
+            .map { FuneralEntity(0, it, getDateTimeNow()) }
     }
 
     /**
@@ -104,6 +91,17 @@ object Converter {
      *
      * @param missionStatement ミッションステートメント
      * @return 憲法Entityリスト
+     */
+    fun constitutionEntityListFromMissionStatement(missionStatement: MissionStatement): List<ConstitutionEntity> {
+        return missionStatement.constitutionList.filter { it.isNotEmpty() }
+            .map { ConstitutionEntity(0, it, getDateTimeNow()) }
+    }
+
+    /**
+     * ミッションステートメントオブジェクト -> 人生の目的Entity
+     *
+     * @param missionStatement ミッションステートメント
+     * @return 人生の目的Entity
      */
     fun purposeLifeEntityFromMissionStatement(missionStatement: MissionStatement): PurposeLifeEntity {
         return PurposeLifeEntity(1, missionStatement.purposeLife, getDateTimeNow(), getDateTimeNow())
