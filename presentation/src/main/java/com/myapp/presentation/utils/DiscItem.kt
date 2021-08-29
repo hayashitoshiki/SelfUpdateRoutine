@@ -9,7 +9,7 @@ import com.xwray.groupie.databinding.BindableItem
  *
  * @property value 表示する文字列
  */
-class DiscItem(private val value: String) : BindableItem<ItemDiscBinding>() {
+open class DiscItem(private val value: String) : BindableItem<ItemDiscBinding>() {
 
     override fun getLayout(): Int = R.layout.item_disc
 

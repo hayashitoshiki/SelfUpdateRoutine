@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.myapp.presentation.R
 import com.myapp.presentation.databinding.FragmentMissionStatementSettingBinding
 import com.myapp.presentation.utils.BaseFragment
 import com.myapp.presentation.utils.Status
@@ -61,27 +62,62 @@ class MissionStatementSettingFragment : BaseFragment() {
             it.adapter = adapter
             it.layoutManager = layoutManager
         }
+        binding.listResultFuneral.also {
+            val adapter = GroupAdapter<ViewHolder>()
+            val layoutManager = LinearLayoutManager(requireContext())
+            it.adapter = adapter
+            it.layoutManager = layoutManager
+        }
+        binding.listResultConstitution.also {
+            val adapter = GroupAdapter<ViewHolder>()
+            val layoutManager = LinearLayoutManager(requireContext())
+            it.adapter = adapter
+            it.layoutManager = layoutManager
+        }
+        binding.editMissionStatement.hint = requireContext().getString(R.string.hint_purpose_life)
         binding.btnChange.setOnClickListener { viewModel.onClickConfirmButton() }
     }
 
     // 理想の葬儀リスト設定
     private fun setFuneralList(data: List<Pair<Long, String>>) {
-        val items = data.mapIndexed { index, s ->
-            val funeralInputItemViewModel = FuneralInputItemViewModel(index, s.first, s.second)
-            FuneralInputItem(funeralInputItemViewModel)
+        (binding.listFuneral.adapter as GroupAdapter<*>).also { adapter ->
+            if (adapter.itemCount == data.count()) return@also
+            val items = data.mapIndexed { index, s ->
+                val funeralInputItemViewModel = FuneralInputItemViewModel(index, s.first, s.second)
+                FuneralInputItem(requireContext(), funeralInputItemViewModel)
+            }
+            adapter.update(items)
         }
-        val adapter = binding.listFuneral.adapter as GroupAdapter<*>
-        adapter.update(items)
+        (binding.listResultFuneral.adapter as GroupAdapter<*>).also { adapter ->
+            val items = data.filter { it.second.isNotBlank() }
+                .map {
+                    MissionStatementSettingResultDiscItem(
+                        it.first, it.second, viewModel.constitutionListDiffColor, requireContext(), viewLifecycleOwner
+                    )
+                }
+            adapter.update(items)
+        }
     }
 
     // 憲法リスト設定
     private fun setConstitutionList(data: List<Pair<Long, String>>) {
-        val items = data.mapIndexed { index, s ->
-            val constitutionInputItemViewModel = ConstitutionInputItemViewModel(index, s.first, s.second)
-            ConstitutionInputItem(constitutionInputItemViewModel)
+        (binding.listConstitution.adapter as GroupAdapter<*>).also { adapter ->
+            if (adapter.itemCount == data.count()) return@also
+            val items = data.mapIndexed { index, s ->
+                val constitutionInputItemViewModel = ConstitutionInputItemViewModel(index, s.first, s.second)
+                ConstitutionInputItem(requireContext(), constitutionInputItemViewModel)
+            }
+            adapter.update(items)
         }
-        val adapter = binding.listConstitution.adapter as GroupAdapter<*>
-        adapter.update(items)
+        (binding.listResultConstitution.adapter as GroupAdapter<*>).also { adapter ->
+            val items = data.filter { it.second.isNotBlank() }
+                .map {
+                    MissionStatementSettingResultDiscItem(
+                        it.first, it.second, viewModel.constitutionListDiffColor, requireContext(), viewLifecycleOwner
+                    )
+                }
+            adapter.update(items)
+        }
     }
 
 

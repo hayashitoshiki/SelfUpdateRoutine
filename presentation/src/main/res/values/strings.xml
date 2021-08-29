@@ -59,7 +59,9 @@
     <string name="hint_item_statement">例）私は、大望をかなえている野心家です</string>
     <string name="hint_item_reason">例）なかなかタスクが進まなかった</string>
     <string name="hint_item_improve">例）優先順位を考える</string>
+    <string name="hint_funeral">例）弔辞：あなたがいたからこの道を見つけることができた</string>
     <string name="hint_purpose_life">例）ワクワクで溢れる人生を提供すること</string>
+    <string name="hint_constitution">例）弱い人の見方であること</string>
 
     <!-- サブタイトル -->
     <string name="title_sub_setting">変更前の時間</string>

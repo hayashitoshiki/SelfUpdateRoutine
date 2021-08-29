@@ -450,9 +450,11 @@ class MissionStatementSettingViewModelTest {
         viewModel.onClickConfirmButton()
         val funeralList = viewModel.funeralList.value!!.toList()
             .map { it.second }
+            .filter { it.isNotBlank() }
         val purposeLife = viewModel.purposeLife.value!!
         val constitutionList = viewModel.constitutionList.value!!.toList()
             .map { it.second }
+            .filter { it.isNotBlank() }
         val dto = MissionStatementInputDto(funeralList, purposeLife, constitutionList)
         coVerify(exactly = 1) { (missionStatementUseCase).createMissionStatement(dto) }
         assertEquals(true, viewModel.confirmStatus.value is Status.Success)
@@ -477,6 +479,9 @@ class MissionStatementSettingViewModelTest {
         assertEquals(true, viewModel.confirmStatus.value is Status.Failure)
     }
 
+
+    // region ボタン活性非活性制御
+
     /**
      * 変更確定ボタン
      *
@@ -489,6 +494,60 @@ class MissionStatementSettingViewModelTest {
     fun isEnableConfirmButtonByAllEmpty() = testScope.runBlockingTest {
         viewModel = MissionStatementSettingViewModel(null, missionStatementUseCase)
         setMockObserver()
+        assertEquals(false, viewModel.isEnableConfirmButton.value)
+    }
+
+    /**
+     * 変更確定ボタン
+     *
+     * 条件：理想の葬儀のみ入力済み(半角スペースのみ)
+     * 期待結果：
+     * ・ミッションステートメント更新ボタンが活性(false)になること
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun isEnableConfirmButtonByFuneralHanSpace() = testScope.runBlockingTest {
+        viewModel = MissionStatementSettingViewModel(null, missionStatementUseCase)
+        setMockObserver()
+        val index = 0
+        val setText = " "
+        MissionStatementDispatcher.changeFuneralText(index, setText)
+        assertEquals(false, viewModel.isEnableConfirmButton.value)
+    }
+
+    /**
+     * 変更確定ボタン
+     *
+     * 条件：理想の葬儀のみ入力済み(全角スペースのみ)
+     * 期待結果：
+     * ・ミッションステートメント更新ボタンが活性(false)になること
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun isEnableConfirmButtonByFuneralZenSpace() = testScope.runBlockingTest {
+        viewModel = MissionStatementSettingViewModel(null, missionStatementUseCase)
+        setMockObserver()
+        val index = 0
+        val setText = "　"
+        MissionStatementDispatcher.changeFuneralText(index, setText)
+        assertEquals(false, viewModel.isEnableConfirmButton.value)
+    }
+
+    /**
+     * 変更確定ボタン
+     *
+     * 条件：理想の葬儀のみ入力済み(改行のみ)
+     * 期待結果：
+     * ・ミッションステートメント更新ボタンが活性(false)になること
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun isEnableConfirmButtonByFuneralEnter() = testScope.runBlockingTest {
+        viewModel = MissionStatementSettingViewModel(null, missionStatementUseCase)
+        setMockObserver()
+        val index = 0
+        val setText = "\n"
+        MissionStatementDispatcher.changeFuneralText(index, setText)
         assertEquals(false, viewModel.isEnableConfirmButton.value)
     }
 
@@ -513,6 +572,54 @@ class MissionStatementSettingViewModelTest {
     /**
      * 変更確定ボタン
      *
+     * 条件：人生の目的のみ入力済み(半角スペース)
+     * 期待結果：
+     * ・ミッションステートメント更新ボタンが活性(false)になること
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun isEnableConfirmButtonByPurposeLifeHanSpace() = testScope.runBlockingTest {
+        viewModel = MissionStatementSettingViewModel(null, missionStatementUseCase)
+        setMockObserver()
+        viewModel.purposeLife.value = " "
+        assertEquals(false, viewModel.isEnableConfirmButton.value)
+    }
+
+    /**
+     * 変更確定ボタン
+     *
+     * 条件：人生の目的のみ入力済み(全角スペース)
+     * 期待結果：
+     * ・ミッションステートメント更新ボタンが活性(false)になること
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun isEnableConfirmButtonByPurposeLifeZenSpace() = testScope.runBlockingTest {
+        viewModel = MissionStatementSettingViewModel(null, missionStatementUseCase)
+        setMockObserver()
+        viewModel.purposeLife.value = "　"
+        assertEquals(false, viewModel.isEnableConfirmButton.value)
+    }
+
+    /**
+     * 変更確定ボタン
+     *
+     * 条件：人生の目的のみ入力済み(改行のみ)
+     * 期待結果：
+     * ・ミッションステートメント更新ボタンが活性(false)になること
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun isEnableConfirmButtonByPurposeLifeEnter() = testScope.runBlockingTest {
+        viewModel = MissionStatementSettingViewModel(null, missionStatementUseCase)
+        setMockObserver()
+        viewModel.purposeLife.value = "\n"
+        assertEquals(false, viewModel.isEnableConfirmButton.value)
+    }
+
+    /**
+     * 変更確定ボタン
+     *
      * 条件：人生の目的のみ入力済み
      * 期待結果：
      * ・ミッションステートメント更新ボタンが活性(true)になること
@@ -524,6 +631,60 @@ class MissionStatementSettingViewModelTest {
         setMockObserver()
         viewModel.purposeLife.value = "test"
         assertEquals(true, viewModel.isEnableConfirmButton.value)
+    }
+
+    /**
+     * 変更確定ボタン
+     *
+     * 条件：憲法のみ入力済み(半角スペースのみ)
+     * 期待結果：
+     * ・ミッションステートメント更新ボタンが活性(false)になること
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun isEnableConfirmButtonByConstitutionHanSpace() = testScope.runBlockingTest {
+        viewModel = MissionStatementSettingViewModel(null, missionStatementUseCase)
+        setMockObserver()
+        val index = 0
+        val setText = " "
+        MissionStatementDispatcher.changeConstitutionText(index, setText)
+        assertEquals(false, viewModel.isEnableConfirmButton.value)
+    }
+
+    /**
+     * 変更確定ボタン
+     *
+     * 条件：憲法のみ入力済み(全角スペースのみ)
+     * 期待結果：
+     * ・ミッションステートメント更新ボタンが活性(false)になること
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun isEnableConfirmButtonByConstitutionZenSpace() = testScope.runBlockingTest {
+        viewModel = MissionStatementSettingViewModel(null, missionStatementUseCase)
+        setMockObserver()
+        val index = 0
+        val setText = "　"
+        MissionStatementDispatcher.changeConstitutionText(index, setText)
+        assertEquals(false, viewModel.isEnableConfirmButton.value)
+    }
+
+    /**
+     * 変更確定ボタン
+     *
+     * 条件：憲法のみ入力済み(改行のみ)
+     * 期待結果：
+     * ・ミッションステートメント更新ボタンが活性(false)になること
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun isEnableConfirmButtonByConstitutionEnter() = testScope.runBlockingTest {
+        viewModel = MissionStatementSettingViewModel(null, missionStatementUseCase)
+        setMockObserver()
+        val index = 0
+        val setText = "\n"
+        MissionStatementDispatcher.changeConstitutionText(index, setText)
+        assertEquals(false, viewModel.isEnableConfirmButton.value)
     }
 
     /**
@@ -543,6 +704,8 @@ class MissionStatementSettingViewModelTest {
         MissionStatementDispatcher.changeConstitutionText(index, setText)
         assertEquals(true, viewModel.isEnableConfirmButton.value)
     }
+
+    // endregion
 
     // endregion
 
