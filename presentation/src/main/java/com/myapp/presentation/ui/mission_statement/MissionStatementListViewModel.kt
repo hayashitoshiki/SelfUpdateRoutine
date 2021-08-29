@@ -60,15 +60,15 @@ class MissionStatementListViewModel(private val missionStatementUseCase: Mission
                 missionStatement = it
                 _status.value = Status.Success(it)
             } ?: run {
-            _funeralList.value = listOf("")
+            _funeralList.value = listOf()
             _purposeLife.value = ""
-            _constitutionList.value = listOf("")
+            _constitutionList.value = listOf()
             _status.value = Status.Failure(IllegalAccessException("初回起動"))
         }
     }
 
     private fun changeFuneral() {
-        _isEnableFuneralList.value = _funeralList.value != listOf("")
+        _isEnableFuneralList.value = _funeralList.value?.isNotEmpty() ?: false
     }
 
     private fun changePurposeLife() {
@@ -76,7 +76,7 @@ class MissionStatementListViewModel(private val missionStatementUseCase: Mission
     }
 
     private fun changeConstitutionList() {
-        _isEnableConstitutionList.value = _constitutionList.value != listOf("")
+        _isEnableConstitutionList.value = _constitutionList.value?.isNotEmpty() ?: false
     }
 
 }

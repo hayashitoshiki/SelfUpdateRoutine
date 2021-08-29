@@ -8,7 +8,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.myapp.presentation.databinding.FragmentMissionStatementListBinding
 import com.myapp.presentation.utils.BaseFragment
-import com.myapp.presentation.utils.DiscItem
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.ViewHolder
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -64,14 +63,14 @@ class MissionStatementListFragment : BaseFragment() {
 
     // 理想の葬儀リスト設定
     private fun setFuneralList(data: List<String>) {
-        val items = data.map { DiscItem(it) }
+        val items = data.map { MissionStatementListDiscItem(it, requireContext()) }
         val adapter = binding.listFuneral.adapter as GroupAdapter<*>
         adapter.update(items)
     }
 
     // 憲法リスト設定
     private fun setConstitutionList(data: List<String>) {
-        val items = data.map { DiscItem(it) }
+        val items = data.map { MissionStatementListDiscItem(it, requireContext()) }
         val adapter = binding.listConstitution.adapter as GroupAdapter<*>
         adapter.update(items)
     }

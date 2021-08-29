@@ -154,7 +154,7 @@ class MissionStatementSettingViewModel(
     // 人生の目的文字色変更
     private fun onChangePurposeLifeTextColor(data: String) {
         _purposeLifeDiffColor.value =
-            if ((missionStatement == null && data == "") || (missionStatement != null && missionStatement.purposeLife != data)) {
+            if ((missionStatement == null && data.isNotBlank()) || (missionStatement != null && missionStatement.purposeLife != data)) {
                 R.color.text_color_light_primary
             } else {
                 R.color.text_color_light_secondary
