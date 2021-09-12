@@ -6,7 +6,10 @@ import androidx.room.Room
 import com.myapp.data.local.LocalMissionStatementRepositoryImp
 import com.myapp.data.local.LocalReportRepositoryImp
 import com.myapp.data.local.LocalSettingRepositoryImp
+import com.myapp.data.local.database.AppDatabase
+import com.myapp.data.local.preferences.PreferenceManager
 import com.myapp.data.local.preferences.UserSharedPreferences
+import com.myapp.data.local.preferences.UserSharedPreferencesImp
 import com.myapp.domain.model.entity.MissionStatement
 import com.myapp.domain.model.entity.Report
 import com.myapp.domain.repository.LocalMissionStatementRepository
@@ -21,9 +24,6 @@ import com.myapp.presentation.ui.mission_statement.MissionStatementListViewModel
 import com.myapp.presentation.ui.mission_statement.MissionStatementSettingViewModel
 import com.myapp.presentation.ui.remember.RememberViewModel
 import com.myapp.presentation.ui.setting.SettingViewModel
-import com.myapp.selfupdateroutine.database.AppDatabase
-import com.myapp.selfupdateroutine.preferences.PreferenceManager
-import com.myapp.selfupdateroutine.preferences.UserSharedPreferencesImp
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.GlobalContext.startKoin

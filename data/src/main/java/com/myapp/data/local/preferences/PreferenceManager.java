@@ -1,4 +1,4 @@
-package com.myapp.selfupdateroutine.preferences;
+package com.myapp.data.local.preferences;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

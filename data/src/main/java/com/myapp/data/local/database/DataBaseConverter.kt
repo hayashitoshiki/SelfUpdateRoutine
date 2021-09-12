@@ -1,4 +1,4 @@
-package com.myapp.chatmemo.database
+package com.myapp.data.local.database
 
 import androidx.room.TypeConverter
 import java.time.LocalDateTime

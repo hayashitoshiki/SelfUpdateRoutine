@@ -1,11 +1,10 @@
-package com.myapp.selfupdateroutine.database
+package com.myapp.data.local.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.myapp.chatmemo.database.DataBaseConverter
 import com.myapp.data.local.database.dao.mission_statement.ConstitutionDao
 import com.myapp.data.local.database.dao.mission_statement.FuneralDao
 import com.myapp.data.local.database.dao.mission_statement.PurposeLifeDao

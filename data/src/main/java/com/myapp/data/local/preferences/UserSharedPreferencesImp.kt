@@ -1,8 +1,7 @@
-package com.myapp.selfupdateroutine.preferences
+package com.myapp.data.local.preferences
 
 
 import com.myapp.common.getDateTimeNow
-import com.myapp.data.local.preferences.UserSharedPreferences
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.LocalTime

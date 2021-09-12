@@ -13,7 +13,7 @@ import java.time.LocalDateTime
  * @property createAt 登録日
  */
 @Entity(tableName = "funeral")
-class FuneralEntity(
+data class FuneralEntity(
     @PrimaryKey(autoGenerate = true) val id: Long,
     @ColumnInfo(name = "text") val text: String,
     @ColumnInfo(name = "create_at") val createAt: LocalDateTime
