@@ -1,9 +1,7 @@
 package com.myapp.presentation.ui.mission_statement
 
-import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
-import androidx.test.core.app.ApplicationProvider
 import com.nhaarman.mockito_kotlin.mock
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -41,8 +39,6 @@ class ConstitutionInputItemViewModelTest {
     @Before
     fun setUp() {
         Dispatchers.setMain(coroutineDispatcher)
-        ApplicationProvider.getApplicationContext<Context>()
-        val context = ApplicationProvider.getApplicationContext<Context>()
     }
 
     @ExperimentalCoroutinesApi

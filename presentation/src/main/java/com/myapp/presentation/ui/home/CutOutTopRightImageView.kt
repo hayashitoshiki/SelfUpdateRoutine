@@ -19,30 +19,18 @@ class CutOutTopRightImageView : View {
 
     private var imgRes = R.drawable.ic_cloudy_and_sunny_96dp
 
-    constructor(context: Context) : super(context) {
-        init(null, 0)
-    }
+    constructor(context: Context) : super(context)
 
     constructor(
         context: Context,
         attrs: AttributeSet
-    ) : super(context, attrs) {
-        init(attrs, 0)
-    }
+    ) : super(context, attrs)
 
     constructor(
         context: Context,
         attrs: AttributeSet,
         defStyle: Int
-    ) : super(context, attrs, defStyle) {
-        init(attrs, defStyle)
-    }
-
-    private fun init(
-        attrs: AttributeSet?,
-        defStyle: Int
-    ) {
-    }
+    ) : super(context, attrs, defStyle)
 
     @SuppressLint("DrawAllocation")
     override fun onDraw(canvas: Canvas) {

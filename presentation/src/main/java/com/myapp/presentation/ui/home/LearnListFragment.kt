@@ -20,7 +20,7 @@ class LearnListFragment : BaseDetailListFragment() {
         super.onViewCreated(view, savedInstanceState)
         val args: LearnListFragmentArgs by navArgs()
         binding.list.also {
-            val items = (args.statementList as ReportDetailList).statementList.map { statement ->
+            val items = args.statementList.statementList.map { statement ->
                 BaseSingleTextItem(statement)
             }
             val adapter = GroupAdapter<ViewHolder>()

@@ -44,9 +44,9 @@ class MissionStatementListViewModelTest {
     private val purposeLife = "世界一楽しく生きること"
     private val constitutionList = listOf("迷ったときは楽しい方向へ", "常に楽しいを見つける努力を")
     private val missionStatement = MissionStatement(funeralList, purposeLife, constitutionList)
-    private val missionStatementOnlyFuneralList = MissionStatement(funeralList, "", listOf(""))
-    private val missionStatementOnlyPurposeLife = MissionStatement(listOf(""), purposeLife, listOf(""))
-    private val missionStatementOnlyConstitutionList = MissionStatement(listOf(""), "", constitutionList)
+    private val missionStatementOnlyFuneralList = MissionStatement(funeralList, "", listOf())
+    private val missionStatementOnlyPurposeLife = MissionStatement(listOf(), purposeLife, listOf())
+    private val missionStatementOnlyConstitutionList = MissionStatement(listOf(), "", constitutionList)
 
     // endregion
 
@@ -118,9 +118,9 @@ class MissionStatementListViewModelTest {
         }
         viewModel = MissionStatementListViewModel(missionStatementUseCase)
         setMockObserver()
-        assertEquals(listOf(""), viewModel.funeralList.value)
+        assertEquals(listOf<String>(), viewModel.funeralList.value)
         assertEquals("", viewModel.purposeLife.value)
-        assertEquals(listOf(""), viewModel.constitutionList.value)
+        assertEquals(listOf<String>(), viewModel.constitutionList.value)
     }
 
 
