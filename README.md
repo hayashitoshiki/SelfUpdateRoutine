@@ -68,3 +68,6 @@ https://github.com/hayashitoshiki/SelfUpdateRoutine/tree/master/data/src/main/ja
 
 #### 共通処理(commone)
 https://github.com/hayashitoshiki/SelfUpdateRoutine/tree/master/common/src/main/java/com/myapp/common
+
+## ソースドキュメント
+https://github.com/hayashitoshiki/SelfUpdateRoutine/blob/master/document/document/index.md
