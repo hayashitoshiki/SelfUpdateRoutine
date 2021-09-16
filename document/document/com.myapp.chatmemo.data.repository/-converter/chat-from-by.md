@@ -1,0 +1,5 @@
+[document](../../index.md) / [com.myapp.chatmemo.data.repository](../index.md) / [Converter](index.md) / [chatFromBy](./chat-from-by.md)
+
+# chatFromBy
+
+`fun chatFromBy(chatRoomEntity: `[`ChatRoomEntity`](../../com.myapp.chatmemo.data.database.entity/-chat-room-entity/index.md)`, commentEntityList: `[`List`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html)`<`[`CommentEntity`](../../com.myapp.chatmemo.data.database.entity/-comment-entity/index.md)`>, templateTitleEntity: `[`TemplateTitleEntity`](../../com.myapp.chatmemo.data.database.entity/-template-title-entity/index.md)`?, templateMessageList: `[`List`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html)`<`[`TemplateMessageEntity`](../../com.myapp.chatmemo.data.database.entity/-template-message-entity/index.md)`>?): `[`ChatRoom`](../../com.myapp.chatmemo.domain.model.entity/-chat-room/index.md)

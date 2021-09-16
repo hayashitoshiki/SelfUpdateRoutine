@@ -1,0 +1,26 @@
+$dokka.format:gfm
+$dokka.linkExtension:md
+$dokka.location:com.myapp.presentation.utils$isToday(java.time.LocalDateTime)com.myapp.presentation.utils/java.time.-local-date-time/is-today.md
+$dokka.location:com.myapp.presentation.utils$observeAtOnce(androidx.lifecycle.LiveData((com.myapp.presentation.utils.observeAtOnce.T)), androidx.lifecycle.LifecycleOwner, kotlin.Function1((com.myapp.presentation.utils.observeAtOnce.T, kotlin.Unit)))com.myapp.presentation.utils/androidx.lifecycle.-live-data/observe-at-once.md
+$dokka.location:com.myapp.presentation.utils$observeNotNull(androidx.lifecycle.LiveData((com.myapp.presentation.utils.observeNotNull.T)), androidx.lifecycle.LifecycleOwner, kotlin.Function1((com.myapp.presentation.utils.observeNotNull.T, kotlin.Unit)))com.myapp.presentation.utils/androidx.lifecycle.-live-data/observe-not-null.md
+com.myapp.common
+com.myapp.data.local
+com.myapp.data.local.database
+com.myapp.data.local.database.dao.mission_statement
+com.myapp.data.local.database.dao.report
+com.myapp.data.local.database.entity.mission_statement
+com.myapp.data.local.database.entity.report
+com.myapp.data.local.preferences
+com.myapp.domain.dto
+com.myapp.domain.model.entity
+com.myapp.domain.model.value
+com.myapp.domain.repository
+com.myapp.domain.usecase
+com.myapp.presentation.ui
+com.myapp.presentation.ui.diary
+com.myapp.presentation.ui.home
+com.myapp.presentation.ui.mission_statement
+com.myapp.presentation.ui.remember
+com.myapp.presentation.ui.setting
+com.myapp.presentation.utils
+com.myapp.selfupdateroutine

@@ -1,0 +1,37 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'org.jetbrains.dokka-android'
+
+android {
+
+    buildTypes {
+        // ドキュメント用のビルドタイプを定義する。これをしないとappモジュールからライブラリのコードをうまく解決できない。
+        docs {}
+    }
+
+    sourceSets {
+        // ドキュメント生成対象のコードをソースセットに追加する
+        docs.java.srcDirs += '../common/src/main/java'
+        docs.java.srcDirs += '../domain/src/main/java'
+        docs.java.srcDirs += '../presentation/src/main/java'
+        docs.java.srcDirs += '../data/src/main/java'
+        docs.java.srcDirs += '../app/src/main/java'
+    }
+
+}
+
+dokka {
+    outputFormat = 'gfm'
+    sourceDirs = files('src/main')
+    includes = ['module_package.md']
+    outputDirectory = "$projectDir"
+}
+dependencies {
+    // Room
+    def room_version = "2.3.0"
+    implementation "androidx.room:room-runtime:$room_version"
+    implementation "androidx.room:room-ktx:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+
+}

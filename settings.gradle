@@ -4,3 +4,5 @@ include ':domain'
 include ':data'
 include ':presentation'
 include ':common'
+// 一旦コメントアウト。のちに時間ができたときに修正
+// include ':document'
