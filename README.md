@@ -27,7 +27,7 @@ Presentation層
 ## 主な使用技術
  #### ネイティブ(ライブラリ)
 * DI
-  * Koin
+  * Hilt
 * 非同期
   * Coroutine
   * Coroutine Flow
