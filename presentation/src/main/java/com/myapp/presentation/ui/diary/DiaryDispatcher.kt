@@ -70,5 +70,4 @@ object DiaryDispatcher {
     suspend fun changeImprove(inputText: String) {
         improveTextMutableFlow.emit(inputText)
     }
-
 }

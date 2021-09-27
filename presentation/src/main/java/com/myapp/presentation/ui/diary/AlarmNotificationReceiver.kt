@@ -13,18 +13,23 @@ import androidx.core.app.NotificationCompat
 import com.myapp.domain.usecase.AlarmNotificationUseCase
 import com.myapp.domain.usecase.SettingUseCase
 import com.myapp.presentation.R
-import org.koin.java.KoinJavaComponent.inject
+import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 import java.time.OffsetDateTime
 import java.util.*
+import javax.inject.Inject
 
 /**
  * 通知バー表示
  */
+@AndroidEntryPoint
 class AlarmNotificationReceiver : BroadcastReceiver() {
 
-    private val alarmNotificationUseCase by inject<AlarmNotificationUseCase>(AlarmNotificationUseCase::class.java)
-    private val settingUseCase by inject<SettingUseCase>(SettingUseCase::class.java)
+    @Inject
+    lateinit var alarmNotificationUseCase: AlarmNotificationUseCase
+
+    @Inject
+    lateinit var settingUseCase: SettingUseCase
 
     companion object {
         const val NOTIFICATION_ID = 0

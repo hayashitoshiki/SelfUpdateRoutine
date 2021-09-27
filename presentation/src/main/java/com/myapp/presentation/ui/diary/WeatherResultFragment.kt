@@ -8,22 +8,23 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.myapp.presentation.R
 import com.myapp.presentation.databinding.ItemDiaryWeatherResultBinding
 import com.myapp.presentation.ui.MainActivity
 import com.myapp.presentation.utils.Status
+import dagger.hilt.android.AndroidEntryPoint
 import es.dmoral.toasty.Toasty
-import org.koin.androidx.viewmodel.ext.android.viewModel
-
 
 /**
  * 振り返り_天気比喩振り返り確認画面
  */
+@AndroidEntryPoint
 class WeatherResultFragment : Fragment() {
 
     private var _binding: ItemDiaryWeatherResultBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: WeatherResultViewModel by viewModel()
+    private val viewModel: WeatherResultViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -77,5 +78,4 @@ class WeatherResultFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
-
 }

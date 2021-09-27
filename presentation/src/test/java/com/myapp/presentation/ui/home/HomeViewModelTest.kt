@@ -15,12 +15,12 @@ import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
+import java.time.LocalDateTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.*
 import org.junit.*
 import org.junit.rules.TestRule
-import java.time.LocalDateTime
 
 /**
  * ホーム画面 ロジック仕様
@@ -51,7 +51,6 @@ class HomeViewModelTest {
     private val purposeLife = "世界一楽しく生きること"
     private val constitutionList = listOf("迷ったときは楽しい方向へ", "常に楽しいを見つける努力を")
     private val missionStatement = MissionStatement(funeralList, purposeLife, constitutionList)
-
 
     private val today = LocalDateTime.now()
     private val yesterday = today.minusDays(1)
@@ -148,7 +147,6 @@ class HomeViewModelTest {
         Dispatchers.resetMain()
         coroutineDispatcher.cleanupTestCoroutines()
     }
-
 
     // endregion
 
@@ -343,5 +341,4 @@ class HomeViewModelTest {
     }
 
     // endregion
-
 }

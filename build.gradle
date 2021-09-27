@@ -1,7 +1,10 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
-    ext.kotlin_version = "1.5.0"
-    ext.dokka_version = '0.9.17'
+    ext {
+        kotlin_version = "1.5.0"
+        dokka_version = '0.9.17'
+        hilt_version = '2.37'
+    }
     repositories {
         google()
         mavenCentral()
@@ -9,11 +12,9 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:7.0.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        // safe-args
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:2.3.5"
         classpath "org.jetbrains.dokka:dokka-android-gradle-plugin:${dokka_version}"
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
+        classpath "com.google.dagger:hilt-android-gradle-plugin:$hilt_version"
     }
 }
 
@@ -38,6 +39,7 @@ subprojects {
 
     apply plugin: 'kotlin-android'
     apply plugin: 'kotlin-kapt'
+    apply plugin: 'dagger.hilt.android.plugin'
 
     android {
         compileSdkVersion 30
@@ -128,9 +130,9 @@ subprojects {
         // ktLint
         def ktLint_version = "0.41.0"
         ktlint "com.pinterest:ktlint:$ktLint_version"
-        // koin
-        def koin_version = "3.0.2"
-        implementation "io.insert-koin:koin-android:$koin_version"
+        // Hilt
+        implementation "com.google.dagger:hilt-android:$rootProject.hilt_version"
+        kapt "com.google.dagger:hilt-android-compiler:$rootProject.hilt_version"
 
         // test
         testImplementation 'junit:junit:4.13.1'

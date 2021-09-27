@@ -4,6 +4,8 @@ import androidx.lifecycle.*
 import com.myapp.domain.dto.AllReportInputDto
 import com.myapp.domain.usecase.ReportUseCase
 import com.myapp.presentation.utils.Status
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -11,7 +13,8 @@ import kotlinx.coroutines.launch
 /**
  * 振り返り_天気比喩振り返り確認画面　画面ロジック
  */
-class WeatherResultViewModel(private val reportUseCase: ReportUseCase) : ViewModel() {
+@HiltViewModel
+class WeatherResultViewModel @Inject constructor(private val reportUseCase: ReportUseCase) : ViewModel() {
 
     // 事実
     private val _factInputText = MutableLiveData("")
@@ -110,5 +113,4 @@ class WeatherResultViewModel(private val reportUseCase: ReportUseCase) : ViewMod
             _saveState.value = Status.Success(null)
         }
     }
-
 }

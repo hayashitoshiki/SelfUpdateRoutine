@@ -18,17 +18,20 @@ import com.myapp.domain.usecase.AlarmNotificationUseCase
 import com.myapp.presentation.R
 import com.myapp.presentation.databinding.ActivityMainBinding
 import com.myapp.presentation.ui.diary.AlarmNotificationReceiver
-import org.koin.java.KoinJavaComponent.inject
-import timber.log.Timber
+import dagger.hilt.android.AndroidEntryPoint
 import java.time.OffsetDateTime
+import javax.inject.Inject
+import timber.log.Timber
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private var _binding: ActivityMainBinding? = null
     private val binding get() = _binding!!
-    private val alarmNotificationUseCase by inject<AlarmNotificationUseCase>(AlarmNotificationUseCase::class.java)
 
+    @Inject
+    lateinit var alarmNotificationUseCase: AlarmNotificationUseCase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,7 +66,6 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
-
 
     // 通知バーアラーム表示設定
     private fun setAlarmAndBack() {

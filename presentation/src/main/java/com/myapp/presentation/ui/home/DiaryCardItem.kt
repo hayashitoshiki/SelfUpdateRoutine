@@ -6,7 +6,6 @@ import com.myapp.presentation.R
 import com.myapp.presentation.databinding.ItemHomeCardDiaryBinding
 import com.xwray.groupie.databinding.BindableItem
 
-
 /**
  * 簡易振り返りカード
  */

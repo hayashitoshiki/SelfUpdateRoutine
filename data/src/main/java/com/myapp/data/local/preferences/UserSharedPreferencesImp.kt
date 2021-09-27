@@ -1,13 +1,13 @@
 package com.myapp.data.local.preferences
 
-
 import com.myapp.common.getDateTimeNow
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneOffset
+import javax.inject.Inject
 
-class UserSharedPreferencesImp(private val preferenceManager: PreferenceManager) : UserSharedPreferences {
+class UserSharedPreferencesImp @Inject constructor(private val preferenceManager: PreferenceManager) : UserSharedPreferences {
 
     // アラーム設定時間取得
     override fun getAlarmDate(): LocalDateTime {

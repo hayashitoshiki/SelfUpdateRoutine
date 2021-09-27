@@ -6,8 +6,9 @@ import com.myapp.data.local.database.dao.mission_statement.FuneralDao
 import com.myapp.data.local.database.dao.mission_statement.PurposeLifeDao
 import com.myapp.domain.model.entity.MissionStatement
 import com.myapp.domain.repository.LocalMissionStatementRepository
+import javax.inject.Inject
 
-class LocalMissionStatementRepositoryImp(
+class LocalMissionStatementRepositoryImp @Inject constructor(
     private val funeralDao: FuneralDao,
     private val purposeLifeDao: PurposeLifeDao,
     private val constitutionDao: ConstitutionDao
@@ -43,6 +44,4 @@ class LocalMissionStatementRepositoryImp(
         val constitutionList = constitutionDao.getAll()
         return Converter.missionStatementFromEntity(funeralList, purposeLife, constitutionList)
     }
-
-
 }

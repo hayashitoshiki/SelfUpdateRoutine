@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.myapp.presentation.R
 import com.myapp.presentation.databinding.FragmentSettingBinding
@@ -19,21 +20,21 @@ import com.myapp.presentation.utils.BaseFragment
 import com.myapp.presentation.utils.Status
 import com.myapp.presentation.utils.observeAtOnce
 import com.myapp.presentation.utils.text
+import dagger.hilt.android.AndroidEntryPoint
 import es.dmoral.toasty.Toasty
-import org.koin.androidx.viewmodel.ext.android.viewModel
-import timber.log.Timber
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
-
+import timber.log.Timber
 
 /**
  * 設定画面
  */
+@AndroidEntryPoint
 class SettingFragment : BaseFragment() {
 
     private var _binding: FragmentSettingBinding? = null
     private val binding get() = _binding!!
-    val viewModel: SettingViewModel by viewModel()
+    val viewModel: SettingViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -56,9 +57,12 @@ class SettingFragment : BaseFragment() {
         viewModel.updateState.observe(viewLifecycleOwner, { onUpdateDateStateChanged(it) })
         viewModel.beforeDate.observeAtOnce(viewLifecycleOwner, { initTimePicker(it) })
         viewModel.alarmModeExplanation.observe(viewLifecycleOwner, { binding.txtModeExplanation.text = getString(it) })
-        viewModel.alarmMode.observe(viewLifecycleOwner, {
-            binding.modeDiffValue.text = getString(viewModel.beforeAlarmMode.text) + " -> " + getString(it.text)
-        })
+        viewModel.alarmMode.observe(
+            viewLifecycleOwner,
+            {
+                binding.modeDiffValue.text = getString(viewModel.beforeAlarmMode.text) + " -> " + getString(it.text)
+            }
+        )
 
         binding.timePicker.also {
             it.setIs24HourView(true)
@@ -132,5 +136,4 @@ class SettingFragment : BaseFragment() {
         super.onDestroyView()
         _binding = null
     }
-
 }

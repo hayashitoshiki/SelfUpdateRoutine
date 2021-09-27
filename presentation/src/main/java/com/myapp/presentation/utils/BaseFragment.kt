@@ -34,13 +34,11 @@ abstract class BaseFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
     }
 
-
     override fun onStart() {
         Timber.tag(this.javaClass.simpleName)
             .d(">>>>>>>>>>>>>>>> [lifecycle] onStart is called")
         super.onStart()
     }
-
 
     override fun onResume() {
         Timber.tag(this.javaClass.simpleName)
@@ -85,5 +83,4 @@ abstract class BaseFragment : Fragment() {
             .d("▲▲▲▲▲▲▲▲▲▲▲▲lifecycle▲▲▲▲▲▲▲▲▲▲▲▲▲")
         super.onDetach()
     }
-
 }

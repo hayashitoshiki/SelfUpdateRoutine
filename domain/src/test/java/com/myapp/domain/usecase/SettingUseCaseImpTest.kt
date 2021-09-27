@@ -4,12 +4,12 @@ import com.myapp.domain.dto.NextAlarmTimeInputDto
 import com.myapp.domain.model.value.AlarmMode
 import com.myapp.domain.repository.LocalSettingRepository
 import io.mockk.*
+import java.time.LocalDateTime
+import java.time.LocalTime
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import java.time.LocalDateTime
-import java.time.LocalTime
 
 /**
  * 設定関連機能 ロジック仕様
@@ -68,7 +68,6 @@ class SettingUseCaseImpTest {
     // 最終レポート記録時間が昨日
     private fun setLastReportByYesterday() {
         coEvery { localSettingRepository.getLastReportSaveDateTime() } returns yesterdayDateTime
-
     }
 
     // endregion

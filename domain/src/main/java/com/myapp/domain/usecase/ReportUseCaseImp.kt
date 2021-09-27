@@ -5,9 +5,10 @@ import com.myapp.domain.model.entity.Report
 import com.myapp.domain.repository.LocalReportRepository
 import com.myapp.domain.repository.LocalSettingRepository
 import com.myapp.domain.translator.ReportTranslator
+import javax.inject.Inject
 
 // 今日の振り返り機能
-class ReportUseCaseImp(
+class ReportUseCaseImp @Inject constructor(
     private val localReportRepository: LocalReportRepository,
     private val localSettingRepository: LocalSettingRepository
 ) : ReportUseCase {

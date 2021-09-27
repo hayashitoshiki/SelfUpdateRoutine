@@ -43,7 +43,6 @@ abstract class AppDatabase : RoomDatabase() {
                 database.execSQL(
                     "CREATE TABLE `funeral` (`id` INTEGER NOT NULL, `text` TEXT NOT NULL, `create_at` TEXT  NOT NULL, PRIMARY KEY(`id`))"
                 )
-
             }
         }
     }

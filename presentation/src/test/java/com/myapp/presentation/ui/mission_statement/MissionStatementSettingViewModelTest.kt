@@ -122,7 +122,6 @@ class MissionStatementSettingViewModelTest {
         assertEquals(mutableListOf(""), viewModel.constitutionList.value!!.map { it.second })
     }
 
-
     /**
      * 初期表示
      *
@@ -479,7 +478,6 @@ class MissionStatementSettingViewModelTest {
         assertEquals(true, viewModel.confirmStatus.value is Status.Failure)
     }
 
-
     // region ボタン活性非活性制御
 
     /**
@@ -708,5 +706,4 @@ class MissionStatementSettingViewModelTest {
     // endregion
 
     // endregion
-
 }

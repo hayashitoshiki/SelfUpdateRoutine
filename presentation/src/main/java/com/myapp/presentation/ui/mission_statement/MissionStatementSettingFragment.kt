@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,18 +15,25 @@ import com.myapp.presentation.utils.BaseFragment
 import com.myapp.presentation.utils.Status
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.ViewHolder
+import dagger.hilt.android.AndroidEntryPoint
 import es.dmoral.toasty.Toasty
-import org.koin.android.ext.android.inject
-import org.koin.core.parameter.parametersOf
+import javax.inject.Inject
 
 /**
  * ミッションステートメント設定画面
  *
  */
+@AndroidEntryPoint
 class MissionStatementSettingFragment : BaseFragment() {
 
     private val args: MissionStatementSettingFragmentArgs by navArgs()
-    private val viewModel: MissionStatementSettingViewModel by inject { parametersOf(args.missionStatement) }
+
+    @Inject
+    lateinit var viewModelFactory: MissionStatementSettingViewModel.Factory
+    private val viewModel: MissionStatementSettingViewModel by viewModels {
+        MissionStatementSettingViewModel.provideFactory(viewModelFactory, args.missionStatement)
+    }
+
     private var _binding: FragmentMissionStatementSettingBinding? = null
     private val binding get() = _binding!!
 
@@ -120,7 +128,6 @@ class MissionStatementSettingFragment : BaseFragment() {
         }
     }
 
-
     // 保存State変更通知
     private fun onStateChanged(state: Status<*>) = when (state) {
         is Status.Loading -> {
@@ -147,5 +154,4 @@ class MissionStatementSettingFragment : BaseFragment() {
         super.onDestroyView()
         _binding = null
     }
-
 }

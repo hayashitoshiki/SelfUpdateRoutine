@@ -2,7 +2,6 @@ package com.myapp.data.local.preferences
 
 import java.time.LocalDateTime
 
-
 /**
  * Preferenceへの設定情報格納
  */
@@ -51,5 +50,4 @@ interface UserSharedPreferences {
      * @param date 最終レポート記録時間
      */
     fun setLastReportSaveDateTime(date: LocalDateTime)
-
 }

@@ -6,11 +6,13 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.ViewHolder
+import dagger.hilt.android.AndroidEntryPoint
 
 /**
  * 宣言一覧画面
  *
  */
+@AndroidEntryPoint
 class StatementListFragment : BaseDetailListFragment() {
 
     override fun onViewCreated(

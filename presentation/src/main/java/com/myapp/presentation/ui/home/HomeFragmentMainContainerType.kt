@@ -1,6 +1,5 @@
 package com.myapp.presentation.ui.home
 
-
 /**
  * ホーム画面 メインコンテナの表示View制御
  *

@@ -2,16 +2,18 @@ package com.myapp.presentation.ui.diary
 
 import android.os.Bundle
 import android.view.View
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.myapp.presentation.R
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import dagger.hilt.android.AndroidEntryPoint
 
 /**
  * 振り返り_宣言画面
  */
+@AndroidEntryPoint
 class FfsStatementFragment : DiaryBaseFragment() {
 
-    override val viewModel: FfsStatementViewModel by viewModel()
+    override val viewModel: FfsStatementViewModel by viewModels()
 
     override fun onViewCreated(
         view: View,

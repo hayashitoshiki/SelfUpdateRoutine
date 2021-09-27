@@ -10,7 +10,6 @@ import com.myapp.domain.model.value.AlarmMode
 import com.myapp.domain.model.value.HeartScore
 import com.myapp.presentation.R
 
-
 /**
  * 今日の天気画像
  */
@@ -48,7 +47,6 @@ val AlarmMode.explanation: Int
         AlarmMode.NORMAL -> R.string.explanation_alarm_mode_normal
         AlarmMode.HARD -> R.string.explanation_alarm_mode_hard
     }
-
 
 /**
  * アラームモードの説明

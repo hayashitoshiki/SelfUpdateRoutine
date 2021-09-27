@@ -40,14 +40,12 @@ class FuneralInputItemViewModelTest {
         Dispatchers.setMain(coroutineDispatcher)
     }
 
-
     @ExperimentalCoroutinesApi
     @After
     fun tearDown() {
         Dispatchers.resetMain()
         coroutineDispatcher.cleanupTestCoroutines()
     }
-
 
     private fun setMockObserver() {
         val observerString = mock<Observer<String>>()
@@ -150,5 +148,4 @@ class FuneralInputItemViewModelTest {
         viewModel.onClickPlusButton()
         assertEquals(index + 1, result)
     }
-
 }

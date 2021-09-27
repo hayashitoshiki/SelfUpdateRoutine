@@ -7,19 +7,21 @@ import android.view.ViewGroup
 import android.widget.SeekBar
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.myapp.presentation.R
 import com.myapp.presentation.databinding.ItemDiaryNumberInputBinding
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import dagger.hilt.android.AndroidEntryPoint
 
 /**
  * 振り返り_評価画面
  */
+@AndroidEntryPoint
 class WeatherAssessmentFragment : Fragment() {
 
     private var _binding: ItemDiaryNumberInputBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: WeatherAssessmentViewModel by viewModel()
+    private val viewModel: WeatherAssessmentViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -48,7 +50,6 @@ class WeatherAssessmentFragment : Fragment() {
 
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
             }
-
         })
         return binding.root
     }
@@ -57,5 +58,4 @@ class WeatherAssessmentFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
-
 }

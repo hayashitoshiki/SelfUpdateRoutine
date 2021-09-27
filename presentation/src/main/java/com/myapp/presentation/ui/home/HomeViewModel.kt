@@ -6,13 +6,16 @@ import com.myapp.domain.usecase.MissionStatementUseCase
 import com.myapp.domain.usecase.ReportUseCase
 import com.myapp.presentation.utils.img
 import com.myapp.presentation.utils.isToday
-import kotlinx.coroutines.launch
+import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.LocalDateTime
+import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 /**
  * ホーム画面　画面ロジック
  */
-class HomeViewModel(
+@HiltViewModel
+class HomeViewModel @Inject constructor(
     private val reportUseCase: ReportUseCase,
     private val missionStatementUseCase: MissionStatementUseCase
 ) : ViewModel() {

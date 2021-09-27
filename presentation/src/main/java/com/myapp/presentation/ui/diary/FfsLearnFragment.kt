@@ -2,16 +2,18 @@ package com.myapp.presentation.ui.diary
 
 import android.os.Bundle
 import android.view.View
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.myapp.presentation.R
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import dagger.hilt.android.AndroidEntryPoint
 
 /**
  * 振り返り_教訓画面
  */
+@AndroidEntryPoint
 class FfsLearnFragment : DiaryBaseFragment() {
 
-    override val viewModel: FfsLearnViewModel by viewModel()
+    override val viewModel: FfsLearnViewModel by viewModels()
 
     override fun onViewCreated(
         view: View,
@@ -25,5 +27,4 @@ class FfsLearnFragment : DiaryBaseFragment() {
             findNavController().navigate(R.id.action_diaryLessonItem_to_diaryStatementItem)
         }
     }
-
 }

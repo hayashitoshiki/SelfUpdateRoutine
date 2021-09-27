@@ -34,7 +34,6 @@ class ConstitutionInputItemViewModelTest {
 
     private lateinit var viewModel: ConstitutionInputItemViewModel
 
-
     @ExperimentalCoroutinesApi
     @Before
     fun setUp() {
@@ -47,7 +46,6 @@ class ConstitutionInputItemViewModelTest {
         Dispatchers.resetMain()
         coroutineDispatcher.cleanupTestCoroutines()
     }
-
 
     private fun setMockObserver() {
         val observerString = mock<Observer<String>>()
@@ -150,5 +148,4 @@ class ConstitutionInputItemViewModelTest {
         viewModel.onClickPlusButton()
         assertEquals(index + 1, result)
     }
-
 }

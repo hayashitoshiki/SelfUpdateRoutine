@@ -2,16 +2,18 @@ package com.myapp.presentation.ui.diary
 
 import android.os.Bundle
 import android.view.View
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.myapp.presentation.R
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import dagger.hilt.android.AndroidEntryPoint
 
 /**
  * 振り返り_改善案画面
  */
+@AndroidEntryPoint
 class WeatherImproveFragment : DiaryBaseFragment() {
 
-    override val viewModel: WeatherImproveViewModel by viewModel()
+    override val viewModel: WeatherImproveViewModel by viewModels()
 
     override fun onViewCreated(
         view: View,
@@ -25,5 +27,4 @@ class WeatherImproveFragment : DiaryBaseFragment() {
             findNavController().navigate(R.id.action_diaryActionItem_to_diaryResultItem)
         }
     }
-
 }

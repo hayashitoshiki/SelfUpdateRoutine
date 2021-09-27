@@ -2,12 +2,15 @@ package com.myapp.domain.usecase
 
 import com.myapp.domain.model.value.AlarmMode
 import com.myapp.domain.repository.LocalSettingRepository
-import timber.log.Timber
 import java.time.LocalDateTime
 import java.time.LocalTime
+import javax.inject.Inject
+import timber.log.Timber
 
 // アラーム通知機能
-class AlarmNotificationUseCaseImp(private val localSettingRepository: LocalSettingRepository) : AlarmNotificationUseCase {
+class AlarmNotificationUseCaseImp @Inject constructor(
+    private val localSettingRepository: LocalSettingRepository
+) : AlarmNotificationUseCase {
 
     // 通知バーの時間を返す
     override fun getNextAlarmDateTime(): LocalDateTime {
@@ -27,7 +30,8 @@ class AlarmNotificationUseCaseImp(private val localSettingRepository: LocalSetti
         val alarmMode = localSettingRepository.getAlarmMode()
         val nextAlertTime = if (alarmMode == AlarmMode.HARD && lastSaveDate.isBefore(nowDate) && nowTime.isAfter(
                 minTime
-            ) && nowTime.isBefore(maxTime)) {
+            ) && nowTime.isBefore(maxTime)
+        ) {
             nowDateTime.plusSeconds(5)
         } else if (nowDateTime.hour == 0) {
             LocalDateTime.now()

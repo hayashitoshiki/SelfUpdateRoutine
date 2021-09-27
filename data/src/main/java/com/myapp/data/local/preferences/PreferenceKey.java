@@ -3,12 +3,12 @@ package com.myapp.data.local.preferences;
 /**
  * Preferenceアクセスキー
  */
-abstract class PreferenceKey {
+public class PreferenceKey {
 
     /**
      * Long型指定
      */
-    protected enum LongKey {
+    public enum LongKey {
         // アラーム時間
         ALARM_DATE,
         // アラーム時間
@@ -19,7 +19,7 @@ abstract class PreferenceKey {
     /**
      * Int型指定
      */
-    protected enum IntKey {
+    public enum IntKey {
         // アラームモード
         ALARM_MODE
     }

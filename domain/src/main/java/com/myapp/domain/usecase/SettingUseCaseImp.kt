@@ -5,9 +5,12 @@ import com.myapp.domain.model.value.AlarmMode
 import com.myapp.domain.repository.LocalSettingRepository
 import java.time.LocalDateTime
 import java.time.LocalTime
+import javax.inject.Inject
 
 // 設定機能関連
-class SettingUseCaseImp(private val localSettingRepository: LocalSettingRepository) : SettingUseCase {
+class SettingUseCaseImp @Inject constructor(
+    private val localSettingRepository: LocalSettingRepository
+) : SettingUseCase {
 
     // アラーム時間取得
     override fun getAlarmDate(): LocalDateTime {
@@ -40,6 +43,5 @@ class SettingUseCaseImp(private val localSettingRepository: LocalSettingReposito
             nextAlertTime = nextAlertTime.plusDays(1)
         }
         return nextAlertTime
-
     }
 }

@@ -4,6 +4,8 @@ import androidx.lifecycle.*
 import com.myapp.domain.model.entity.MissionStatement
 import com.myapp.domain.usecase.MissionStatementUseCase
 import com.myapp.presentation.utils.Status
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -12,7 +14,11 @@ import kotlinx.coroutines.launch
  * ミッションステートメント一覧画面_画面ロジック
  *
  */
-class MissionStatementListViewModel(private val missionStatementUseCase: MissionStatementUseCase) : ViewModel() {
+@HiltViewModel
+class MissionStatementListViewModel @Inject constructor(
+    private val missionStatementUseCase: MissionStatementUseCase
+) :
+    ViewModel() {
 
     // 登録済みのミッションステートメント
     var missionStatement: MissionStatement? = null
@@ -29,14 +35,13 @@ class MissionStatementListViewModel(private val missionStatementUseCase: Mission
     private val _isEnablePurposeLife = MediatorLiveData<Boolean>()
     val isEnablePurposeLife: LiveData<Boolean> = _isEnablePurposeLife
 
-
     // 憲法
     private val _constitutionList = MutableLiveData(listOf(""))
     val constitutionList: LiveData<List<String>> = _constitutionList
     private val _isEnableConstitutionList = MediatorLiveData<Boolean>()
     val isEnableConstitutionList: LiveData<Boolean> = _isEnableConstitutionList
 
-    //　ミッションステートメント取得ステータス
+    // 　ミッションステートメント取得ステータス
     private val _status = MutableLiveData<Status<*>>()
     val status: LiveData<Status<*>> = _status
 
@@ -78,5 +83,4 @@ class MissionStatementListViewModel(private val missionStatementUseCase: Mission
     private fun changeConstitutionList() {
         _isEnableConstitutionList.value = _constitutionList.value?.isNotEmpty() ?: false
     }
-
 }

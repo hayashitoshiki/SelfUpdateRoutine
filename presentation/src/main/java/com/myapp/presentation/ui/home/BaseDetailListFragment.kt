@@ -6,11 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import com.myapp.presentation.databinding.FragmentReportDetailListBaseBinding
 import com.myapp.presentation.utils.BaseFragment
+import dagger.hilt.android.AndroidEntryPoint
 
 /**
  * 一覧画面基盤
  *
  */
+@AndroidEntryPoint
 abstract class BaseDetailListFragment : BaseFragment() {
 
     protected var _binding: FragmentReportDetailListBaseBinding? = null

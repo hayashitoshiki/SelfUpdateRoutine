@@ -13,7 +13,6 @@ interface ReportUseCase {
      */
     suspend fun saveReport(allReportInputDto: AllReportInputDto)
 
-
     /**
      * 全ての振り返り日記取得
      */

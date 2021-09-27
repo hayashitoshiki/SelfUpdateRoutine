@@ -3,10 +3,14 @@ package com.myapp.presentation.ui.remember
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.myapp.domain.model.entity.Report
 import com.myapp.presentation.utils.img
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 
-class RememberViewModel(private val report: Report) : ViewModel() {
+class RememberViewModel @AssistedInject constructor(@Assisted private val report: Report) : ViewModel() {
 
     // 事実
     private val _factComment = MutableLiveData("")
@@ -63,4 +67,20 @@ class RememberViewModel(private val report: Report) : ViewModel() {
         _heartScoreImg.value = report.weatherReport.heartScore.img
     }
 
+    @AssistedFactory
+    interface Factory {
+        fun create(report: Report): RememberViewModel
+    }
+
+    companion object {
+        @Suppress("UNCHECKED_CAST")
+        fun provideFactory(
+            factory: Factory,
+            report: Report
+        ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                return factory.create(report) as T
+            }
+        }
+    }
 }

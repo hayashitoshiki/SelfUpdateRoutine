@@ -4,9 +4,12 @@ import com.myapp.domain.dto.MissionStatementInputDto
 import com.myapp.domain.model.entity.MissionStatement
 import com.myapp.domain.repository.LocalMissionStatementRepository
 import com.myapp.domain.translator.MissionStatementTranslator
+import javax.inject.Inject
 
 // ミッションステートメント機能ロジック
-class MissionStatementUseCaseImp(private val localMissionStatementRepository: LocalMissionStatementRepository) :
+class MissionStatementUseCaseImp @Inject constructor(
+    private val localMissionStatementRepository: LocalMissionStatementRepository
+) :
     MissionStatementUseCase {
 
     // ミッションステートメント取得
@@ -32,5 +35,4 @@ class MissionStatementUseCaseImp(private val localMissionStatementRepository: Lo
         }
         localMissionStatementRepository.saveMissionStatement(missionStatement)
     }
-
 }

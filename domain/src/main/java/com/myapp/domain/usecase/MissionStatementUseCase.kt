@@ -34,5 +34,4 @@ interface MissionStatementUseCase {
         missionStatement: MissionStatement,
         dto: MissionStatementInputDto
     )
-
 }

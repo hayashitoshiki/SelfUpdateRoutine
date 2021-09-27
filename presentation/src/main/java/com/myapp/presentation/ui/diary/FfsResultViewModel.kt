@@ -4,13 +4,16 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 /**
  * 振り返り_FFS振り返り確認画面 画面ロジック
  */
-class FfsResultViewModel : ViewModel() {
+@HiltViewModel
+class FfsResultViewModel @Inject constructor() : ViewModel() {
 
     // 事実
     private val _factInputText = MutableLiveData("")

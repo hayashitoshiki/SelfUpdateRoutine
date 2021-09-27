@@ -52,6 +52,4 @@ interface LocalSettingRepository {
      * @param date レポートを記録した日時
      */
     fun setLastReportSaveDateTime(date: LocalDateTime)
-
-
 }

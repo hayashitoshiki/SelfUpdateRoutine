@@ -4,8 +4,9 @@ import com.myapp.data.local.database.dao.report.FfsReportDao
 import com.myapp.data.local.database.dao.report.WeatherReportDao
 import com.myapp.domain.model.entity.Report
 import com.myapp.domain.repository.LocalReportRepository
+import javax.inject.Inject
 
-class LocalReportRepositoryImp(
+class LocalReportRepositoryImp @Inject constructor(
     private val weatherReportDao: WeatherReportDao,
     private val ffsReportDao: FfsReportDao
 ) : LocalReportRepository {

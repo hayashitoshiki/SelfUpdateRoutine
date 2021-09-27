@@ -10,15 +10,17 @@ import com.myapp.domain.usecase.SettingUseCase
 import com.myapp.presentation.R
 import com.myapp.presentation.utils.Status
 import com.myapp.presentation.utils.explanation
+import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
-
+import javax.inject.Inject
 
 /**
  * 設定画面 画面ロジック
  */
-class SettingViewModel(private val settingUseCase: SettingUseCase) : ViewModel() {
+@HiltViewModel
+class SettingViewModel @Inject constructor(private val settingUseCase: SettingUseCase) : ViewModel() {
 
     // 変更前のアラーム時間
     private val _beforeDate = MediatorLiveData<String>()
@@ -71,7 +73,6 @@ class SettingViewModel(private val settingUseCase: SettingUseCase) : ViewModel()
                 hourDate.value = it.hour
                 minutesDate.value = it.minute
                 secondsDate.value = it.second
-
             }
         settingUseCase.getAlarmMode()
             .let {
@@ -169,5 +170,4 @@ class SettingViewModel(private val settingUseCase: SettingUseCase) : ViewModel()
         _isEnableConfirmButton.value =
             _alarmModeDiffColor.value == R.color.text_color_light_primary || _alarmTimeDiffColor.value == R.color.text_color_light_primary
     }
-
 }

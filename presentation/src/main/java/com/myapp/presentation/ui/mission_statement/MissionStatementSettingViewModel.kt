@@ -6,6 +6,9 @@ import com.myapp.domain.model.entity.MissionStatement
 import com.myapp.domain.usecase.MissionStatementUseCase
 import com.myapp.presentation.R
 import com.myapp.presentation.utils.Status
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -14,8 +17,8 @@ import kotlinx.coroutines.launch
  * ミッションステートメント設定画面_画面ロジック
  *
  */
-class MissionStatementSettingViewModel(
-    private val missionStatement: MissionStatement?,
+class MissionStatementSettingViewModel @AssistedInject constructor(
+    @Assisted private val missionStatement: MissionStatement?,
     private val missionStatementUseCase: MissionStatementUseCase
 ) : ViewModel() {
 
@@ -225,4 +228,20 @@ class MissionStatementSettingViewModel(
             (purposeLife.isNotBlank() || funeralList.isNotEmpty() || constitutionList.isNotEmpty()) && (missionStatement == null || (purposeLife != missionStatement.purposeLife || funeralList != missionStatement.funeralList || constitutionList != missionStatement.constitutionList))
     }
 
+    @AssistedFactory
+    interface Factory {
+        fun create(missionStatement: MissionStatement?): MissionStatementSettingViewModel
+    }
+
+    companion object {
+        @Suppress("UNCHECKED_CAST")
+        fun provideFactory(
+            factory: Factory,
+            missionStatement: MissionStatement?
+        ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                return factory.create(missionStatement) as T
+            }
+        }
+    }
 }

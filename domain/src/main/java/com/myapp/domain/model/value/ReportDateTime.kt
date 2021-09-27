@@ -34,7 +34,6 @@ data class ReportDateTime(val date: LocalDateTime) {
         return df.format(systemDateTime)
     }
 
-
     // 日付取得
     @SuppressLint("SimpleDateFormat")
     private fun getDataNow(): String {

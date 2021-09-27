@@ -5,25 +5,31 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.myapp.presentation.R
 import com.myapp.presentation.databinding.FragmentRemenberBinding
 import com.myapp.presentation.utils.BaseFragment
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import org.koin.android.ext.android.inject
-import org.koin.core.parameter.parametersOf
 
 /**
  * 設定画面
  */
+@AndroidEntryPoint
 class RememberFragment : BaseFragment() {
 
     private var _binding: FragmentRemenberBinding? = null
     private val binding get() = _binding!!
 
     private val args: RememberFragmentArgs by navArgs()
-    val viewModel: RememberViewModel by inject { parametersOf(args.report) }
 
+    @Inject
+    lateinit var viewModelFactory: RememberViewModel.Factory
+    private val viewModel: RememberViewModel by viewModels {
+        RememberViewModel.provideFactory(viewModelFactory, args.report)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

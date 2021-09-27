@@ -68,7 +68,6 @@ class MissionStatementListViewModelTest {
         viewModel.isEnableFuneralList.observeForever(observerBoolean)
         viewModel.isEnablePurposeLife.observeForever(observerBoolean)
         viewModel.isEnableConstitutionList.observeForever(observerBoolean)
-
     }
 
     @ExperimentalCoroutinesApi
@@ -98,7 +97,6 @@ class MissionStatementListViewModelTest {
         assertEquals(missionStatement.constitutionList, viewModel.constitutionList.value)
     }
 
-
     /**
      * 初期表示動作
      *
@@ -122,7 +120,6 @@ class MissionStatementListViewModelTest {
         assertEquals("", viewModel.purposeLife.value)
         assertEquals(listOf<String>(), viewModel.constitutionList.value)
     }
-
 
     /**
      * ミッションステートメント更新

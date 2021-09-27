@@ -6,12 +6,12 @@ import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
+import java.time.LocalDateTime
+import java.time.LocalTime
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import java.time.LocalDateTime
-import java.time.LocalTime
 
 /**
  * アラーム関連機能 ロジック仕様
@@ -93,10 +93,8 @@ class AlarmNotificationUseCaseImpTest {
 
     // endregion
 
-
     @After
     fun tearDown() {
-
     }
 
     /**
@@ -175,7 +173,6 @@ class AlarmNotificationUseCaseImpTest {
         assertEquals(tomorrowAlarmDate, result)
     }
 
-
     /**
      * 今日の記録をつけてある場合
      *
@@ -245,5 +242,4 @@ class AlarmNotificationUseCaseImpTest {
         val result = alarmNotificationUseCaseImp.checkAlarmNotificationEnable()
         assertEquals(true, result)
     }
-
 }

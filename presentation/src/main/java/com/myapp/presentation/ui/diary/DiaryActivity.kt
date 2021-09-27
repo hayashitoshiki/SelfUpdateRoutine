@@ -6,10 +6,12 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import com.myapp.presentation.R
+import dagger.hilt.android.AndroidEntryPoint
 
 /**
  * 振り返り画面 Activity
  */
+@AndroidEntryPoint
 class DiaryActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration

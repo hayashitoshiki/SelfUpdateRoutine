@@ -21,5 +21,4 @@ interface PurposeLifeDao {
 
     @Query("SELECT * FROM purpose_life WHERE id = 1")
     suspend fun get(): PurposeLifeEntity?
-
 }

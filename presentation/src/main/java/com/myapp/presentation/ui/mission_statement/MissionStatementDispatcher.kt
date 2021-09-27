@@ -75,5 +75,4 @@ object MissionStatementDispatcher {
     suspend fun updateMissionStatement() {
         _updateMessage.emit("update")
     }
-
 }

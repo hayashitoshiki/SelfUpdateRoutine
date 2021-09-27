@@ -4,6 +4,8 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.myapp.presentation.R
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.take
@@ -12,7 +14,8 @@ import kotlinx.coroutines.launch
 /**
  * 振り返り_評価画面 画面ロジック
  */
-class WeatherAssessmentViewModel : DiaryBaseViewModel() {
+@HiltViewModel
+class WeatherAssessmentViewModel @Inject constructor() : DiaryBaseViewModel() {
 
     val assessmentValue = MutableLiveData(50)
     val assessmentImg = MediatorLiveData<Int>()
@@ -42,5 +45,4 @@ class WeatherAssessmentViewModel : DiaryBaseViewModel() {
             DiaryDispatcher.changeAssessment(input)
         }
     }
-
 }

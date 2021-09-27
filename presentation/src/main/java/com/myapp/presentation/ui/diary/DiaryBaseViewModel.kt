@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 /**
  * 振り返り画面 BaseViewModel
  */
-abstract class DiaryBaseViewModel : ViewModel() {
+abstract class DiaryBaseViewModel() : ViewModel() {
 
     val inputText = MutableLiveData("")
 
@@ -20,5 +20,4 @@ abstract class DiaryBaseViewModel : ViewModel() {
     private fun changeButtonEnable(text: String) {
         isButtonEnable.value = text.isNotEmpty()
     }
-
 }

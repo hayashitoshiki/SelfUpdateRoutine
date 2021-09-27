@@ -4,21 +4,23 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.myapp.presentation.databinding.FragmentMissionStatementListBinding
 import com.myapp.presentation.utils.BaseFragment
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.ViewHolder
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import dagger.hilt.android.AndroidEntryPoint
 
 /**
  * ミッションステートメント一覧画面
  *
  */
+@AndroidEntryPoint
 class MissionStatementListFragment : BaseFragment() {
 
-    private val viewModel: MissionStatementListViewModel by viewModel()
+    private val viewModel: MissionStatementListViewModel by viewModels()
     private var _binding: FragmentMissionStatementListBinding? = null
     private val binding get() = _binding!!
 

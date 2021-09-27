@@ -40,5 +40,4 @@ class MissionStatementSettingResultDiscItem(
     }
 
     override fun getId(): Long = id
-
 }

@@ -11,10 +11,12 @@ import androidx.databinding.DataBindingUtil
 import com.myapp.presentation.R
 import com.myapp.presentation.databinding.ItemDiaryTextInputBinding
 import com.myapp.presentation.utils.BaseFragment
+import dagger.hilt.android.AndroidEntryPoint
 
 /**
  * 振り返り画面_テキスト入力系画面 BaseFragment
  */
+@AndroidEntryPoint
 abstract class DiaryBaseFragment : BaseFragment() {
 
     private var _binding: ItemDiaryTextInputBinding? = null

@@ -3,12 +3,12 @@ package com.myapp.domain.translator
 import com.myapp.domain.dto.AllReportInputDto
 import io.mockk.every
 import io.mockk.mockkStatic
+import java.time.LocalDateTime
+import java.time.LocalTime
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import java.time.LocalDateTime
-import java.time.LocalTime
 
 class ReportTranslatorTest {
 
