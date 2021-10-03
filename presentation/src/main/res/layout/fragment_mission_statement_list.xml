@@ -6,7 +6,7 @@
 
         <import type="android.view.View" />
 
-        <import type="com.myapp.presentation.utils.Status" />
+        <import type="com.myapp.presentation.utils.base.Status" />
 
         <variable
             name="viewModel"

@@ -5,7 +5,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import com.myapp.presentation.databinding.ItemDiscBinding
-import com.myapp.presentation.utils.DiscItem
+import com.myapp.presentation.utils.base.DiscItem
 
 /**
  * 「・」から始まる文字列リストアイテム(ミッションステートメント設定画面用)

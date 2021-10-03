@@ -1,23 +1,37 @@
 package com.myapp.presentation.ui.diary
 
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.myapp.presentation.utils.base.BaseViewModel
+import kotlinx.coroutines.launch
 
 /**
  * 振り返り画面 BaseViewModel
  */
-abstract class DiaryBaseViewModel() : ViewModel() {
+abstract class DiaryBaseViewModel :
+    BaseViewModel<DiaryBaseContract.State, DiaryBaseContract.Effect, DiaryBaseContract.Event>() {
 
-    val inputText = MutableLiveData("")
-
-    val isButtonEnable = MediatorLiveData<Boolean>()
-
-    init {
-        isButtonEnable.addSource(inputText) { changeButtonEnable(it) }
+    override fun initState(): DiaryBaseContract.State {
+        return DiaryBaseContract.State()
     }
 
-    private fun changeButtonEnable(text: String) {
-        isButtonEnable.value = text.isNotEmpty()
+    override fun handleEvents(event: DiaryBaseContract.Event) {
+        when (event) {
+            is DiaryBaseContract.Event.OnChangeText -> changeText(event.value)
+            is DiaryBaseContract.Event.OnClickNextButton -> setEffect { DiaryBaseContract.Effect.NextNavigation }
+        }
     }
+
+    private fun changeText(value: String) {
+        setState { copy(inputText = value, isButtonEnable = value.isNotBlank()) }
+        viewModelScope.launch {
+            sendDispatcher(value)
+        }
+    }
+
+    /**
+     * 値変更共有定義
+     *
+     * @param value 変更した値
+     */
+    abstract suspend fun sendDispatcher(value: String)
 }

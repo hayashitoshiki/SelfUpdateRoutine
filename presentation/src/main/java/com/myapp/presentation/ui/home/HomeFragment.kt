@@ -12,7 +12,7 @@ import com.myapp.domain.model.entity.Report
 import com.myapp.presentation.R
 import com.myapp.presentation.databinding.FragmentHomeBinding
 import com.myapp.presentation.ui.diary.DiaryActivity
-import com.myapp.presentation.utils.BaseFragment
+import com.myapp.presentation.utils.base.BaseFragment
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.ViewHolder
 import com.xwray.groupie.databinding.BindableItem

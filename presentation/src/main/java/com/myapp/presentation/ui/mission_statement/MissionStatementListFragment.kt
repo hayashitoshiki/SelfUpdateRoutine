@@ -8,7 +8,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.myapp.presentation.databinding.FragmentMissionStatementListBinding
-import com.myapp.presentation.utils.BaseFragment
+import com.myapp.presentation.utils.base.BaseFragment
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.ViewHolder
 import dagger.hilt.android.AndroidEntryPoint

@@ -3,12 +3,12 @@ package com.myapp.presentation.ui.mission_statement
 import androidx.lifecycle.*
 import com.myapp.domain.model.entity.MissionStatement
 import com.myapp.domain.usecase.MissionStatementUseCase
-import com.myapp.presentation.utils.Status
+import com.myapp.presentation.utils.base.Status
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * ミッションステートメント一覧画面_画面ロジック
@@ -17,8 +17,7 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class MissionStatementListViewModel @Inject constructor(
     private val missionStatementUseCase: MissionStatementUseCase
-) :
-    ViewModel() {
+) : ViewModel() {
 
     // 登録済みのミッションステートメント
     var missionStatement: MissionStatement? = null

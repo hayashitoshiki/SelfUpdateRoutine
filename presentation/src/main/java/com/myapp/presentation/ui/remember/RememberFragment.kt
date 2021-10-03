@@ -9,10 +9,10 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.myapp.presentation.R
 import com.myapp.presentation.databinding.FragmentRemenberBinding
-import com.myapp.presentation.utils.BaseFragment
+import com.myapp.presentation.utils.base.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import javax.inject.Inject
 
 /**
  * 設定画面

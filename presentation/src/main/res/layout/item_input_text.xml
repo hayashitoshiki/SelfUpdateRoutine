@@ -10,7 +10,7 @@
 
         <variable
             name="viewModel"
-            type="com.myapp.presentation.utils.BaseInputTextItemViewModel" />
+            type="com.myapp.presentation.utils.base.BaseInputTextItemViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

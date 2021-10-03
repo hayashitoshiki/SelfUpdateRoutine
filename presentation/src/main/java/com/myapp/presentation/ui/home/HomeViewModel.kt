@@ -4,12 +4,12 @@ import androidx.lifecycle.*
 import com.myapp.domain.model.entity.Report
 import com.myapp.domain.usecase.MissionStatementUseCase
 import com.myapp.domain.usecase.ReportUseCase
-import com.myapp.presentation.utils.img
-import com.myapp.presentation.utils.isToday
+import com.myapp.presentation.utils.expansion.img
+import com.myapp.presentation.utils.expansion.isToday
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import javax.inject.Inject
-import kotlinx.coroutines.launch
 
 /**
  * ホーム画面　画面ロジック

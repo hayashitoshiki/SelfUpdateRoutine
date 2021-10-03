@@ -1,4 +1,4 @@
-package com.myapp.presentation.utils
+package com.myapp.presentation.utils.expansion
 
 /**
  * LiveData拡張定義用ファイル
@@ -19,15 +19,12 @@ fun <T> LiveData<T>.observeAtOnce(
     owner: LifecycleOwner,
     observe: (value: T) -> Unit
 ) = apply {
-    observe(
-        owner,
-        object : Observer<T> {
-            override fun onChanged(value: T?) {
-                removeObserver(this)
-                observeNotNull(owner, observe)
-            }
+    observe(owner, object : Observer<T> {
+        override fun onChanged(value: T?) {
+            removeObserver(this)
+            observeNotNull(owner, observe)
         }
-    )
+    })
 }
 
 /**
@@ -41,11 +38,8 @@ fun <T> LiveData<T>.observeNotNull(
     owner: LifecycleOwner,
     observe: (value: T) -> Unit
 ) = apply {
-    observe(
-        owner,
-        Observer { value ->
-            value ?: return@Observer
-            observe(value)
-        }
-    )
+    observe(owner, Observer { value ->
+        value ?: return@Observer
+        observe(value)
+    })
 }

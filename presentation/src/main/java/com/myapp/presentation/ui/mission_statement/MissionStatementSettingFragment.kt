@@ -11,8 +11,8 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.myapp.presentation.R
 import com.myapp.presentation.databinding.FragmentMissionStatementSettingBinding
-import com.myapp.presentation.utils.BaseFragment
-import com.myapp.presentation.utils.Status
+import com.myapp.presentation.utils.base.BaseFragment
+import com.myapp.presentation.utils.base.Status
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.ViewHolder
 import dagger.hilt.android.AndroidEntryPoint

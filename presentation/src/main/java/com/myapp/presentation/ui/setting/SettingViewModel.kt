@@ -8,8 +8,8 @@ import com.myapp.domain.dto.NextAlarmTimeInputDto
 import com.myapp.domain.model.value.AlarmMode
 import com.myapp.domain.usecase.SettingUseCase
 import com.myapp.presentation.R
-import com.myapp.presentation.utils.Status
-import com.myapp.presentation.utils.explanation
+import com.myapp.presentation.utils.base.Status
+import com.myapp.presentation.utils.expansion.explanation
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter

@@ -1,4 +1,4 @@
-package com.myapp.presentation.utils
+package com.myapp.presentation.utils.expansion
 
 /**
  * Resource拡張用ファイル

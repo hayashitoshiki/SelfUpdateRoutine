@@ -31,10 +31,12 @@
     <string name="title_item_short_fact">【事実】</string>
     <string name="title_item_short_find">【発見】</string>
     <string name="title_item_short_learn">【教訓】</string>
+    <string name="title_item_short_ffs_result">【FFS確認】</string>
     <string name="title_item_short_statement">【宣言】</string>
     <string name="title_item_short_assessment">【天気】</string>
     <string name="title_item_short_reason">【理由】</string>
     <string name="title_item_short_improve">【改善】</string>
+    <string name="title_item_short_wather_result">【PDCA確認】</string>
     <string name="title_item_fact">【事実】\n何がありましたか？</string>
     <string name="title_item_find">【発見】\nどんな気づきがありましたか？</string>
     <string name="title_item_learn">【格言】\nどんな学びがありましたか？</string>

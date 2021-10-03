@@ -1,44 +1,39 @@
 package com.myapp.presentation.ui.diary
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.myapp.presentation.utils.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 /**
  * 振り返り_FFS振り返り確認画面 画面ロジック
  */
 @HiltViewModel
-class FfsResultViewModel @Inject constructor() : ViewModel() {
+class FfsResultViewModel @Inject constructor() :
+    BaseViewModel<FfsResultContract.State, FfsResultContract.Effect, FfsResultContract.Event>() {
 
-    // 事実
-    private val _factInputText = MutableLiveData("")
-    val factInputText: LiveData<String> = _factInputText
+    override fun initState(): FfsResultContract.State {
+        return FfsResultContract.State()
+    }
 
-    // 発見
-    private val _findInputText = MutableLiveData("")
-    val findInputText: LiveData<String> = _findInputText
-
-    // 学び
-    private val _learnInputText = MutableLiveData("")
-    val learnInputText: LiveData<String> = _learnInputText
-
-    // 宣言
-    private val _statementInputText = MutableLiveData("")
-    val statementInputText: LiveData<String> = _statementInputText
+    override fun handleEvents(event: FfsResultContract.Event) {
+        when (event) {
+            is FfsResultContract.Event.OnClickNextButton -> setEffect { FfsResultContract.Effect.NextNavigation }
+        }
+    }
 
     init {
-        DiaryDispatcher.factTextFlow.onEach { _factInputText.value = it }
-            .launchIn(viewModelScope)
-        DiaryDispatcher.findTextFlow.onEach { _findInputText.value = it }
-            .launchIn(viewModelScope)
-        DiaryDispatcher.learnTextFlow.onEach { _learnInputText.value = it }
-            .launchIn(viewModelScope)
-        DiaryDispatcher.statementTextFlow.onEach { _statementInputText.value = it }
+        DiaryDispatcher.action.onEach {
+            when (it) {
+                is DiaryDispatcherContract.Action.ChangeFact -> setState { copy(fact = it.value) }
+                is DiaryDispatcherContract.Action.ChangeFind -> setState { copy(find = it.value) }
+                is DiaryDispatcherContract.Action.ChangeLesson -> setState { copy(learn = it.value) }
+                is DiaryDispatcherContract.Action.ChangeStatement -> setState { copy(statement = it.value) }
+            }
+        }
             .launchIn(viewModelScope)
     }
+
 }

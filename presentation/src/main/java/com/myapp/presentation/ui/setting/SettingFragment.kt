@@ -16,15 +16,15 @@ import androidx.navigation.fragment.findNavController
 import com.myapp.presentation.R
 import com.myapp.presentation.databinding.FragmentSettingBinding
 import com.myapp.presentation.ui.diary.AlarmNotificationReceiver
-import com.myapp.presentation.utils.BaseFragment
-import com.myapp.presentation.utils.Status
-import com.myapp.presentation.utils.observeAtOnce
-import com.myapp.presentation.utils.text
+import com.myapp.presentation.utils.base.BaseFragment
+import com.myapp.presentation.utils.base.Status
+import com.myapp.presentation.utils.expansion.observeAtOnce
+import com.myapp.presentation.utils.expansion.text
 import dagger.hilt.android.AndroidEntryPoint
 import es.dmoral.toasty.Toasty
+import timber.log.Timber
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
-import timber.log.Timber
 
 /**
  * 設定画面
@@ -57,12 +57,9 @@ class SettingFragment : BaseFragment() {
         viewModel.updateState.observe(viewLifecycleOwner, { onUpdateDateStateChanged(it) })
         viewModel.beforeDate.observeAtOnce(viewLifecycleOwner, { initTimePicker(it) })
         viewModel.alarmModeExplanation.observe(viewLifecycleOwner, { binding.txtModeExplanation.text = getString(it) })
-        viewModel.alarmMode.observe(
-            viewLifecycleOwner,
-            {
-                binding.modeDiffValue.text = getString(viewModel.beforeAlarmMode.text) + " -> " + getString(it.text)
-            }
-        )
+        viewModel.alarmMode.observe(viewLifecycleOwner, {
+            binding.modeDiffValue.text = getString(viewModel.beforeAlarmMode.text) + " -> " + getString(it.text)
+        })
 
         binding.timePicker.also {
             it.setIs24HourView(true)

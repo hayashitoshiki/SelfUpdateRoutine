@@ -5,7 +5,7 @@ import com.myapp.domain.dto.MissionStatementInputDto
 import com.myapp.domain.model.entity.MissionStatement
 import com.myapp.domain.usecase.MissionStatementUseCase
 import com.myapp.presentation.R
-import com.myapp.presentation.utils.Status
+import com.myapp.presentation.utils.base.Status
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject

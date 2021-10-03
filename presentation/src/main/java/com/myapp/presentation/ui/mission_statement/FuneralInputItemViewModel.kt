@@ -3,7 +3,7 @@ package com.myapp.presentation.ui.mission_statement
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.myapp.presentation.utils.BaseInputTextItemViewModel
+import com.myapp.presentation.utils.base.BaseInputTextItemViewModel
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
