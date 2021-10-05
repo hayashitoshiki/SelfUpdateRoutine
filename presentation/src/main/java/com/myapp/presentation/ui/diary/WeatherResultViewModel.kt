@@ -35,7 +35,7 @@ class WeatherResultViewModel @Inject constructor(private val reportUseCase: Repo
                 is DiaryDispatcherContract.Action.ChangeFact -> setState { copy(fact = it.value) }
                 is DiaryDispatcherContract.Action.ChangeFind -> setState { copy(find = it.value) }
                 is DiaryDispatcherContract.Action.ChangeImprove -> setState { copy(improve = it.value) }
-                is DiaryDispatcherContract.Action.ChangeLesson -> setState { copy(learn = it.value) }
+                is DiaryDispatcherContract.Action.ChangeLearn -> setState { copy(learn = it.value) }
                 is DiaryDispatcherContract.Action.ChangeReason -> setState { copy(reason = it.value) }
                 is DiaryDispatcherContract.Action.ChangeStatement -> setState { copy(statement = it.value) }
             }
@@ -45,38 +45,55 @@ class WeatherResultViewModel @Inject constructor(private val reportUseCase: Repo
 
     // 振り返り日記登録
     private fun saveReport() {
-        if (state.value.fact.isEmpty()) {
-            setEffect { WeatherResultContract.Effect.SaveResult(Status.Failure(IllegalAccessError("事実データが入っていません"))) }
-            return
-        }
-        if (state.value.find.isEmpty()) {
-            setEffect { WeatherResultContract.Effect.SaveResult(Status.Failure(IllegalAccessError("発見データが入っていません"))) }
-            return
-        }
-        if (state.value.learn.isEmpty()) {
-            setEffect { WeatherResultContract.Effect.SaveResult(Status.Failure(IllegalAccessError("学びデータが入っていません"))) }
-            return
-        }
-        if (state.value.statement.isEmpty()) {
-            setEffect { WeatherResultContract.Effect.SaveResult(Status.Failure(IllegalAccessError("宣言データが入っていません"))) }
-            return
-        }
-        if (state.value.reason.isEmpty()) {
-            setEffect { WeatherResultContract.Effect.SaveResult(Status.Failure(IllegalAccessError("理由データが入っていません"))) }
-            return
-        }
-        if (state.value.improve.isEmpty()) {
-            setEffect { WeatherResultContract.Effect.SaveResult(Status.Failure(IllegalAccessError("改善データが入っていません"))) }
-            return
-        }
-        val allReportInputDto = AllReportInputDto(
-            state.value.fact, state.value.find, state.value.learn, state.value.statement, state.value.assessment,
-            state.value.reason, state.value.improve
-        )
-        viewModelScope.launch {
-            reportUseCase.saveReport(allReportInputDto)
-            setEffect { WeatherResultContract.Effect.SaveResult(Status.Success(null)) }
-        }
+        runCatching {
+            if (state.value.fact.isEmpty()) throw IllegalAccessError("事実データが入っていません")
+            if (state.value.find.isEmpty()) throw IllegalAccessError("発見データが入っていません")
+            if (state.value.learn.isEmpty()) throw IllegalAccessError("学びデータが入っていません")
+            if (state.value.statement.isEmpty()) throw IllegalAccessError("宣言データが入っていません")
+            if (state.value.reason.isEmpty()) throw IllegalAccessError("理由データが入っていません")
+            if (state.value.improve.isEmpty()) throw IllegalAccessError("改善案データが入っていません")
+
+            val allReportInputDto = AllReportInputDto(
+                state.value.fact, state.value.find, state.value.learn, state.value.statement, state.value.assessment,
+                state.value.reason, state.value.improve
+            )
+            viewModelScope.launch { reportUseCase.saveReport(allReportInputDto) }
+        }.onSuccess { setEffect { WeatherResultContract.Effect.SaveResult(Status.Success(null)) } }
+            .onFailure { setEffect { WeatherResultContract.Effect.SaveResult(Status.Failure(it)) } }
+
+
+        //        if (state.value.fact.isEmpty()) {
+        //            setEffect { WeatherResultContract.Effect.SaveResult(Status.Failure(IllegalAccessError("事実データが入っていません"))) }
+        //            return
+        //        }
+        //        if (state.value.find.isEmpty()) {
+        //            setEffect { WeatherResultContract.Effect.SaveResult(Status.Failure(IllegalAccessError("発見データが入っていません"))) }
+        //            return
+        //        }
+        //        if (state.value.learn.isEmpty()) {
+        //            setEffect { WeatherResultContract.Effect.SaveResult(Status.Failure(IllegalAccessError("学びデータが入っていません"))) }
+        //            return
+        //        }
+        //        if (state.value.statement.isEmpty()) {
+        //            setEffect { WeatherResultContract.Effect.SaveResult(Status.Failure(IllegalAccessError("宣言データが入っていません"))) }
+        //            return
+        //        }
+        //        if (state.value.reason.isEmpty()) {
+        //            setEffect { WeatherResultContract.Effect.SaveResult(Status.Failure(IllegalAccessError("理由データが入っていません"))) }
+        //            return
+        //        }
+        //        if (state.value.improve.isEmpty()) {
+        //            setEffect { WeatherResultContract.Effect.SaveResult(Status.Failure(IllegalAccessError("改善データが入っていません"))) }
+        //            return
+        //        }
+        //        val allReportInputDto = AllReportInputDto(
+        //            state.value.fact, state.value.find, state.value.learn, state.value.statement, state.value.assessment,
+        //            state.value.reason, state.value.improve
+        //        )
+        //        viewModelScope.launch {
+        //            reportUseCase.saveReport(allReportInputDto)
+        //            setEffect { WeatherResultContract.Effect.SaveResult(Status.Success(null)) }
+        //        }
     }
 
 }

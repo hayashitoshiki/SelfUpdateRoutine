@@ -27,7 +27,7 @@ interface DiaryDispatcherContract {
     sealed class Action {
         data class ChangeFact(val value: String) : Action()
         data class ChangeFind(val value: String) : Action()
-        data class ChangeLesson(val value: String) : Action()
+        data class ChangeLearn(val value: String) : Action()
         data class ChangeStatement(val value: String) : Action()
         data class ChangeAssessment(val value: Float) : Action()
         data class ChangeReason(val value: String) : Action()

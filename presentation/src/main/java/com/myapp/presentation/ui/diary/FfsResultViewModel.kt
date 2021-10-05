@@ -29,7 +29,7 @@ class FfsResultViewModel @Inject constructor() :
             when (it) {
                 is DiaryDispatcherContract.Action.ChangeFact -> setState { copy(fact = it.value) }
                 is DiaryDispatcherContract.Action.ChangeFind -> setState { copy(find = it.value) }
-                is DiaryDispatcherContract.Action.ChangeLesson -> setState { copy(learn = it.value) }
+                is DiaryDispatcherContract.Action.ChangeLearn -> setState { copy(learn = it.value) }
                 is DiaryDispatcherContract.Action.ChangeStatement -> setState { copy(statement = it.value) }
             }
         }
