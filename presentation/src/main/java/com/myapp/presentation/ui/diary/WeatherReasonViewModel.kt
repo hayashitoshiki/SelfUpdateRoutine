@@ -10,6 +10,6 @@ import javax.inject.Inject
 class WeatherReasonViewModel @Inject constructor() : DiaryBaseViewModel() {
 
     override suspend fun sendDispatcher(value: String) {
-        DiaryDispatcher.handleActions(DiaryDispatcherContract.Action.ChangeReason(value))
+        DiaryDispatcher.setActions(DiaryDispatcherContract.Action.ChangeReason(value))
     }
 }

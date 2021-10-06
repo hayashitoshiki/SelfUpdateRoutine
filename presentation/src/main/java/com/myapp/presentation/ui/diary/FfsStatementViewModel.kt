@@ -10,6 +10,6 @@ import javax.inject.Inject
 class FfsStatementViewModel @Inject constructor() : DiaryBaseViewModel() {
 
     override suspend fun sendDispatcher(value: String) {
-        DiaryDispatcher.handleActions(DiaryDispatcherContract.Action.ChangeStatement(value))
+        DiaryDispatcher.setActions(DiaryDispatcherContract.Action.ChangeStatement(value))
     }
 }

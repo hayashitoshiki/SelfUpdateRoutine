@@ -11,7 +11,7 @@ package com.myapp.domain.dto
  * @property reasonComment 感情日記_その理由
  * @property improveComment 感情日記_明日への改善点
  */
-class AllReportInputDto(
+data class AllReportInputDto(
     val factComment: String,
     val findComment: String,
     val learnComment: String,

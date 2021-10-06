@@ -1,8 +1,10 @@
 package com.myapp.presentation.ui.diary
 
+import com.myapp.domain.dto.AllReportInputDto
 import com.myapp.domain.usecase.ReportUseCase
 import com.myapp.presentation.utils.base.Status
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -87,49 +89,49 @@ class WeatherResultViewModelTest {
     private suspend fun diaryDispatcherFactAction(expectationsState: WeatherResultContract.State): Pair<WeatherResultContract.State, DiaryDispatcherContract.Action> {
         val value = "fact"
         val action = DiaryDispatcherContract.Action.ChangeFact(value)
-        DiaryDispatcher.handleActions(action)
+        DiaryDispatcher.setActions(action)
         return Pair(expectationsState.copy(fact = value), action)
     }
 
     private suspend fun diaryDispatcherFindAction(expectationsState: WeatherResultContract.State): Pair<WeatherResultContract.State, DiaryDispatcherContract.Action> {
         val value = "find"
         val action = DiaryDispatcherContract.Action.ChangeFind(value)
-        DiaryDispatcher.handleActions(action)
+        DiaryDispatcher.setActions(action)
         return Pair(expectationsState.copy(find = value), action)
     }
 
     private suspend fun diaryDispatcherLearnAction(expectationsState: WeatherResultContract.State): Pair<WeatherResultContract.State, DiaryDispatcherContract.Action> {
         val value = "learn"
         val action = DiaryDispatcherContract.Action.ChangeLearn(value)
-        DiaryDispatcher.handleActions(action)
+        DiaryDispatcher.setActions(action)
         return Pair(expectationsState.copy(learn = value), action)
     }
 
     private suspend fun diaryDispatcherStatementAction(expectationsState: WeatherResultContract.State): Pair<WeatherResultContract.State, DiaryDispatcherContract.Action> {
         val value = "statement"
         val action = DiaryDispatcherContract.Action.ChangeStatement(value)
-        DiaryDispatcher.handleActions(action)
+        DiaryDispatcher.setActions(action)
         return Pair(expectationsState.copy(statement = value), action)
     }
 
     private suspend fun diaryDispatcherAssessmentAction(expectationsState: WeatherResultContract.State): Pair<WeatherResultContract.State, DiaryDispatcherContract.Action> {
         val value = 50f
         val action = DiaryDispatcherContract.Action.ChangeAssessment(value)
-        DiaryDispatcher.handleActions(action)
+        DiaryDispatcher.setActions(action)
         return Pair(expectationsState.copy(assessment = (value * 100).toInt()), action)
     }
 
     private suspend fun diaryDispatcherReasonAction(expectationsState: WeatherResultContract.State): Pair<WeatherResultContract.State, DiaryDispatcherContract.Action> {
         val value = "reason"
         val action = DiaryDispatcherContract.Action.ChangeReason(value)
-        DiaryDispatcher.handleActions(action)
+        DiaryDispatcher.setActions(action)
         return Pair(expectationsState.copy(reason = value), action)
     }
 
     private suspend fun diaryDispatcherImproveAction(expectationsState: WeatherResultContract.State): Pair<WeatherResultContract.State, DiaryDispatcherContract.Action> {
         val value = "improve"
         val action = DiaryDispatcherContract.Action.ChangeImprove(value)
-        DiaryDispatcher.handleActions(action)
+        DiaryDispatcher.setActions(action)
         return Pair(expectationsState.copy(improve = value), action)
     }
 
@@ -165,6 +167,7 @@ class WeatherResultViewModelTest {
 
         // 比較
         result(expectationsState, expectationsEffect, expectationsAction)
+        coVerify(exactly = 0) { (reportUseCase).saveReport(any()) }
     }
 
     /**
@@ -200,6 +203,7 @@ class WeatherResultViewModelTest {
 
         // 比較
         result(expectationsState, expectationsEffect, expectationsAction)
+        coVerify(exactly = 0) { (reportUseCase).saveReport(any()) }
     }
 
     /**
@@ -235,6 +239,7 @@ class WeatherResultViewModelTest {
 
         // 比較
         result(expectationsState, expectationsEffect, expectationsAction)
+        coVerify(exactly = 0) { (reportUseCase).saveReport(any()) }
     }
 
     /**
@@ -270,6 +275,7 @@ class WeatherResultViewModelTest {
 
         // 比較
         result(expectationsState, expectationsEffect, expectationsAction)
+        coVerify(exactly = 0) { (reportUseCase).saveReport(any()) }
     }
 
     /**
@@ -305,6 +311,7 @@ class WeatherResultViewModelTest {
 
         // 比較
         result(expectationsState, expectationsEffect, expectationsAction)
+        coVerify(exactly = 0) { (reportUseCase).saveReport(any()) }
     }
 
     /**
@@ -319,7 +326,7 @@ class WeatherResultViewModelTest {
      * ・共通処理イベント
      * 　　ー
      * ・業務ロジック
-     * 　・保存処理が入力した値で呼ばれること
+     * 　・保存処理が呼ばれないこと
      */
     @ExperimentalCoroutinesApi
     @Test
@@ -340,6 +347,7 @@ class WeatherResultViewModelTest {
 
         // 比較
         result(expectationsState, expectationsEffect, expectationsAction)
+        coVerify(exactly = 0) { (reportUseCase).saveReport(any()) }
     }
 
     /**
@@ -354,7 +362,7 @@ class WeatherResultViewModelTest {
      * ・共通処理イベント
      * 　　ー
      * ・業務ロジック
-     * 　・保存処理が入力した値で呼ばれること
+     * 　・保存処理が呼ばれないこと
      */
     @ExperimentalCoroutinesApi
     @Test
@@ -375,6 +383,7 @@ class WeatherResultViewModelTest {
 
         // 比較
         result(expectationsState, expectationsEffect, expectationsAction)
+        coVerify(exactly = 0) { (reportUseCase).saveReport(any()) }
     }
 
     /**
@@ -406,12 +415,17 @@ class WeatherResultViewModelTest {
         stateCopy = diaryDispatcherImproveAction(stateCopy).first
         val expectationsEffect = WeatherResultContract.Effect.SaveResult(status)
         val (expectationsState, expectationsAction) = diaryDispatcherImproveAction(stateCopy)
+        val allReportInputDto = AllReportInputDto(
+            stateCopy.fact, stateCopy.find, stateCopy.learn, stateCopy.statement, stateCopy.assessment, stateCopy.reason,
+            stateCopy.improve
+        )
 
         // 実行
         ffsFactViewModel.setEvent(WeatherResultContract.Event.OnClickSaveButton)
 
         // 比較
         result(expectationsState, expectationsEffect, expectationsAction)
+        coVerify(exactly = 1) { (reportUseCase).saveReport(allReportInputDto) }
     }
 
     // endregion
@@ -441,7 +455,7 @@ class WeatherResultViewModelTest {
         val expectationsEffect = null
 
         // 実施
-        DiaryDispatcher.handleActions(action)
+        DiaryDispatcher.setActions(action)
 
         // 比較
         result(expectationsState, expectationsEffect, action)
@@ -470,7 +484,7 @@ class WeatherResultViewModelTest {
         val expectationsEffect = null
 
         // 実施
-        DiaryDispatcher.handleActions(action)
+        DiaryDispatcher.setActions(action)
 
         // 比較
         result(expectationsState, expectationsEffect, action)
@@ -499,7 +513,7 @@ class WeatherResultViewModelTest {
         val expectationsEffect = null
 
         // 実施
-        DiaryDispatcher.handleActions(action)
+        DiaryDispatcher.setActions(action)
 
         // 比較
         result(expectationsState, expectationsEffect, action)
@@ -528,7 +542,7 @@ class WeatherResultViewModelTest {
         val expectationsEffect = null
 
         // 実施
-        DiaryDispatcher.handleActions(action)
+        DiaryDispatcher.setActions(action)
 
         // 比較
         result(expectationsState, expectationsEffect, action)
@@ -559,7 +573,7 @@ class WeatherResultViewModelTest {
         val expectationsEffect = null
 
         // 実施
-        DiaryDispatcher.handleActions(action)
+        DiaryDispatcher.setActions(action)
 
         // 比較
         result(expectationsState, expectationsEffect, action)
@@ -588,7 +602,7 @@ class WeatherResultViewModelTest {
         val expectationsEffect = null
 
         // 実施
-        DiaryDispatcher.handleActions(action)
+        DiaryDispatcher.setActions(action)
 
         // 比較
         result(expectationsState, expectationsEffect, action)
@@ -617,7 +631,7 @@ class WeatherResultViewModelTest {
         val expectationsEffect = null
 
         // 実施
-        DiaryDispatcher.handleActions(action)
+        DiaryDispatcher.setActions(action)
 
         // 比較
         result(expectationsState, expectationsEffect, action)

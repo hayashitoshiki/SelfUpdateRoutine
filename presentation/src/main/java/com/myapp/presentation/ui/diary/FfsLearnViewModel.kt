@@ -10,6 +10,6 @@ import javax.inject.Inject
 class FfsLearnViewModel @Inject constructor() : DiaryBaseViewModel() {
 
     override suspend fun sendDispatcher(value: String) {
-        DiaryDispatcher.handleActions(DiaryDispatcherContract.Action.ChangeLearn(value))
+        DiaryDispatcher.setActions(DiaryDispatcherContract.Action.ChangeLearn(value))
     }
 }

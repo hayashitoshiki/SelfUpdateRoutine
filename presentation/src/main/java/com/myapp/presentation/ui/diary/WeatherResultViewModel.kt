@@ -60,40 +60,6 @@ class WeatherResultViewModel @Inject constructor(private val reportUseCase: Repo
             viewModelScope.launch { reportUseCase.saveReport(allReportInputDto) }
         }.onSuccess { setEffect { WeatherResultContract.Effect.SaveResult(Status.Success(null)) } }
             .onFailure { setEffect { WeatherResultContract.Effect.SaveResult(Status.Failure(it)) } }
-
-
-        //        if (state.value.fact.isEmpty()) {
-        //            setEffect { WeatherResultContract.Effect.SaveResult(Status.Failure(IllegalAccessError("事実データが入っていません"))) }
-        //            return
-        //        }
-        //        if (state.value.find.isEmpty()) {
-        //            setEffect { WeatherResultContract.Effect.SaveResult(Status.Failure(IllegalAccessError("発見データが入っていません"))) }
-        //            return
-        //        }
-        //        if (state.value.learn.isEmpty()) {
-        //            setEffect { WeatherResultContract.Effect.SaveResult(Status.Failure(IllegalAccessError("学びデータが入っていません"))) }
-        //            return
-        //        }
-        //        if (state.value.statement.isEmpty()) {
-        //            setEffect { WeatherResultContract.Effect.SaveResult(Status.Failure(IllegalAccessError("宣言データが入っていません"))) }
-        //            return
-        //        }
-        //        if (state.value.reason.isEmpty()) {
-        //            setEffect { WeatherResultContract.Effect.SaveResult(Status.Failure(IllegalAccessError("理由データが入っていません"))) }
-        //            return
-        //        }
-        //        if (state.value.improve.isEmpty()) {
-        //            setEffect { WeatherResultContract.Effect.SaveResult(Status.Failure(IllegalAccessError("改善データが入っていません"))) }
-        //            return
-        //        }
-        //        val allReportInputDto = AllReportInputDto(
-        //            state.value.fact, state.value.find, state.value.learn, state.value.statement, state.value.assessment,
-        //            state.value.reason, state.value.improve
-        //        )
-        //        viewModelScope.launch {
-        //            reportUseCase.saveReport(allReportInputDto)
-        //            setEffect { WeatherResultContract.Effect.SaveResult(Status.Success(null)) }
-        //        }
     }
 
 }

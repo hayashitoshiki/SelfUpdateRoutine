@@ -14,6 +14,6 @@ class WeatherAssessmentViewModel @Inject constructor() : DiaryBaseViewModel() {
     }
 
     override suspend fun sendDispatcher(value: String) {
-        DiaryDispatcher.handleActions(DiaryDispatcherContract.Action.ChangeAssessment(value.toFloat()))
+        DiaryDispatcher.setActions(DiaryDispatcherContract.Action.ChangeAssessment(value.toFloat()))
     }
 }

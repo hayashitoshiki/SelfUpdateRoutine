@@ -10,6 +10,6 @@ import javax.inject.Inject
 class FfsFindViewModel @Inject constructor() : DiaryBaseViewModel() {
 
     override suspend fun sendDispatcher(value: String) {
-        DiaryDispatcher.handleActions(DiaryDispatcherContract.Action.ChangeFind(value))
+        DiaryDispatcher.setActions(DiaryDispatcherContract.Action.ChangeFind(value))
     }
 }

@@ -188,7 +188,7 @@ class WeatherImproveViewModelTest {
         val expectationsEffect = null
 
         // 実施
-        DiaryDispatcher.handleActions(action)
+        DiaryDispatcher.setActions(action)
 
         // 比較
         result(expectationsState, expectationsEffect, action)
@@ -216,7 +216,7 @@ class WeatherImproveViewModelTest {
         val expectationsEffect = null
 
         // 実施
-        DiaryDispatcher.handleActions(action)
+        DiaryDispatcher.setActions(action)
 
         // 比較
         result(expectationsState, expectationsEffect, action)
@@ -244,7 +244,7 @@ class WeatherImproveViewModelTest {
         val expectationsEffect = null
 
         // 実施
-        DiaryDispatcher.handleActions(action)
+        DiaryDispatcher.setActions(action)
 
         // 比較
         result(expectationsState, expectationsEffect, action)
@@ -272,7 +272,7 @@ class WeatherImproveViewModelTest {
         val expectationsEffect = null
 
         // 実施
-        DiaryDispatcher.handleActions(action)
+        DiaryDispatcher.setActions(action)
 
         // 比較
         result(expectationsState, expectationsEffect, action)
@@ -301,7 +301,7 @@ class WeatherImproveViewModelTest {
         val expectationsEffect = null
 
         // 実施
-        DiaryDispatcher.handleActions(action)
+        DiaryDispatcher.setActions(action)
 
         // 比較
         result(expectationsState, expectationsEffect, action)
@@ -329,7 +329,7 @@ class WeatherImproveViewModelTest {
         val expectationsEffect = null
 
         // 実施
-        DiaryDispatcher.handleActions(action)
+        DiaryDispatcher.setActions(action)
 
         // 比較
         result(expectationsState, expectationsEffect, action)
@@ -357,7 +357,7 @@ class WeatherImproveViewModelTest {
         val expectationsEffect = null
 
         // 実施
-        DiaryDispatcher.handleActions(action)
+        DiaryDispatcher.setActions(action)
 
         // 比較
         result(expectationsState, expectationsEffect, action)
