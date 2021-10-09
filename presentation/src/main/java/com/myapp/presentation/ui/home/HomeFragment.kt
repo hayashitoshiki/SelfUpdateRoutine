@@ -1,5 +1,6 @@
 package com.myapp.presentation.ui.home
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -28,95 +29,93 @@ class HomeFragment : BaseFragment() {
     private val viewModel: HomeViewModel by viewModels()
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
-    private var isFABOpen = false
+    private lateinit var  lister: OnDiaryCardItemClickListener
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
         return binding.root
     }
 
-    override fun onViewCreated(
-        view: View,
-        savedInstanceState: Bundle?
-    ) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        viewModel.report.observe(viewLifecycleOwner, { setDiaryList(it) })
+        setEvent()
+        viewModel.state.observe(viewLifecycleOwner, { changeState(it) })
+        viewModel.effect.observe(viewLifecycleOwner, { executionEffect(it) })
 
         val adapter = GroupAdapter<ViewHolder>()
         val layoutManager = LinearLayoutManager(requireContext())
         layoutManager.orientation = LinearLayoutManager.HORIZONTAL
         binding.listDiary.adapter = adapter
         binding.listDiary.layoutManager = layoutManager
+    }
+
+    // State設定
+    private fun changeState(state: HomeContract.State) {
+        setDiaryList(state.reportList)
+    }
+
+    // イベント設定
+    private fun setEvent() {
 
         // 今日の日記入力ボタン
-        binding.btnDiaryInput.setOnClickListener {
+        binding.btnDiaryInput.setOnClickListener { viewModel.setEvent(HomeContract.Event.OnClickReportButton) }
+
+        // Fabボタン
+        binding.fab.setOnClickListener { viewModel.setEvent(HomeContract.Event.OnClickFabButton) }
+
+        // Fab_宣言一覧ボタン
+        binding.fabStatement.setOnClickListener { viewModel.setEvent(HomeContract.Event.OnClickFabStatementButton) }
+
+        // Fab_格言一覧ボタン
+        binding.fabLearn.setOnClickListener { viewModel.setEvent(HomeContract.Event.OnClickFabLearnButton) }
+
+        // 振り返りカード
+        lister = object : OnDiaryCardItemClickListener {
+            override fun onItemClick(report: Report) {
+                viewModel.setEvent(HomeContract.Event.OnClickReportCard(report))
+            }
+        }
+    }
+
+    // エフェクト設定
+    @SuppressLint("TimberExceptionLogging")
+    @Suppress("IMPLICIT_CAST_TO_ANY")
+    private fun executionEffect(effect: HomeContract.Effect) = when(effect) {
+        is HomeContract.Effect.ChangeFabEnable -> {
+            if (effect.value) {
+                binding.fabStatement.animate().translationY(resources.getDimension(R.dimen.standard_55))
+                binding.fabLearn.animate().translationY(resources.getDimension(R.dimen.standard_105))
+            } else {
+                binding.fabStatement.animate().translationY(0.toFloat())
+                binding.fabLearn.animate().translationY(0.toFloat())
+            }
+        }
+        is HomeContract.Effect.DiaryReportNavigation -> {
             val intent = Intent(context, DiaryActivity::class.java)
             startActivity(intent)
         }
-
-        // Fabボタン
-        binding.fab.setOnClickListener {
-            if (!isFABOpen) {
-                showFABMenu()
-            } else {
-                closeFABMenu()
-            }
+        is HomeContract.Effect.LearnListNavigation -> {
+            val statementList = effect.value.map { report -> ReportDetail(report.ffsReport.learnComment, report.ffsReport.dataTime) }
+            val data = ReportDetailList(statementList)
+            val action = HomeFragmentDirections.actionNavHomeToNavLearnList(data)
+            findNavController().navigate(action)
         }
-
-        // Fab_宣言一覧ボタン
-        binding.fabStatement.setOnClickListener {
-            viewModel.report.value?.let { reportList ->
-                val statementList = reportList.map { report ->
-                    ReportDetail(report.ffsReport.statementComment, report.ffsReport.dataTime)
-                }
-                val data = ReportDetailList(statementList)
-                val action = HomeFragmentDirections.actionNavHomeToNavStatementList(data)
-                findNavController().navigate(action)
-                isFABOpen = false
-            } ?: run {
-                Timber.tag(this.javaClass.simpleName)
-                    .d("レポートリストが登録されていないのに宣言一覧画面を表示しようとしています")
-            }
+        is HomeContract.Effect.StatementListNavigation -> {
+            val statementList = effect.value.map { report -> ReportDetail(report.ffsReport.statementComment, report.ffsReport.dataTime) }
+            val data = ReportDetailList(statementList)
+            val action = HomeFragmentDirections.actionNavHomeToNavStatementList(data)
+            findNavController().navigate(action)
         }
-
-        // Fab_格言一覧ボタン
-        binding.fabLearn.setOnClickListener {
-            viewModel.report.value?.let { reportList ->
-                val statementList = reportList.map { report ->
-                    ReportDetail(report.ffsReport.learnComment, report.ffsReport.dataTime)
-                }
-                val data = ReportDetailList(statementList)
-                val action = HomeFragmentDirections.actionNavHomeToNavLearnList(data)
-                findNavController().navigate(action)
-                isFABOpen = false
-            } ?: run {
-                Timber.tag(this.javaClass.simpleName)
-                    .d("レポートリストが登録されていないのに宣言一覧画面を表示しようとしています")
-            }
+        is HomeContract.Effect.ReportDetailListNavigation -> {
+            val action = HomeFragmentDirections.actionNavHomeToNavRememner(effect.value)
+            findNavController().navigate(action)
         }
-    }
-
-    private fun showFABMenu() {
-        isFABOpen = true
-        binding.fabStatement.animate()
-            .translationY(resources.getDimension(R.dimen.standard_55))
-        binding.fabLearn.animate()
-            .translationY(resources.getDimension(R.dimen.standard_105))
-    }
-
-    private fun closeFABMenu() {
-        isFABOpen = false
-        binding.fabStatement.animate()
-            .translationY(0.toFloat())
-        binding.fabLearn.animate()
-            .translationY(0.toFloat())
+        is HomeContract.Effect.OnDestroyView -> {}
+        is HomeContract.Effect.ErrorShow -> {
+            Timber.tag(this.javaClass.simpleName).d(effect.throwable.message)
+        }
     }
 
     // レポートリスト設定
@@ -124,14 +123,8 @@ class HomeFragment : BaseFragment() {
         val adapter = GroupAdapter<ViewHolder>()
         val items = mutableListOf<BindableItem<*>>()
         data.forEach { report ->
-            val viewModel = DiaryCardViewModel(report)
-            val lister = object : OnDiaryCardItemClickListener {
-                override fun onItemClick(report: Report) {
-                    val action = HomeFragmentDirections.actionNavHomeToNavRememner(report)
-                    findNavController().navigate(action)
-                }
-            }
-            val item = DiaryCardItem(viewModel, viewLifecycleOwner, lister)
+            val diaryCardViewModel = DiaryCardViewModel(report)
+            val item = DiaryCardItem(diaryCardViewModel, viewLifecycleOwner, lister)
             items.add(item)
         }
         binding.listDiary.adapter = adapter
@@ -139,6 +132,7 @@ class HomeFragment : BaseFragment() {
     }
 
     override fun onDestroyView() {
+        viewModel.setEvent(HomeContract.Event.OnDestroyView)
         super.onDestroyView()
         _binding = null
     }

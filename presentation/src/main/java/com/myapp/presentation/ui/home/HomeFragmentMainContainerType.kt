@@ -3,28 +3,20 @@ package com.myapp.presentation.ui.home
 /**
  * ホーム画面 メインコンテナの表示View制御
  *
- * @param T
  */
-sealed class HomeFragmentMainContainerType<out T> {
-
+enum class HomeFragmentMainContainerType {
     /**
-     * レポートみ入力　View
+     * レポート入力View
      */
-    object NotReport : HomeFragmentMainContainerType<Nothing>()
-
+    NotReport,
     /**
-     * レポートView
+     * 今日のレポートView
      *
-     * @param Report
-     * @property data
      */
-    data class Report<Report>(val data: Report) : HomeFragmentMainContainerType<Report>()
-
+    Report,
     /**
-     * ビジョンView
+     * 今日の目標View
      *
-     * @param Report
-     * @property data
      */
-    data class Vision<Report>(val data: Report) : HomeFragmentMainContainerType<Report>()
+    Vision;
 }
