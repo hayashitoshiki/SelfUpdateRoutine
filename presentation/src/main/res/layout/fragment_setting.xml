@@ -4,14 +4,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
-
-        <import type="com.myapp.domain.model.value.AlarmMode" />
-
-        <import type="android.graphics.drawable.Drawable" />
-
-        <variable
-            name="viewModel"
-            type="com.myapp.presentation.ui.setting.SettingViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -108,26 +100,23 @@
                     app:layout_constraintTop_toBottomOf="@+id/txt_alarm_title" />
 
                 <com.google.android.material.radiobutton.MaterialRadioButton
-                    android:id="@+id/radioButton"
+                    android:id="@+id/radio_normal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:checked="@{viewModel.alarmMode.equals(AlarmMode.NORMAL)}"
-                    android:onClick="@{()->viewModel.setAlarmMode(AlarmMode.NORMAL)}"
                     android:text="@string/radio_btn_alarm_mode_normal"
                     android:layout_marginStart="8dp"
                     app:layout_constraintStart_toEndOf="@+id/img_alarm"
                     app:layout_constraintTop_toTopOf="@+id/img_alarm" />
 
                 <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/radio_hard"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:checked="@{viewModel.alarmMode.equals(AlarmMode.HARD)}"
-                    android:onClick="@{()->viewModel.setAlarmMode(AlarmMode.HARD)}"
                     android:text="@string/radio_btn_alarm_mode_hard"
-                    app:layout_constraintBottom_toBottomOf="@+id/radioButton"
-                    app:layout_constraintStart_toEndOf="@+id/radioButton"
-                    app:layout_constraintTop_toTopOf="@+id/radioButton" />
+                    app:layout_constraintBottom_toBottomOf="@+id/radio_normal"
+                    app:layout_constraintStart_toEndOf="@+id/radio_normal"
+                    app:layout_constraintTop_toTopOf="@+id/radio_normal" />
 
                 <TextView
                     android:id="@+id/txt_mode_explanation"
@@ -137,8 +126,8 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginStart="8dp"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="@+id/radioButton"
-                    app:layout_constraintTop_toBottomOf="@+id/radioButton" />
+                    app:layout_constraintStart_toStartOf="@+id/radio_normal"
+                    app:layout_constraintTop_toBottomOf="@+id/radio_normal" />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.cardview.widget.CardView>
 
@@ -157,7 +146,6 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="24dp"
                 android:text="@string/title_item_alarm_time"
-                android:textColor="@{context.getColor(viewModel.alarmTimeDiffColor)}"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -166,9 +154,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="24dp"
-                android:text="@{viewModel.alarmTimeDiff}"
-                android:textColor="@{context.getColor(viewModel.alarmTimeDiffColor)}"
-                app:layout_constraintEnd_toEndOf="parent"
+               app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/alarm_title" />
 
             <TextView
@@ -177,17 +163,18 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="@string/title_item_alarm_mode"
-                android:textColor="@{context.getColor(viewModel.alarmModeDiffColor)}"
                 app:layout_constraintStart_toStartOf="@+id/alarm_title"
                 app:layout_constraintTop_toBottomOf="@+id/alarm_title" />
+<!--            android:textColor="@{context.getColor(viewModel.alarmModeDiffColor)}"-->
+
 
             <TextView
                 android:id="@+id/mode_diff_value"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@{context.getColor(viewModel.alarmModeDiffColor)}"
                 app:layout_constraintEnd_toEndOf="@+id/alarm_value"
                 app:layout_constraintTop_toTopOf="@+id/mode_title" />
+            <!--            android:textColor="@{context.getColor(viewModel.alarmModeDiffColor)}"-->
 
             <TextView
                 android:id="@+id/next_title"
@@ -203,7 +190,6 @@
                 android:id="@+id/next_value"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{viewModel.nextAlarmTime}"
                 android:textColor="@color/text_color_light_primary"
                 app:layout_constraintEnd_toEndOf="@+id/mode_diff_value"
                 app:layout_constraintTop_toTopOf="@+id/next_title" />
@@ -214,7 +200,6 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
                 android:text="@string/btn_update"
-                android:enabled="@{viewModel.isEnableConfirmButton()}"
                 style="@style/Widget.MyApp.Button.White"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

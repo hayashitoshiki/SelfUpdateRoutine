@@ -13,12 +13,11 @@ import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.myapp.domain.model.value.AlarmMode
 import com.myapp.presentation.R
 import com.myapp.presentation.databinding.FragmentSettingBinding
 import com.myapp.presentation.ui.diary.AlarmNotificationReceiver
 import com.myapp.presentation.utils.base.BaseFragment
-import com.myapp.presentation.utils.base.Status
-import com.myapp.presentation.utils.expansion.observeAtOnce
 import com.myapp.presentation.utils.expansion.text
 import dagger.hilt.android.AndroidEntryPoint
 import es.dmoral.toasty.Toasty
@@ -34,7 +33,7 @@ class SettingFragment : BaseFragment() {
 
     private var _binding: FragmentSettingBinding? = null
     private val binding get() = _binding!!
-    val viewModel: SettingViewModel by viewModels()
+    private val viewModel: SettingViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -43,7 +42,6 @@ class SettingFragment : BaseFragment() {
     ): View {
         _binding = DataBindingUtil.inflate(inflater, R.layout.fragment_setting, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
-        binding.viewModel = viewModel
         return binding.root
     }
 
@@ -53,60 +51,93 @@ class SettingFragment : BaseFragment() {
         savedInstanceState: Bundle?
     ) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel.state.value?.let { state ->
+            binding.timePicker.hour = state.beforeDate.substring(0, 2).toInt()
+            binding.timePicker.minute = state.beforeDate.substring(3, 5).toInt()
+            binding.alarmValue.text = state.alarmTimeDiff
+            binding.alarmValue.setTextColor(resources.getColor(state.alarmTimeDiffColor, null))
+            binding.alarmTitle.setTextColor(resources.getColor(state.alarmTimeDiffColor, null))
+            binding.nextValue.text = state.nextAlarmTime
+            binding.radioHard.isChecked = state.alarmMode == AlarmMode.HARD
+            binding.radioNormal.isChecked = state.alarmMode == AlarmMode.NORMAL
+            binding.modeDiffValue.text = getString(state.beforeAlarmMode.text) + " -> " + getString(state.alarmMode.text)
+            binding.modeTitle.setTextColor(resources.getColor(state.alarmModeDiffColor, null))
+            binding.modeDiffValue.setTextColor(resources.getColor(state.alarmModeDiffColor, null))
+            binding.txtModeExplanation.text = requireContext().getString(state.alarmModeExplanation)
+            binding.btnOk.isEnabled = state.isEnableConfirmButton
+        }
+        setEvent()
+        viewModel.state.observe(viewLifecycleOwner,{changeState(it)})
+        viewModel.effect.observe(viewLifecycleOwner,{executionEffect(it)})
+        viewModel.setEvent(SettingContract.Event.CreatedView)
+    }
 
-        viewModel.updateState.observe(viewLifecycleOwner, { onUpdateDateStateChanged(it) })
-        viewModel.beforeDate.observeAtOnce(viewLifecycleOwner, { initTimePicker(it) })
-        viewModel.alarmModeExplanation.observe(viewLifecycleOwner, { binding.txtModeExplanation.text = getString(it) })
-        viewModel.alarmMode.observe(viewLifecycleOwner, {
-            binding.modeDiffValue.text = getString(viewModel.beforeAlarmMode.text) + " -> " + getString(it.text)
-        })
-
-        binding.timePicker.also {
-            it.setIs24HourView(true)
-            it.setOnTimeChangedListener { timePicker, hourOfDay, minute ->
-                if (hourOfDay in 0..14) {
-                    timePicker.hour = 18
-                }
-                if (hourOfDay in 15..17) {
-                    timePicker.hour = 23
-                }
-                if (timePicker.hour != viewModel.hourDate.value) {
-                    viewModel.hourDate.value = timePicker.hour
-                }
-                if (minute != viewModel.minutesDate.value) {
-                    viewModel.minutesDate.value = minute
-                }
+    // Viewの各値変更
+    private fun changeState(state: SettingContract.State) {
+        viewModel.cashState.let { cash ->
+            if (cash == null || state.beforeDate != cash.beforeDate) {
+                binding.timePicker.hour = state.beforeDate.substring(0, 2).toInt()
+                binding.timePicker.minute = state.beforeDate.substring(3, 5).toInt()
+            }
+            if (cash == null || state.alarmTimeDiff != cash.alarmTimeDiff) {
+                binding.alarmValue.text = state.alarmTimeDiff
+            }
+            if (cash == null || state.alarmTimeDiffColor != cash.alarmTimeDiffColor) {
+                binding.alarmValue.setTextColor(resources.getColor(state.alarmTimeDiffColor, null))
+                binding.alarmTitle.setTextColor(resources.getColor(state.alarmTimeDiffColor, null))
+            }
+            if (cash == null || state.nextAlarmTime != cash.nextAlarmTime) {
+                binding.nextValue.text = state.nextAlarmTime
+            }
+            if (cash == null || state.alarmMode != cash.alarmMode) {
+                binding.radioHard.isChecked = state.alarmMode == AlarmMode.HARD
+                binding.radioNormal.isChecked = state.alarmMode == AlarmMode.NORMAL
+                binding.modeDiffValue.text = getString(state.beforeAlarmMode.text) + " -> " + getString(state.alarmMode.text)
+            }
+            if (cash == null || state.alarmModeDiffColor != cash.alarmModeDiffColor) {
+                binding.modeTitle.setTextColor(resources.getColor(state.alarmModeDiffColor, null))
+                binding.modeDiffValue.setTextColor(resources.getColor(state.alarmModeDiffColor, null))
+            }
+            if (cash == null || state.alarmModeExplanation != cash.alarmModeExplanation) {
+                binding.txtModeExplanation.text = requireContext().getString(state.alarmModeExplanation)
+            }
+            if (cash == null || state.isEnableConfirmButton != cash.isEnableConfirmButton) {
+                binding.btnOk.isEnabled = state.isEnableConfirmButton
             }
         }
 
+    }
+
+    // イベント発火
+    private fun setEvent() {
+
+        // アラート時間
+        binding.timePicker.also {
+            it.setIs24HourView(true)
+            it.setOnTimeChangedListener { timePicker, hourOfDay, minute ->
+                if (hourOfDay in 0..14) timePicker.hour = 18
+                if (hourOfDay in 15..17) timePicker.hour = 23
+
+                val state = viewModel.state.value
+                if (state == null || timePicker.hour != state.hourDate) { viewModel.setEvent(SettingContract.Event.OnChangeAlarmHour(timePicker.hour)) }
+                if (state == null || minute != state.minutesDate) { viewModel.setEvent(SettingContract.Event.OnChangeAlarmMinute(minute)) }
+            }
+        }
+
+        // アラートモード
+        binding.radioHard.setOnClickListener { viewModel.setEvent(SettingContract.Event.OnChangeAlarmMode(AlarmMode.HARD)) }
+        binding.radioNormal.setOnClickListener { viewModel.setEvent(SettingContract.Event.OnChangeAlarmMode(AlarmMode.NORMAL)) }
+
         // 確定ボタン
-        binding.btnOk.setOnClickListener {
-            viewModel.updateDate()
-        }
+        binding.btnOk.setOnClickListener { viewModel.setEvent(SettingContract.Event.OnClickNextButton) }
     }
 
-    // TimPicker初期値設定
-    private fun initTimePicker(dataStr: String) {
-        binding.timePicker.hour = dataStr.substring(0, 2)
-            .toInt()
-        binding.timePicker.minute = dataStr.substring(3, 5)
-            .toInt()
+    // イベント発火
+    private fun executionEffect(effect: SettingContract.Effect) = when(effect) {
+        is SettingContract.Effect.ErrorShow -> Toasty.error(requireContext(), effect.throwable.message!!, Toast.LENGTH_SHORT, true).show()
+        is SettingContract.Effect.NextNavigation -> setAlarmAndBack(effect.value)
     }
 
-    // アラーム設定ステータス監視
-    private fun onUpdateDateStateChanged(state: Status<LocalDateTime>) = when (state) {
-        is Status.Loading -> {
-        }
-        is Status.Success -> {
-            setAlarmAndBack(state.data)
-        }
-        is Status.Failure -> {
-            Toasty.error(requireContext(), state.throwable.message!!, Toast.LENGTH_SHORT, true)
-                .show()
-        }
-        is Status.Non -> {
-        }
-    }
 
     // 通知バーアラーム表示設定(次の日の設定)
     private fun setAlarmAndBack(date: LocalDateTime) {

@@ -10,7 +10,7 @@ import com.myapp.domain.model.value.AlarmMode
  * @property second 秒
  * @property mode アラームモード
  */
-class NextAlarmTimeInputDto(
+data class NextAlarmTimeInputDto(
     val hour: Int,
     val minute: Int,
     val second: Int,
