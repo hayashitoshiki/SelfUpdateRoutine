@@ -15,7 +15,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import javax.inject.Inject
 
 /**
- * 設定画面
+ * 過去の振り返り詳細画面
+ *
  */
 @AndroidEntryPoint
 class RememberFragment : BaseFragment() {
