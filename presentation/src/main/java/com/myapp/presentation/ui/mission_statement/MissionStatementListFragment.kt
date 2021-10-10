@@ -8,6 +8,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.myapp.presentation.databinding.FragmentMissionStatementListBinding
+import com.myapp.presentation.ui.home.HomeContract
 import com.myapp.presentation.utils.base.BaseFragment
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.ViewHolder
@@ -31,7 +32,6 @@ class MissionStatementListFragment : BaseFragment() {
     ): View {
         _binding = FragmentMissionStatementListBinding.inflate(inflater, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
-        binding.viewModel = viewModel
         return binding.root
     }
 
@@ -40,44 +40,65 @@ class MissionStatementListFragment : BaseFragment() {
         savedInstanceState: Bundle?
     ) {
         super.onViewCreated(view, savedInstanceState)
-
-        viewModel.funeralList.observe(viewLifecycleOwner, { setFuneralList(it) })
-        viewModel.constitutionList.observe(viewLifecycleOwner, { setConstitutionList(it) })
+        setEvent()
+        viewModel.state.observe(viewLifecycleOwner, { changeState(it) })
+        viewModel.effect.observe(viewLifecycleOwner, { executionEffect(it) })
 
         binding.listConstitution.also {
-            val adapter = GroupAdapter<ViewHolder>()
-            val layoutManager = LinearLayoutManager(requireContext())
-            it.adapter = adapter
-            it.layoutManager = layoutManager
+            it.adapter = GroupAdapter<ViewHolder>()
+            it.layoutManager = LinearLayoutManager(requireContext())
         }
         binding.listFuneral.also {
-            val adapter = GroupAdapter<ViewHolder>()
-            val layoutManager = LinearLayoutManager(requireContext())
-            it.adapter = adapter
-            it.layoutManager = layoutManager
+            it.adapter = GroupAdapter<ViewHolder>()
+            it.layoutManager = LinearLayoutManager(requireContext())
         }
-        binding.btnChange.setOnClickListener {
-            val data = viewModel.missionStatement
-            val action = MissionStatementListFragmentDirections.actionNavConstitutionToNavConstitutionSetting(data)
+    }
+
+    private fun changeState(state: MissionStatementListContract.State) {
+        viewModel.cashState.let { cash ->
+            if (cash == null || state.missionStatement != cash.missionStatement) {
+                val mainVisibility = if (state.missionStatement != null) View.VISIBLE else View.INVISIBLE
+                val notFoundVisibility = if (state.missionStatement == null) View.VISIBLE else View.INVISIBLE
+                binding.layoutMain.visibility = mainVisibility
+                binding.txtNotFoundMessage.visibility = notFoundVisibility
+            }
+            if (cash == null || state.purposeLife != cash.purposeLife) {
+                val visibility = if (state.isEnablePurposeLife) View.VISIBLE else View.INVISIBLE
+                binding.txtValueMissionStatement.text = state.purposeLife
+                binding.cardPurpose.visibility = visibility
+            }
+            if (cash == null || state.funeralList != cash.funeralList) {
+                val visibility = if (state.isEnableFuneralList) View.VISIBLE else View.INVISIBLE
+                val items = state.funeralList.map { MissionStatementListDiscItem(it, requireContext()) }
+                (binding.listFuneral.adapter as GroupAdapter<*>).update(items)
+                binding.cardFuneral.visibility = visibility
+            }
+            if (cash == null || state.constitutionList != cash.constitutionList) {
+                val visibility = if (state.isEnableConstitutionList) View.VISIBLE else View.INVISIBLE
+                val items = state.constitutionList.map { MissionStatementListDiscItem(it, requireContext()) }
+                (binding.listConstitution.adapter as GroupAdapter<*>).update(items)
+                binding.cardConstitution.visibility = visibility
+            }
+        }
+    }
+
+    // イベント設定
+    private fun setEvent() {
+        // 変更ボタン
+        binding.btnChange.setOnClickListener { viewModel.setEvent(MissionStatementListContract.Event.OnClickChangeButton) }
+    }
+
+    // エフェクト発火
+    private fun executionEffect(effect: MissionStatementListContract.Effect) = when(effect) {
+        is MissionStatementListContract.Effect.NavigateMissionStatementSetting -> {
+            val action = MissionStatementListFragmentDirections.actionNavConstitutionToNavConstitutionSetting(effect.value)
             findNavController().navigate(action)
         }
-    }
-
-    // 理想の葬儀リスト設定
-    private fun setFuneralList(data: List<String>) {
-        val items = data.map { MissionStatementListDiscItem(it, requireContext()) }
-        val adapter = binding.listFuneral.adapter as GroupAdapter<*>
-        adapter.update(items)
-    }
-
-    // 憲法リスト設定
-    private fun setConstitutionList(data: List<String>) {
-        val items = data.map { MissionStatementListDiscItem(it, requireContext()) }
-        val adapter = binding.listConstitution.adapter as GroupAdapter<*>
-        adapter.update(items)
+        is MissionStatementListContract.Effect.OnDestroyView -> {}
     }
 
     override fun onDestroyView() {
+        viewModel.setEvent(MissionStatementListContract.Event.OnDestroyView)
         super.onDestroyView()
         _binding = null
     }
