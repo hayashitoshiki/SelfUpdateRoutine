@@ -1,8 +1,7 @@
 package com.myapp.presentation.ui.mission_statement
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.Observer
-import com.nhaarman.mockito_kotlin.mock
+import com.myapp.presentation.utils.base.BaseInputTextItemContract
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.launchIn
@@ -33,11 +32,16 @@ class ConstitutionInputItemViewModelTest {
     val rule: TestRule = InstantTaskExecutorRule()
 
     private lateinit var viewModel: ConstitutionInputItemViewModel
+    private val state = BaseInputTextItemContract.State()
+    private var resultAction: MissionStatementDispatcherContract.Action? = null
+
 
     @ExperimentalCoroutinesApi
     @Before
     fun setUp() {
         Dispatchers.setMain(coroutineDispatcher)
+        MissionStatementDispatcher.action.onEach { resultAction = it }
+            .launchIn(testScope)
     }
 
     @ExperimentalCoroutinesApi
@@ -47,105 +51,234 @@ class ConstitutionInputItemViewModelTest {
         coroutineDispatcher.cleanupTestCoroutines()
     }
 
-    private fun setMockObserver() {
-        val observerString = mock<Observer<String>>()
-        val observerBoolean = mock<Observer<Boolean>>()
-        viewModel.isPlusButtonEnable.observeForever(observerBoolean)
-        viewModel.isMinusButtonEnable.observeForever(observerBoolean)
-        viewModel.value.observeForever(observerString)
+    /**
+     * 実行結果比較
+     *
+     * @param state Stateの期待値
+     * @param effect Effectの期待値
+     * @param action actionの期待値
+     */
+    @ExperimentalCoroutinesApi
+    private fun result(
+        state: BaseInputTextItemContract.State,
+        effect: BaseInputTextItemContract.Effect?,
+        action: MissionStatementDispatcherContract.Action?
+    ) = testScope.runBlockingTest {
+        val resultState = viewModel.state.value
+        val resultEffect: BaseInputTextItemContract.Effect? = null
+
+        // 比較
+        assertEquals(resultState, state)
+        assertEquals(resultAction, action)
+        assertEquals(resultEffect, effect)
     }
+
+    // region 初期表示
 
     /**
      * 理想の葬式編集初期表示
      *
-     * 条件：一番先頭のリスト
-     * 期待結果：マイナスボタンが表示されないこと
+     * 条件：リストの先頭の項目
+     * 期待結果；
+     * ・画面の値
+     * 　　・テキスト　　　　：渡された値
+     * 　　・＋ボタン表示制御：表示
+     * 　　・ーボタン表示制御：非表示
+     * ・画面イベント
+     * 　　ー
+     * ・共通処理イベント
+     * 　　ー
      */
+    @ExperimentalCoroutinesApi
     @Test
     fun initByIndexFirst() {
-        viewModel = ConstitutionInputItemViewModel(0, 1, "test")
-        setMockObserver()
-        assertEquals(true, viewModel.isPlusButtonEnable.value)
-        assertEquals(false, viewModel.isMinusButtonEnable.value)
-        assertEquals("test", viewModel.value.value)
+
+        // 期待結果
+        val textValue = "test"
+        val expectationsState = state.copy(value = textValue, isPlusButtonVisibility = true, isMinusButtonVisibility = false)
+        val expectationsEffect = null
+        val expectationsAction = null
+
+        // 実施
+        viewModel = ConstitutionInputItemViewModel(0, 1, textValue)
+
+        // 比較
+        result(expectationsState, expectationsEffect, expectationsAction)
     }
 
     /**
      * 理想の葬式編集初期表示
      *
-     * 条件：２つ目以降ののリスト
-     * 期待結果：マイナスボタンが表示されること
+     * 条件：リストの先頭以外項目
+     * 期待結果；
+     * ・画面の値
+     * 　　・テキスト　　　　：渡された値
+     * 　　・＋ボタン表示制御：表示
+     * 　　・ーボタン表示制御：表示
+     * ・画面イベント
+     * 　　ー
+     * ・共通処理イベント
+     * 　　ー
      */
+    @ExperimentalCoroutinesApi
     @Test
     fun initByIndexSecond() {
+
+        // 期待結果
+        val textValue = "test"
+        val expectationsState = state.copy(value = textValue, isPlusButtonVisibility = true, isMinusButtonVisibility = true)
+        val expectationsEffect = null
+        val expectationsAction = null
+
+        // 実施
         viewModel = ConstitutionInputItemViewModel(1, 2, "test")
-        setMockObserver()
-        assertEquals(true, viewModel.isPlusButtonEnable.value)
-        assertEquals(true, viewModel.isMinusButtonEnable.value)
-        assertEquals("test", viewModel.value.value)
+
+        // 比較
+        result(expectationsState, expectationsEffect, expectationsAction)
+    }
+
+    // endregion
+
+    // region 理想の葬式テキスト修正
+
+    /**
+     * 理想の葬式文字列修正
+     *
+     * 条件：テキストを入力
+     * 期待結果；理想の葬式変更通知Dispatcherへ通知されること
+     * 条件：リストの先頭以外項目
+     * 期待結果；
+     * ・画面の値
+     * 　　・テキスト　　　　：変更した値
+     * 　　・＋ボタン表示制御：表示
+     * 　　・ーボタン表示制御：表示
+     * ・画面イベント
+     * 　　ー
+     * ・共通処理イベント
+     * 　　憲法テキスト変更アクションが流れること
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun changeConstitutionByAdd() = testScope.runBlockingTest {
+
+        // 期待結果
+        val afterValue = "test"
+        val expectationsState = state.copy(value = afterValue, isPlusButtonVisibility = true, isMinusButtonVisibility = true)
+        val expectationsEffect = null
+        val expectationsAction = MissionStatementDispatcherContract.Action.ChangeConstitutionText(1, afterValue)
+
+        // 実施
+        viewModel = ConstitutionInputItemViewModel(1, 2, "changeText")
+        viewModel.setEvent(BaseInputTextItemContract.Event.ChangeText(afterValue))
+
+        // 比較
+        result(expectationsState, expectationsEffect, expectationsAction)
     }
 
     /**
      * 理想の葬式文字列修正
      *
-     * 条件：なし
+     * 条件：理想の葬式文字列削除
      * 期待結果；理想の葬式変更通知Dispatcherへ通知されること
-     */
+     * 条件：リストの先頭以外項目
+     * 期待結果；
+     * ・画面の値
+     * 　　・テキスト　　　　：変更した値
+     * 　　・＋ボタン表示制御：表示
+     * 　　・ーボタン表示制御：表示
+     * ・画面イベント
+     * 　　ー
+     * ・共通処理イベント
+     * 　憲法テキスト変更アクションが流れること
+    */
     @ExperimentalCoroutinesApi
     @Test
-    fun changeFuneral() = testScope.runBlockingTest {
-        var result = Pair(0, "aaa")
-        val act = Pair(0, "test1")
-        MissionStatementDispatcher.constitutionText.onEach {
-            result = it
-        }
-            .launchIn(testScope)
-        viewModel = ConstitutionInputItemViewModel(0, 1, "aaa")
-        setMockObserver()
-        viewModel.value.value = "test1"
-        assertEquals(act, result)
+    fun changeConstitutionByDelete() = testScope.runBlockingTest {
+
+        // 期待結果
+        val afterValue = ""
+        val expectationsState = state.copy(value = afterValue, isPlusButtonVisibility = true, isMinusButtonVisibility = true)
+        val expectationsEffect = null
+        val expectationsAction = MissionStatementDispatcherContract.Action.ChangeConstitutionText(1, afterValue)
+
+        // 実施
+        viewModel = ConstitutionInputItemViewModel(1, 2, "changeText")
+        viewModel.setEvent(BaseInputTextItemContract.Event.ChangeText(afterValue))
+
+        // 比較
+        result(expectationsState, expectationsEffect, expectationsAction)
     }
 
-    /**
-     * 理想の葬式文字列削除
-     *
-     * 条件：なし
-     * 期待結果：理想の葬式削除通知のDispatcherへ通知されること
-     *
-     */
-    @ExperimentalCoroutinesApi
-    @Test
-    fun deleteFuneral() = testScope.runBlockingTest {
-        val index = 3
-        var result = 0
-        MissionStatementDispatcher.constitutionMinusButton.onEach {
-            result = it
-        }
-            .launchIn(testScope)
-        viewModel = ConstitutionInputItemViewModel(index, 1, "test")
-        setMockObserver()
-        viewModel.onClickMinusButton()
-        assertEquals(index, result)
-    }
+    // endregion
+
+    // region 理想の葬式リスト追加
 
     /**
      * 理想の葬式リスト追加
      *
      * 条件：なし
-     * 期待結果：理想の葬式リスト追加通知のDispatcherへ通知されること
+     * 期待結果；
+     * ・画面の値
+     * 　　ー
+     * ・画面イベント
+     * 　　ー
+     * ・共通処理イベント
+     * 　　憲法項目追加アクションが流れること
      */
     @ExperimentalCoroutinesApi
     @Test
-    fun addFuneral() = testScope.runBlockingTest {
-        val index = 3
-        var result = 0
-        MissionStatementDispatcher.constitutionPlusButton.onEach {
-            result = it
-        }
-            .launchIn(testScope)
-        viewModel = ConstitutionInputItemViewModel(index, 2, "test")
-        setMockObserver()
-        viewModel.onClickPlusButton()
-        assertEquals(index + 1, result)
+    fun addConstitution() = testScope.runBlockingTest {
+
+        // 期待結果
+        val textValue = "test"
+        val indexValue = 1
+        val expectationsState = state.copy(value = textValue, isPlusButtonVisibility = true, isMinusButtonVisibility = true)
+        val expectationsEffect = null
+        val expectationsAction = MissionStatementDispatcherContract.Action.AddConstitution(indexValue + 1)
+
+        // 実施
+        viewModel = ConstitutionInputItemViewModel(indexValue, 2, textValue)
+        viewModel.setEvent(BaseInputTextItemContract.Event.OnClickPlusButton)
+
+        // 比較
+        result(expectationsState, expectationsEffect, expectationsAction)
     }
+
+    // endregion
+
+    // region 理想の葬式リスト削除
+
+    /**
+     * 理想の葬式リスト追加
+     *
+     * 条件：なし
+     * 期待結果；
+     * ・画面の値
+     * 　　ー
+     * ・画面イベント
+     * 　　ー
+     * ・共通処理イベント
+     * 　　憲法項目追加アクションが流れること
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun deleteConstitution() = testScope.runBlockingTest {
+
+        // 期待結果
+        val textValue = "test"
+        val indexValue = 1
+        val expectationsState = state.copy(value = textValue, isPlusButtonVisibility = true, isMinusButtonVisibility = true)
+        val expectationsEffect = null
+        val expectationsAction = MissionStatementDispatcherContract.Action.DeleteConstitution(indexValue)
+
+        // 実施
+        viewModel = ConstitutionInputItemViewModel(indexValue, 2, textValue)
+        viewModel.setEvent(BaseInputTextItemContract.Event.OnClickMinusButton)
+
+        // 比較
+        result(expectationsState, expectationsEffect, expectationsAction)
+    }
+
+    // endregion
+
 }

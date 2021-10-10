@@ -21,8 +21,6 @@ class FuneralInputItem(
     ) {
         super.bind(binding, position)
         binding.edtInput.hint = context.getString(R.string.hint_funeral)
-        binding.btnPlus.setOnClickListener { viewModel.onClickPlusButton() }
-        binding.btnMinus.setOnClickListener { viewModel.onClickMinusButton() }
     }
 
     override fun getId(): Long = viewModel.id

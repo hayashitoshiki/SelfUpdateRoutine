@@ -3,6 +3,7 @@ package com.myapp.presentation.ui.mission_statement
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.myapp.presentation.utils.base.BaseInputTextItemContract
 import com.myapp.presentation.utils.base.BaseInputTextItemViewModel
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -13,37 +14,35 @@ import kotlinx.coroutines.launch
  * 憲法アイテム_画面ロジック
  *
  * @property index 憲法リストのインデックス
- * @property value 憲法の文字列
+ * @property id 憲法の文字列のID
+ * @property text 憲法の文字列
  */
 class ConstitutionInputItemViewModel @AssistedInject constructor(
-    @Assisted private val index: Int,
+    @Assisted index: Int,
     @Assisted val id: Long,
     @Assisted text: String
-) : BaseInputTextItemViewModel() {
+) : BaseInputTextItemViewModel(index, text) {
 
-    private var first = true
-
-    init {
-        value.value = text
-        _isMinusButtonEnable.value = index != 0
-        value.observeForever {
-            if (!first) {
-                viewModelScope.launch {
-                    MissionStatementDispatcher.changeConstitutionText(index, it)
-                }
-            }
-            first = false
+    // テキスト変更
+    override fun changeText(text: String) {
+        viewModelScope.launch {
+            setState { copy(value = text) }
+            MissionStatementDispatcher.setActions(MissionStatementDispatcherContract.Action.ChangeConstitutionText(index, text))
         }
     }
 
     // 追加ボタン
-    fun onClickPlusButton() = viewModelScope.launch {
-        MissionStatementDispatcher.addConstitution(index + 1)
+    override fun onClickPlusButton() {
+        viewModelScope.launch {
+            MissionStatementDispatcher.setActions(MissionStatementDispatcherContract.Action.AddConstitution(index + 1))
+        }
     }
 
     // 削除ボタン
-    fun onClickMinusButton() = viewModelScope.launch {
-        MissionStatementDispatcher.deleteConstitution(index)
+    override fun onClickMinusButton() {
+        viewModelScope.launch {
+            MissionStatementDispatcher.setActions(MissionStatementDispatcherContract.Action.DeleteConstitution(index))
+        }
     }
 
     @AssistedFactory
@@ -68,4 +67,5 @@ class ConstitutionInputItemViewModel @AssistedInject constructor(
             }
         }
     }
+
 }

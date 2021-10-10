@@ -1,20 +1,27 @@
 package com.myapp.presentation.utils.base
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-
 /**
  * リサイクルビュー_テキスト入力用アイテム 画面ベースロジック
  *
  */
-abstract class BaseInputTextItemViewModel : ViewModel() {
+abstract class BaseInputTextItemViewModel(val index: Int, val text: String) :
+    BaseAacViewModel<BaseInputTextItemContract.State, BaseInputTextItemContract.Effect, BaseInputTextItemContract.Event>() {
 
-    val value = MutableLiveData<String>()
+    init {
+        setState { copy(value = text, isMinusButtonVisibility = index != 0) }
+    }
 
-    private val _isPlusButtonEnable = MutableLiveData(true)
-    val isPlusButtonEnable: LiveData<Boolean> = _isPlusButtonEnable
+    override fun initState(): BaseInputTextItemContract.State {
+        return BaseInputTextItemContract.State()
+    }
 
-    protected val _isMinusButtonEnable = MutableLiveData(true)
-    val isMinusButtonEnable: LiveData<Boolean> = _isMinusButtonEnable
+    override fun handleEvents(event: BaseInputTextItemContract.Event) = when(event) {
+        is BaseInputTextItemContract.Event.ChangeText -> changeText(event.value)
+        is BaseInputTextItemContract.Event.OnClickMinusButton -> onClickMinusButton()
+        is BaseInputTextItemContract.Event.OnClickPlusButton -> onClickPlusButton()
+    }
+
+    protected abstract fun changeText(text: String)
+    protected abstract fun onClickPlusButton()
+    protected abstract fun onClickMinusButton()
 }

@@ -13,36 +13,35 @@ import kotlinx.coroutines.launch
  * 理想の葬式アイテム_画面ロジック
  *
  * @property index 理想の葬式リストのインデックス
- * @property value 理想の葬式の文字列
+ * @property id 理想の葬式の文字列のID
+ * @property text 理想の葬式の文字列
  */
 class FuneralInputItemViewModel @AssistedInject constructor(
-    @Assisted private val index: Int,
+    @Assisted index: Int,
     @Assisted val id: Long,
     @Assisted text: String
-) : BaseInputTextItemViewModel() {
-    private var first = true
+) : BaseInputTextItemViewModel(index, text) {
 
-    init {
-        value.value = text
-        _isMinusButtonEnable.value = index != 0
-        value.observeForever {
-            if (!first) {
-                viewModelScope.launch {
-                    MissionStatementDispatcher.changeFuneralText(index, it)
-                }
-            }
-            first = false
+    // テキスト変更
+    override fun changeText(text: String) {
+        viewModelScope.launch {
+            setState { copy(value = text) }
+            MissionStatementDispatcher.setActions(MissionStatementDispatcherContract.Action.ChangeFuneralText(index, text))
         }
     }
 
     // 追加ボタン
-    fun onClickPlusButton() = viewModelScope.launch {
-        MissionStatementDispatcher.addFuneral(index + 1)
+    override fun onClickPlusButton() {
+        viewModelScope.launch {
+            MissionStatementDispatcher.setActions(MissionStatementDispatcherContract.Action.AddFuneral(index + 1))
+        }
     }
 
     // 削除ボタン
-    fun onClickMinusButton() = viewModelScope.launch {
-        MissionStatementDispatcher.deleteFuneral(index)
+    override fun onClickMinusButton() {
+        viewModelScope.launch {
+            MissionStatementDispatcher.setActions(MissionStatementDispatcherContract.Action.DeleteFuneral(index))
+        }
     }
 
     @AssistedFactory
