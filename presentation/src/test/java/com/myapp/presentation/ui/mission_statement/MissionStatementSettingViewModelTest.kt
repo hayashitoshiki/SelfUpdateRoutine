@@ -1,24 +1,18 @@
 package com.myapp.presentation.ui.mission_statement
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.Observer
 import com.myapp.domain.dto.MissionStatementInputDto
 import com.myapp.domain.model.entity.MissionStatement
 import com.myapp.domain.usecase.MissionStatementUseCase
-import com.myapp.presentation.utils.base.Status
-import com.nhaarman.mockito_kotlin.mock
+import com.myapp.presentation.R
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.*
-import org.junit.After
+import org.junit.*
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotEquals
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
 import org.junit.rules.TestRule
 
 /**
@@ -41,13 +35,13 @@ class MissionStatementSettingViewModelTest {
     // endregion
 
     // region test date
-
+    private val state = MissionStatementSettingContract.State()
     private lateinit var viewModel: MissionStatementSettingViewModel
     private lateinit var missionStatementUseCase: MissionStatementUseCase
 
     private val funeralList = listOf("弔辞：感謝されること", "人：優しい人間", "雰囲気：和気藹々")
     private val purposeLife = "世界一楽しく生きること"
-    private val constitutionList = listOf("迷ったときは楽しい方向へ", "常に楽しいを見つける努力を")
+    private val constitutionList = listOf("迷ったときは楽しい方向へ", "常に楽しいを見つける努力を", "判断基準は周りが笑顔になるかどどうか")
     private val missionStatement = MissionStatement(funeralList, purposeLife, constitutionList)
 
     // endregion
@@ -65,18 +59,6 @@ class MissionStatementSettingViewModelTest {
         }
     }
 
-    private fun setMockObserver() {
-        val observerString = mock<Observer<String>>()
-        val observerIntStringList = mock<Observer<MutableList<Pair<Long, String>>>>()
-        val observerStatus = mock<Observer<Status<*>>>()
-        val observerBoolean = mock<Observer<Boolean>>()
-        viewModel.funeralList.observeForever(observerIntStringList)
-        viewModel.purposeLife.observeForever(observerString)
-        viewModel.constitutionList.observeForever(observerIntStringList)
-        viewModel.confirmStatus.observeForever(observerStatus)
-        viewModel.isEnableConfirmButton.observeForever(observerBoolean)
-    }
-
     @ExperimentalCoroutinesApi
     @After
     fun tearDown() {
@@ -84,90 +66,30 @@ class MissionStatementSettingViewModelTest {
         coroutineDispatcher.cleanupTestCoroutines()
     }
 
-    // endregion
-
-    // region 初期表示ロジック
-
     /**
-     * 初期表示
+     * 実行結果比較
      *
-     * 条件：
-     * ・アプリ立ち上げ後編集履歴なし（Dispatcherなし）
-     * ・２回目以降登録（ミッションステートの取得値がnull)
-     * 期待結果：UseCaseから取得した値が格納されていること
-     */
-    @Test
-    fun initByNotDispatcher() {
-        viewModel = MissionStatementSettingViewModel(missionStatement, missionStatementUseCase)
-        setMockObserver()
-        assertEquals(missionStatement.funeralList.toMutableList(), viewModel.funeralList.value!!.map { it.second })
-        assertEquals(missionStatement.purposeLife, viewModel.purposeLife.value)
-        assertEquals(missionStatement.constitutionList.toMutableList(), viewModel.constitutionList.value!!.map { it.second })
-    }
-
-    /**
-     * 初期表示
-     *
-     * 条件：
-     * ・アプリ立ち上げ後編集履歴なし（Dispatcherなし）
-     * ・初回登録（ミッションステートの取得値がnull)
-     * 期待結果：UseCaseから取得した値が格納されていること
-     */
-    @Test
-    fun initByNotDispatcherAndNotMissionStatement() {
-        viewModel = MissionStatementSettingViewModel(null, missionStatementUseCase)
-        setMockObserver()
-        assertEquals(mutableListOf(""), viewModel.funeralList.value!!.map { it.second })
-        assertEquals("", viewModel.purposeLife.value)
-        assertEquals(mutableListOf(""), viewModel.constitutionList.value!!.map { it.second })
-    }
-
-    /**
-     * 初期表示
-     *
-     * 条件：
-     * ・アプリ立ち上げ後編集履歴あり（Dispatcherあり）
-     * ・初回登録（ミッションステートの取得値がnull)
-     * 期待結果：UseCaseから取得した値が格納されていること
+     * @param state Stateの期待値
+     * @param effect Effectの期待値
      */
     @ExperimentalCoroutinesApi
-    @Test
-    fun initByDispatcher() = testScope.runBlockingTest {
-        val index1 = missionStatement.funeralList.size - 1
-        val setText1 = "test After"
-        MissionStatementDispatcher.changeFuneralText(index1, setText1)
-        val index2 = missionStatement.constitutionList.size - 1
-        val setText2 = "test After"
-        MissionStatementDispatcher.changeFuneralText(index2, setText2)
-        viewModel = MissionStatementSettingViewModel(null, missionStatementUseCase)
-        setMockObserver()
-        assertEquals(listOf(""), viewModel.funeralList.value!!.map { it.second })
-        assertEquals("", viewModel.purposeLife.value)
-        assertEquals(listOf(""), viewModel.constitutionList.value!!.map { it.second })
-    }
+    private fun result(
+        state: MissionStatementSettingContract.State,
+        effect: MissionStatementSettingContract.Effect?
+    ) = testScope.runBlockingTest {
+        val resultState = viewModel.state.value
+        val resultEffect = viewModel.effect.value
 
-    /**
-     * 初期表示
-     *
-     * 条件：
-     * ・アプリ立ち上げ後編集履歴あり（Dispatcherあり）
-     * ・初回登録（ミッションステートの取得値がnull)
-     * 期待結果：UseCaseから取得した値が格納されていること
-     */
-    @ExperimentalCoroutinesApi
-    @Test
-    fun initByDispatcherAndNotMissionStatement() = testScope.runBlockingTest {
-        val index1 = missionStatement.funeralList.size - 1
-        val setText1 = "test After"
-        MissionStatementDispatcher.changeFuneralText(index1, setText1)
-        val index2 = missionStatement.constitutionList.size - 1
-        val setText2 = "test After"
-        MissionStatementDispatcher.changeFuneralText(index2, setText2)
-        viewModel = MissionStatementSettingViewModel(null, missionStatementUseCase)
-        setMockObserver()
-        assertEquals(mutableListOf(""), viewModel.funeralList.value!!.map { it.second })
-        assertEquals("", viewModel.purposeLife.value)
-        assertEquals(mutableListOf(""), viewModel.constitutionList.value!!.map { it.second })
+        // 比較
+        assertEquals(resultState, state)
+        if (resultEffect is MissionStatementSettingContract.Effect.ShowError) {
+            val resultMessage = resultEffect.value.message
+            val message = (effect as MissionStatementSettingContract.Effect.ShowError).value.message
+            assertEquals(resultMessage, message)
+        } else {
+            assertEquals(resultEffect, effect)
+        }
+        assertEquals(resultEffect, effect)
     }
 
     // endregion
@@ -177,115 +99,301 @@ class MissionStatementSettingViewModelTest {
     /**
      * 理想の葬式リストの内容変更
      *
-     * 条件：指定した理想の葬式アイテムの文字列を変更
-     * 期待結果：理想の葬式リストの文字列が変更されていること
+     * 条件：指定したIDのリストが存在しない
+     * 期待結果；
+     * ・画面の値
+     * 　　指定したIDのテキストが渡された値で変更されること
+     * ・画面イベント
+     * 　　ー
+     * ・共通処理イベント
+     * 　　ー
+     * ・業務ロジック
+     * 　ー
      */
     @ExperimentalCoroutinesApi
     @Test
     fun changeFuneralTextByFoundIndex() = testScope.runBlockingTest {
+
+        // 期待結果
+        val value = "test01"
+        val id = 3L
+        val expectationsEffect = null
+        var funeralListCount = 1L
+        var constitutionListCount = 1L
+        val funeralList = missionStatement.funeralList
+            .map { funeral -> Pair(funeralListCount++, funeral) }
+            .toMutableList()
+        val constitutionList = missionStatement.constitutionList
+            .map { constitution -> Pair(constitutionListCount++, constitution) }
+            .toMutableList()
+        val index = funeralList.indexOfFirst { it.first == id }
+        funeralList[index] = Pair(id, value)
+        val expectationsState = state.copy(
+            funeralListCount = funeralListCount,
+            funeralList = funeralList,
+            funeralListDiffColor = R.color.text_color_light_primary,
+            purposeLife = missionStatement.purposeLife,
+            purposeLifeDiffColor = R.color.text_color_light_secondary,
+            constitutionListCount = constitutionListCount,
+            constitutionList = constitutionList,
+            constitutionListDiffColor= R.color.text_color_light_secondary,
+            isEnableConfirmButton = true
+        )
+
+        //実施
         viewModel = MissionStatementSettingViewModel(missionStatement, missionStatementUseCase)
-        setMockObserver()
-        val index = 1
-        val setText = "test After"
-        val act = missionStatement.funeralList
-        MissionStatementDispatcher.changeFuneralText(index, setText)
-        val result = viewModel.funeralList.value!!.map { it.second }
-        assertNotEquals(act, result)
-        assertEquals(setText, result[index])
+        MissionStatementDispatcher.setActions(MissionStatementDispatcherContract.Action.ChangeFuneralText(id, value))
+
+        // 比較
+        result(expectationsState, expectationsEffect)
     }
 
     /**
      * 理想の葬式リストの内容変更
      *
-     * 条件：指定した理想の葬式アイテムのインデックスが存在しないインデックス
-     * 期待結果：理想の葬式リストの文字列が変更されないこと
+     * 条件：指定したIDのリストが存在しない
+     * 期待結果；
+     * ・画面の値
+     * 　　何も値が変更されないこと
+     * ・画面イベント
+     * 　　ー
+     * ・共通処理イベント
+     * 　　ー
+     * ・業務ロジック
+     * 　ー
      */
     @ExperimentalCoroutinesApi
     @Test
     fun changeFuneralTextByNotFoundIndex() = testScope.runBlockingTest {
+
+        // 期待結果
+        val value = "test01"
+        val id = 100L
+        val expectationsEffect = null
+        var funeralListCount = 1L
+        var constitutionListCount = 1L
+        val funeralList = missionStatement.funeralList
+            .map { funeral -> Pair(funeralListCount++, funeral) }
+            .toMutableList()
+        val constitutionList = missionStatement.constitutionList
+            .map { constitution -> Pair(constitutionListCount++, constitution) }
+            .toMutableList()
+        val expectationsState = state.copy(
+            funeralListCount = funeralListCount,
+            funeralList = funeralList,
+            funeralListDiffColor = R.color.text_color_light_secondary,
+            purposeLife = missionStatement.purposeLife,
+            purposeLifeDiffColor = R.color.text_color_light_secondary,
+            constitutionListCount = constitutionListCount,
+            constitutionList = constitutionList,
+            constitutionListDiffColor= R.color.text_color_light_secondary,
+            isEnableConfirmButton = false
+        )
+
+        //実施
         viewModel = MissionStatementSettingViewModel(missionStatement, missionStatementUseCase)
-        setMockObserver()
-        val index = 4
-        val setText = "test After"
-        val act = missionStatement.funeralList
-        MissionStatementDispatcher.changeFuneralText(index, setText)
-        val result = viewModel.funeralList.value!!.map { it.second }
-        assertEquals(act, result)
+        MissionStatementDispatcher.setActions(MissionStatementDispatcherContract.Action.ChangeFuneralText(id, value))
+
+        // 比較
+        result(expectationsState, expectationsEffect)
     }
 
     /**
      * 理想の葬式リストのリスト削除
      *
-     * 条件：指定した理想の葬式アイテムのインデックスが存在する
-     * 期待結果：理想の葬式リストの文字列が削除されていること
+     * 条件：指定したインデックスが存在する
+     * 期待結果；
+     * ・画面の値
+     * 　　理想の葬式リストの指定したインデックスが削除されること
+     * ・画面イベント
+     * 　　ー
+     * ・共通処理イベント
+     * 　　ー
+     * ・業務ロジック
+     * 　ー
      */
     @ExperimentalCoroutinesApi
     @Test
     fun deleteFuneralItemByFoundIndex() = testScope.runBlockingTest {
+
+        // 期待結果
+        val value = 2
+        val expectationsEffect = null
+        var funeralListCount = 1L
+        var constitutionListCount = 1L
+        val funeralList = missionStatement.funeralList
+            .map { funeral -> Pair(funeralListCount++, funeral) }
+            .toMutableList()
+        val constitutionList = missionStatement.constitutionList
+            .map { constitution -> Pair(constitutionListCount++, constitution) }
+            .toMutableList()
+        funeralList.removeAt(value)
+        val expectationsState = state.copy(
+            funeralListCount = funeralListCount,
+            funeralList = funeralList,
+            funeralListDiffColor = R.color.text_color_light_primary,
+            purposeLife = missionStatement.purposeLife,
+            purposeLifeDiffColor = R.color.text_color_light_secondary,
+            constitutionListCount = constitutionListCount,
+            constitutionList = constitutionList,
+            constitutionListDiffColor= R.color.text_color_light_secondary,
+            isEnableConfirmButton = true
+        )
+
+        //実施
         viewModel = MissionStatementSettingViewModel(missionStatement, missionStatementUseCase)
-        setMockObserver()
-        val index = missionStatement.funeralList.size - 1
-        val act: MutableList<String> = missionStatement.funeralList.toMutableList()
-        act.removeAt(index)
-        MissionStatementDispatcher.deleteFuneral(index)
-        val result = viewModel.funeralList.value!!.map { it.second }
-        assertEquals(act, result)
+        MissionStatementDispatcher.setActions(MissionStatementDispatcherContract.Action.DeleteFuneral(value))
+
+        // 比較
+        result(expectationsState, expectationsEffect)
     }
 
     /**
      * 理想の葬式リストのリスト削除
      *
-     * 条件：指定した理想の葬式アイテムのインデックスが存在しない
-     * 期待結果：理想の葬式リストの文字列が削除されていないこと
+     * 条件：指定したインデックスが存在しない
+     * 期待結果；
+     * ・画面の値
+     * 　　何も変更されないこと
+     * ・画面イベント
+     * 　　ー
+     * ・共通処理イベント
+     * 　　ー
+     * ・業務ロジック
+     * 　ー
      */
     @ExperimentalCoroutinesApi
     @Test
     fun deleteFuneralItemByNotFoundIndex() = testScope.runBlockingTest {
+
+        // 期待結果
+        val value = 200
+        val expectationsEffect = null
+        var funeralListCount = 1L
+        var constitutionListCount = 1L
+        val funeralList = missionStatement.funeralList
+            .map { funeral -> Pair(funeralListCount++, funeral) }
+            .toMutableList()
+        val constitutionList = missionStatement.constitutionList
+            .map { constitution -> Pair(constitutionListCount++, constitution) }
+            .toMutableList()
+        val expectationsState = state.copy(
+            funeralListCount = funeralListCount,
+            funeralList = funeralList,
+            funeralListDiffColor = R.color.text_color_light_secondary,
+            purposeLife = missionStatement.purposeLife,
+            purposeLifeDiffColor = R.color.text_color_light_secondary,
+            constitutionListCount = constitutionListCount,
+            constitutionList = constitutionList,
+            constitutionListDiffColor= R.color.text_color_light_secondary,
+            isEnableConfirmButton = false
+        )
+
+        //実施
         viewModel = MissionStatementSettingViewModel(missionStatement, missionStatementUseCase)
-        setMockObserver()
-        val index = missionStatement.funeralList.size
-        val act = missionStatement.funeralList
-        MissionStatementDispatcher.deleteFuneral(index)
-        val result = viewModel.funeralList.value!!.map { it.second }
-        assertEquals(act, result)
+        MissionStatementDispatcher.setActions(MissionStatementDispatcherContract.Action.DeleteFuneral(value))
+
+        // 比較
+        result(expectationsState, expectationsEffect)
     }
 
     /**
      * 理想の葬式リストのリスト追加
      *
-     * 条件：指定した理想の葬式アイテムのインデックスが存在する
-     * 期待結果：理想の葬式リストの文字列が追加されていること
+     * 条件：指定したインデックスが存在する
+     * 期待結果；
+     * ・画面の値
+     * 　・理想の葬式リストの指定したインデックスに空のリストが追加されること
+     * ・画面イベント
+     * 　　ー
+     * ・共通処理イベント
+     * 　　ー
+     * ・業務ロジック
+     * 　ー
      */
     @ExperimentalCoroutinesApi
     @Test
     fun addFuneralItemByFoundIndex() = testScope.runBlockingTest {
+
+        // 期待結果
+        val value = 2
+        val expectationsEffect = null
+        var funeralListCount = 1L
+        var constitutionListCount = 1L
+        val funeralList = missionStatement.funeralList
+            .map { funeral -> Pair(funeralListCount++, funeral) }
+            .toMutableList()
+        val constitutionList = missionStatement.constitutionList
+            .map { constitution -> Pair(constitutionListCount++, constitution) }
+            .toMutableList()
+        funeralList.add(value, Pair(funeralListCount, ""))
+        val expectationsState = state.copy(
+            funeralListCount = funeralListCount + 1,
+            funeralList = funeralList,
+            funeralListDiffColor = R.color.text_color_light_secondary,
+            purposeLife = missionStatement.purposeLife,
+            purposeLifeDiffColor = R.color.text_color_light_secondary,
+            constitutionListCount = constitutionListCount,
+            constitutionList = constitutionList,
+            constitutionListDiffColor= R.color.text_color_light_secondary,
+            isEnableConfirmButton = false
+        )
+
+        //実施
         viewModel = MissionStatementSettingViewModel(missionStatement, missionStatementUseCase)
-        setMockObserver()
-        val index = missionStatement.funeralList.size
-        val act: MutableList<String> = missionStatement.funeralList.toMutableList()
-        act.add(index, "")
-        MissionStatementDispatcher.addFuneral(index)
-        val result = viewModel.funeralList.value!!.map { it.second }
-        assertEquals(act, result)
+        MissionStatementDispatcher.setActions(MissionStatementDispatcherContract.Action.AddFuneral(value))
+
+        // 比較
+        result(expectationsState, expectationsEffect)
     }
 
     /**
      * 理想の葬式リストのリスト追加
      *
-     * 条件：指定した理想の葬式アイテムのインデックスが存在しない
-     * 期待結果：理想の葬式リストの文字列が追加されていないこと
-     *
+     * 条件：指定したインデックスが存在しない
+     * 期待結果；
+     * ・画面の値
+     * 　　値が変更されないこと
+     * ・画面イベント
+     * 　　ー
+     * ・共通処理イベント
+     * 　　ー
+     * ・業務ロジック
+     * 　ー
      */
     @ExperimentalCoroutinesApi
     @Test
     fun addFuneralItemByNotFoundIndex() = testScope.runBlockingTest {
+
+        // 期待結果
+        val value = 200
+        val expectationsEffect = null
+        var funeralListCount = 1L
+        var constitutionListCount = 1L
+        val funeralList = missionStatement.funeralList
+            .map { funeral -> Pair(funeralListCount++, funeral) }
+            .toMutableList()
+        val constitutionList = missionStatement.constitutionList
+            .map { constitution -> Pair(constitutionListCount++, constitution) }
+            .toMutableList()
+        val expectationsState = state.copy(
+            funeralListCount = funeralListCount,
+            funeralList = funeralList,
+            funeralListDiffColor = R.color.text_color_light_secondary,
+            purposeLife = missionStatement.purposeLife,
+            purposeLifeDiffColor = R.color.text_color_light_secondary,
+            constitutionListCount = constitutionListCount,
+            constitutionList = constitutionList,
+            constitutionListDiffColor= R.color.text_color_light_secondary,
+            isEnableConfirmButton = false
+        )
+
+        //実施
         viewModel = MissionStatementSettingViewModel(missionStatement, missionStatementUseCase)
-        setMockObserver()
-        val index = missionStatement.funeralList.size + 1
-        val act = missionStatement.funeralList
-        MissionStatementDispatcher.addFuneral(index)
-        val result = viewModel.funeralList.value!!.map { it.second }
-        assertEquals(act, result)
+        MissionStatementDispatcher.setActions(MissionStatementDispatcherContract.Action.AddFuneral(value))
+
+        // 比較
+        result(expectationsState, expectationsEffect)
     }
 
     // endregion
@@ -295,114 +403,299 @@ class MissionStatementSettingViewModelTest {
     /**
      * 憲法リストの内容変更
      *
-     * 条件：指定した憲法アイテムの文字列を変更
-     * 期待結果：憲法リストの文字列が変更されていること
+     * 条件：指定したIDのリストが存在しない
+     * 期待結果；
+     * ・画面の値
+     * 　　指定したIDのテキストが渡された値で変更されること
+     * ・画面イベント
+     * 　　ー
+     * ・共通処理イベント
+     * 　　ー
+     * ・業務ロジック
+     * 　ー
      */
     @ExperimentalCoroutinesApi
     @Test
     fun changeConstitutionTextByFoundIndex() = testScope.runBlockingTest {
+        // 期待結果
+        val value = "test01"
+        val id = 3L
+        val expectationsEffect = null
+        var funeralListCount = 1L
+        var constitutionListCount = 1L
+        val funeralList = missionStatement.funeralList
+            .map { funeral -> Pair(funeralListCount++, funeral) }
+            .toMutableList()
+        val constitutionList = missionStatement.constitutionList
+            .map { constitution -> Pair(constitutionListCount++, constitution) }
+            .toMutableList()
+        val index = constitutionList.indexOfFirst { it.first == id }
+        constitutionList[index] = Pair(id, value)
+        val expectationsState = state.copy(
+            funeralListCount = funeralListCount,
+            funeralList = funeralList,
+            funeralListDiffColor = R.color.text_color_light_secondary,
+            purposeLife = missionStatement.purposeLife,
+            purposeLifeDiffColor = R.color.text_color_light_secondary,
+            constitutionListCount = constitutionListCount,
+            constitutionList = constitutionList,
+            constitutionListDiffColor= R.color.text_color_light_primary,
+            isEnableConfirmButton = true
+        )
+
+        //実施
         viewModel = MissionStatementSettingViewModel(missionStatement, missionStatementUseCase)
-        setMockObserver()
-        val index = missionStatement.constitutionList.size - 1
-        val setText = "test After"
-        val act = missionStatement.constitutionList
-        MissionStatementDispatcher.changeConstitutionText(index, setText)
-        val result = viewModel.constitutionList.value!!.map { it.second }
-        assertNotEquals(act, result)
-        assertEquals(setText, result[index])
+        MissionStatementDispatcher.setActions(MissionStatementDispatcherContract.Action.ChangeConstitutionText(id, value))
+
+        // 比較
+        result(expectationsState, expectationsEffect)
     }
 
     /**
      * 憲法リストの内容変更
      *
-     * 条件：指定した憲法アイテムのインデックスが存在しないインデックス
-     * 期待結果：憲法リストの文字列が変更されないこと
+     * 条件：指定したIDのリストが存在しない
+     * 期待結果；
+     * ・画面の値
+     * 　　何も値が変更されないこと
+     * ・画面イベント
+     * 　　ー
+     * ・共通処理イベント
+     * 　　ー
+     * ・業務ロジック
+     * 　ー
      */
     @ExperimentalCoroutinesApi
     @Test
     fun changeConstitutionTextByNotFoundIndex() = testScope.runBlockingTest {
+        // 期待結果
+        val value = "test01"
+        val id = 100L
+        val expectationsEffect = null
+        var funeralListCount = 1L
+        var constitutionListCount = 1L
+        val funeralList = missionStatement.funeralList
+            .map { funeral -> Pair(funeralListCount++, funeral) }
+            .toMutableList()
+        val constitutionList = missionStatement.constitutionList
+            .map { constitution -> Pair(constitutionListCount++, constitution) }
+            .toMutableList()
+        val expectationsState = state.copy(
+            funeralListCount = funeralListCount,
+            funeralList = funeralList,
+            funeralListDiffColor = R.color.text_color_light_secondary,
+            purposeLife = missionStatement.purposeLife,
+            purposeLifeDiffColor = R.color.text_color_light_secondary,
+            constitutionListCount = constitutionListCount,
+            constitutionList = constitutionList,
+            constitutionListDiffColor= R.color.text_color_light_secondary,
+            isEnableConfirmButton = false
+        )
+
+        //実施
         viewModel = MissionStatementSettingViewModel(missionStatement, missionStatementUseCase)
-        setMockObserver()
-        val index = missionStatement.constitutionList.size
-        val setText = "test After"
-        val act = missionStatement.constitutionList
-        MissionStatementDispatcher.changeConstitutionText(index, setText)
-        val result = viewModel.constitutionList.value!!.map { it.second }
-        assertEquals(act, result)
+        MissionStatementDispatcher.setActions(MissionStatementDispatcherContract.Action.ChangeConstitutionText(id, value))
+
+        // 比較
+        result(expectationsState, expectationsEffect)
     }
 
     /**
      * 憲法リストのリスト削除
      *
-     * 条件：指定した憲法アイテムのインデックスが存在する
-     * 期待結果：憲法リストの文字列が削除されていること
+     * 条件：指定したインデックスが存在する
+     * 期待結果；
+     * ・画面の値
+     * 　　憲法リストの指定したインデックスが削除されること
+     * ・画面イベント
+     * 　　ー
+     * ・共通処理イベント
+     * 　　ー
+     * ・業務ロジック
+     * 　ー
      */
     @ExperimentalCoroutinesApi
     @Test
     fun deleteConstitutionItemByFoundIndex() = testScope.runBlockingTest {
+
+        // 期待結果
+        val value = 2
+        val expectationsEffect = null
+        var funeralListCount = 1L
+        var constitutionListCount = 1L
+        val funeralList = missionStatement.funeralList
+            .map { funeral -> Pair(funeralListCount++, funeral) }
+            .toMutableList()
+        val constitutionList = missionStatement.constitutionList
+            .map { constitution -> Pair(constitutionListCount++, constitution) }
+            .toMutableList()
+        constitutionList.removeAt(value)
+        val expectationsState = state.copy(
+            funeralListCount = funeralListCount,
+            funeralList = funeralList,
+            funeralListDiffColor = R.color.text_color_light_secondary,
+            purposeLife = missionStatement.purposeLife,
+            purposeLifeDiffColor = R.color.text_color_light_secondary,
+            constitutionListCount = constitutionListCount,
+            constitutionList = constitutionList,
+            constitutionListDiffColor= R.color.text_color_light_primary,
+            isEnableConfirmButton = true
+        )
+
+        //実施
         viewModel = MissionStatementSettingViewModel(missionStatement, missionStatementUseCase)
-        setMockObserver()
-        val index = missionStatement.constitutionList.size - 1
-        val act: MutableList<String> = missionStatement.constitutionList.toMutableList()
-        act.removeAt(index)
-        MissionStatementDispatcher.deleteConstitution(index)
-        val result = viewModel.constitutionList.value!!.map { it.second }
-        assertEquals(act, result)
+        MissionStatementDispatcher.setActions(MissionStatementDispatcherContract.Action.DeleteConstitution(value))
+
+        // 比較
+        result(expectationsState, expectationsEffect)
     }
 
     /**
      * 憲法リストのリスト削除
      *
-     * 条件：指定した憲法アイテムのインデックスが存在しない
-     * 期待結果：憲法リストの文字列が削除されていないこと
+     * 条件：指定したインデックスが存在しない
+     * 期待結果；
+     * ・画面の値
+     * 　　何も変更されないこと
+     * ・画面イベント
+     * 　　ー
+     * ・共通処理イベント
+     * 　　ー
+     * ・業務ロジック
+     * 　ー
      */
     @ExperimentalCoroutinesApi
     @Test
     fun deleteConstitutionItemByNotFoundIndex() = testScope.runBlockingTest {
+
+        // 期待結果
+        val value = 200
+        val expectationsEffect = null
+        var funeralListCount = 1L
+        var constitutionListCount = 1L
+        val funeralList = missionStatement.funeralList
+            .map { funeral -> Pair(funeralListCount++, funeral) }
+            .toMutableList()
+        val constitutionList = missionStatement.constitutionList
+            .map { constitution -> Pair(constitutionListCount++, constitution) }
+            .toMutableList()
+        val expectationsState = state.copy(
+            funeralListCount = funeralListCount,
+            funeralList = funeralList,
+            funeralListDiffColor = R.color.text_color_light_secondary,
+            purposeLife = missionStatement.purposeLife,
+            purposeLifeDiffColor = R.color.text_color_light_secondary,
+            constitutionListCount = constitutionListCount,
+            constitutionList = constitutionList,
+            constitutionListDiffColor= R.color.text_color_light_secondary,
+            isEnableConfirmButton = false
+        )
+
+        //実施
         viewModel = MissionStatementSettingViewModel(missionStatement, missionStatementUseCase)
-        setMockObserver()
-        val index = missionStatement.constitutionList.size
-        val act = missionStatement.constitutionList
-        MissionStatementDispatcher.deleteConstitution(index)
-        val result = viewModel.constitutionList.value!!.map { it.second }
-        assertEquals(act, result)
+        MissionStatementDispatcher.setActions(MissionStatementDispatcherContract.Action.DeleteConstitution(value))
+
+        // 比較
+        result(expectationsState, expectationsEffect)
     }
 
     /**
      * 憲法リストのリスト追加
      *
-     * 条件：指定した憲法アイテムのインデックスが存在する
-     * 期待結果：憲法リストの文字列が追加されていること
+     * 条件：指定したインデックスが存在する
+     * 期待結果；
+     * ・画面の値
+     * 　　憲法リストの指定したインデックスに空のリストが追加されること
+     * ・画面イベント
+     * 　　ー
+     * ・共通処理イベント
+     * 　　ー
+     * ・業務ロジック
+     * 　ー
      */
     @ExperimentalCoroutinesApi
     @Test
     fun addConstitutionItemByFoundIndex() = testScope.runBlockingTest {
+
+        // 期待結果
+        val value = 2
+        val expectationsEffect = null
+        var funeralListCount = 1L
+        var constitutionListCount = 1L
+        val funeralList = missionStatement.funeralList
+            .map { funeral -> Pair(funeralListCount++, funeral) }
+            .toMutableList()
+        val constitutionList = missionStatement.constitutionList
+            .map { constitution -> Pair(constitutionListCount++, constitution) }
+            .toMutableList()
+        constitutionList.add(value, Pair(constitutionListCount, ""))
+        val expectationsState = state.copy(
+            funeralListCount = funeralListCount,
+            funeralList = funeralList,
+            funeralListDiffColor = R.color.text_color_light_secondary,
+            purposeLife = missionStatement.purposeLife,
+            purposeLifeDiffColor = R.color.text_color_light_secondary,
+            constitutionListCount = constitutionListCount + 1,
+            constitutionList = constitutionList,
+            constitutionListDiffColor= R.color.text_color_light_secondary,
+            isEnableConfirmButton = false
+        )
+
+        //実施
         viewModel = MissionStatementSettingViewModel(missionStatement, missionStatementUseCase)
-        setMockObserver()
-        val index = missionStatement.constitutionList.size - 2
-        val act: MutableList<String> = missionStatement.constitutionList.toMutableList()
-        act.add(index, "")
-        MissionStatementDispatcher.addConstitution(index)
-        val result = viewModel.constitutionList.value!!.map { it.second }
-        assertEquals(act, result)
+        MissionStatementDispatcher.setActions(MissionStatementDispatcherContract.Action.AddConstitution(value))
+
+        // 比較
+        result(expectationsState, expectationsEffect)
     }
 
     /**
      * 憲法リストのリスト追加
      *
-     * 条件：指定した憲法アイテムのインデックスが存在しない
-     * 期待結果：憲法リストの文字列が追加されていないこと
+     * 条件：指定したインデックスが存在しない
+     * 期待結果；
+     * ・画面の値
+     * 　　値が変更されないこと
+     * ・画面イベント
+     * 　　ー
+     * ・共通処理イベント
+     * 　　ー
+     * ・業務ロジック
+     * 　ー
      */
     @ExperimentalCoroutinesApi
     @Test
     fun addConstitutionItemByNotFoundIndex() = testScope.runBlockingTest {
+
+        // 期待結果
+        val value = 200
+        val expectationsEffect = null
+        var funeralListCount = 1L
+        var constitutionListCount = 1L
+        val funeralList = missionStatement.funeralList
+            .map { funeral -> Pair(funeralListCount++, funeral) }
+            .toMutableList()
+        val constitutionList = missionStatement.constitutionList
+            .map { constitution -> Pair(constitutionListCount++, constitution) }
+            .toMutableList()
+        val expectationsState = state.copy(
+            funeralListCount = funeralListCount,
+            funeralList = funeralList,
+            funeralListDiffColor = R.color.text_color_light_secondary,
+            purposeLife = missionStatement.purposeLife,
+            purposeLifeDiffColor = R.color.text_color_light_secondary,
+            constitutionListCount = constitutionListCount,
+            constitutionList = constitutionList,
+            constitutionListDiffColor= R.color.text_color_light_secondary,
+            isEnableConfirmButton = false
+        )
+
+        //実施
         viewModel = MissionStatementSettingViewModel(missionStatement, missionStatementUseCase)
-        setMockObserver()
-        val index = missionStatement.constitutionList.size + 1
-        val act = missionStatement.constitutionList
-        MissionStatementDispatcher.addConstitution(index)
-        val result = viewModel.constitutionList.value!!.map { it.second }
-        assertEquals(act, result)
+        MissionStatementDispatcher.setActions(MissionStatementDispatcherContract.Action.AddConstitution(value))
+
+        // 比較
+        result(expectationsState, expectationsEffect)
     }
 
     // endregion
@@ -410,300 +703,206 @@ class MissionStatementSettingViewModelTest {
     // region 確定ボタンロジック
 
     /**
-     * 更新ボタン
+     * 変更ボタンタップ
      *
-     * 条件：
-     * ・更新処理(missionStatementがnullではない)であること
-     * ・理想の葬式・人生の目的・憲法、の全てに対してNull以外の値が入っていること
-     * 期待結果：入力した内容で更新メソッドが呼ばれること
+     * 条件：更新
+     * 期待結果；
+     * ・画面の値
+     * 　　ー
+     * ・画面イベント
+     * 　・画面遷移イベントが走ること
+     * ・共通処理イベント
+     * 　　ー
+     * ・業務ロジック
+     * 　・更新処理が走ること
      */
     @ExperimentalCoroutinesApi
     @Test
     fun onClickConfirmButtonByNotNullUpdate() = testScope.runBlockingTest {
-        viewModel = MissionStatementSettingViewModel(missionStatement, missionStatementUseCase)
-        setMockObserver()
-        viewModel.onClickConfirmButton()
-        val funeralList = viewModel.funeralList.value!!.toList()
-            .map { it.second }
-        val purposeLife = viewModel.purposeLife.value!!
-        val constitutionList = viewModel.constitutionList.value!!.toList()
-            .map { it.second }
+
+        // 期待結果
         val dto = MissionStatementInputDto(funeralList, purposeLife, constitutionList)
+        val expectationsEffect = MissionStatementSettingContract.Effect.NavigateMissionStatementSetting
+        var funeralListCount = 1L
+        var constitutionListCount = 1L
+        val funeralList = missionStatement.funeralList
+            .map { funeral -> Pair(funeralListCount++, funeral) }
+            .toMutableList()
+        val constitutionList = missionStatement.constitutionList
+            .map { constitution -> Pair(constitutionListCount++, constitution) }
+            .toMutableList()
+        val expectationsState = state.copy(
+            funeralListCount = funeralListCount,
+            funeralList = funeralList,
+            funeralListDiffColor = R.color.text_color_light_secondary,
+            purposeLife = missionStatement.purposeLife,
+            purposeLifeDiffColor = R.color.text_color_light_secondary,
+            constitutionListCount = constitutionListCount,
+            constitutionList = constitutionList,
+            constitutionListDiffColor= R.color.text_color_light_secondary,
+            isEnableConfirmButton = false
+        )
+
+        //実施
+        viewModel = MissionStatementSettingViewModel(missionStatement, missionStatementUseCase)
+        viewModel.setEvent(MissionStatementSettingContract.Event.OnClickChangeButton)
+
+        // 比較
+        result(expectationsState, expectationsEffect)
         coVerify(exactly = 1) { (missionStatementUseCase).updateMissionStatement(missionStatement, dto) }
-        assertEquals(true, viewModel.confirmStatus.value is Status.Success)
     }
 
     /**
-     * 登録ボタン
+     * 変更ボタンタップ
      *
-     * 条件：
-     * ・登録処理(missionStatementがnull)であること
-     * ・理想の葬式・人生の目的・憲法、の全てに対してNull以外の値が入っていること
-     * 期待結果：入力した内容で登録メソッドが呼ばれること
+     * 条件：更新 & ビジネスロジックでExceptionエラー
+     * 期待結果；
+     * ・画面の値
+     * 　　ー
+     * ・画面イベント
+     * 　・エラーイベントが走ること
+     * ・共通処理イベント
+     * 　　ー
+     * ・業務ロジック
+     * 　・更新処理が走ること
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun onClickConfirmButtonByNotNullUpdateException() = testScope.runBlockingTest {
+
+        // 期待結果
+        val error = IllegalArgumentException("test")
+        val expectationsEffect = MissionStatementSettingContract.Effect.ShowError(error)
+        val dto = MissionStatementInputDto(funeralList, purposeLife, constitutionList)
+        var funeralListCount = 1L
+        var constitutionListCount = 1L
+        val funeralList = missionStatement.funeralList
+            .map { funeral -> Pair(funeralListCount++, funeral) }
+            .toMutableList()
+        val constitutionList = missionStatement.constitutionList
+            .map { constitution -> Pair(constitutionListCount++, constitution) }
+            .toMutableList()
+        val expectationsState = state.copy(
+            funeralListCount = funeralListCount,
+            funeralList = funeralList,
+            funeralListDiffColor = R.color.text_color_light_secondary,
+            purposeLife = missionStatement.purposeLife,
+            purposeLifeDiffColor = R.color.text_color_light_secondary,
+            constitutionListCount = constitutionListCount,
+            constitutionList = constitutionList,
+            constitutionListDiffColor= R.color.text_color_light_secondary,
+            isEnableConfirmButton = false
+        )
+
+        //実施
+        missionStatementUseCase = mockk<MissionStatementUseCase>().also {
+            coEvery { it.getMissionStatement() } returns missionStatement
+            coEvery { it.createMissionStatement(any()) } throws error
+            coEvery { it.updateMissionStatement(any(), any()) } throws error
+        }
+        viewModel = MissionStatementSettingViewModel(missionStatement, missionStatementUseCase)
+        viewModel.setEvent(MissionStatementSettingContract.Event.OnClickChangeButton)
+
+        // 比較
+        result(expectationsState, expectationsEffect)
+        coVerify(exactly = 1) { (missionStatementUseCase).updateMissionStatement(missionStatement, dto) }
+    }
+
+    /**
+     * 変更ボタンタップ
+     *
+     * 条件：新規登録
+     * 期待結果；
+     * ・画面の値
+     * 　　ー
+     * ・画面イベント
+     * 　・画面遷移イベントが走ること
+     * ・共通処理イベント
+     * 　　ー
+     * ・業務ロジック
+     * 　・新規登録処理が走ること
      */
     @ExperimentalCoroutinesApi
     @Test
     fun onClickConfirmButtonByNotNullCreate() = testScope.runBlockingTest {
+
+        // 期待結果
+        val value = "test1"
+        val emptyList = mutableListOf(Pair(0L,""))
+        val expectationsEffect = MissionStatementSettingContract.Effect.NavigateMissionStatementSetting
+        val dto = MissionStatementInputDto(mutableListOf(), value, mutableListOf())
+        val expectationsState = state.copy(
+            funeralListCount = state.funeralListCount + 1,
+            funeralList = emptyList,
+            funeralListDiffColor = R.color.text_color_light_secondary,
+            purposeLife = value,
+            purposeLifeDiffColor = R.color.text_color_light_primary,
+            constitutionListCount = state.constitutionListCount + 1,
+            constitutionList = emptyList,
+            constitutionListDiffColor= R.color.text_color_light_secondary,
+            isEnableConfirmButton = true
+        )
+
+        //実施
         viewModel = MissionStatementSettingViewModel(null, missionStatementUseCase)
-        setMockObserver()
-        viewModel.onClickConfirmButton()
-        val funeralList = viewModel.funeralList.value!!.toList()
-            .map { it.second }
-            .filter { it.isNotBlank() }
-        val purposeLife = viewModel.purposeLife.value!!
-        val constitutionList = viewModel.constitutionList.value!!.toList()
-            .map { it.second }
-            .filter { it.isNotBlank() }
-        val dto = MissionStatementInputDto(funeralList, purposeLife, constitutionList)
+        viewModel.setEvent(MissionStatementSettingContract.Event.OnChangePurposeText(value))
+        viewModel.setEvent(MissionStatementSettingContract.Event.OnClickChangeButton)
+
+        // 比較
+        result(expectationsState, expectationsEffect)
         coVerify(exactly = 1) { (missionStatementUseCase).createMissionStatement(dto) }
-        assertEquals(true, viewModel.confirmStatus.value is Status.Success)
     }
 
     /**
-     * 変更確定ボタン
+     * 変更ボタンタップ
      *
-     * 条件：人生の目的がNull
-     * 期待結果：
-     * ・ミッションステートメント更新メソッドが呼ばれないこと
-     * ・ミッションステートメント更新ステータスがエラーになること
+     * 条件：新規登録 & ビジネスロジックでExceptionエラー
+     * 期待結果；
+     * ・画面の値
+     * 　　ー
+     * ・画面イベント
+     * 　・エラーイベントが走ること
+     * ・共通処理イベント
+     * 　　ー
+     * ・業務ロジック
+     * 　・新規登録処理が走ること
      */
     @ExperimentalCoroutinesApi
     @Test
-    fun onClickConfirmButtonByNullPurposeLife() = testScope.runBlockingTest {
-        viewModel = MissionStatementSettingViewModel(missionStatement, missionStatementUseCase)
-        setMockObserver()
-        viewModel.purposeLife.value = null
-        viewModel.onClickConfirmButton()
-        coVerify(exactly = 0) { (missionStatementUseCase).updateMissionStatement(any(), any()) }
-        assertEquals(true, viewModel.confirmStatus.value is Status.Failure)
-    }
+    fun onClickConfirmButtonByNotNullCreateException() = testScope.runBlockingTest {
 
-    // region ボタン活性非活性制御
+        // 期待結果
+        val error = IllegalArgumentException("test")
+        val value = "test01"
+        val emptyList = mutableListOf(Pair(0L,""))
+        val expectationsEffect = MissionStatementSettingContract.Effect.ShowError(error)
+        val dto = MissionStatementInputDto(mutableListOf(), value, mutableListOf())
+        val expectationsState = state.copy(
+            funeralListCount = state.funeralListCount + 1,
+            funeralList = emptyList,
+            funeralListDiffColor = R.color.text_color_light_secondary,
+            purposeLife = value,
+            purposeLifeDiffColor = R.color.text_color_light_primary,
+            constitutionListCount = state.constitutionListCount + 1,
+            constitutionList = emptyList,
+            constitutionListDiffColor= R.color.text_color_light_secondary,
+            isEnableConfirmButton = true
+        )
 
-    /**
-     * 変更確定ボタン
-     *
-     * 条件：全ての入力項目が空
-     * 期待結果：
-     * ・ミッションステートメント更新ボタンが非活性(false)になること
-     */
-    @ExperimentalCoroutinesApi
-    @Test
-    fun isEnableConfirmButtonByAllEmpty() = testScope.runBlockingTest {
+        //実施
+        missionStatementUseCase = mockk<MissionStatementUseCase>().also {
+            coEvery { it.getMissionStatement() } returns missionStatement
+            coEvery { it.createMissionStatement(any()) } throws error
+            coEvery { it.updateMissionStatement(any(), any()) } throws error
+        }
         viewModel = MissionStatementSettingViewModel(null, missionStatementUseCase)
-        setMockObserver()
-        assertEquals(false, viewModel.isEnableConfirmButton.value)
-    }
+        viewModel.setEvent(MissionStatementSettingContract.Event.OnChangePurposeText(value))
+        viewModel.setEvent(MissionStatementSettingContract.Event.OnClickChangeButton)
 
-    /**
-     * 変更確定ボタン
-     *
-     * 条件：理想の葬儀のみ入力済み(半角スペースのみ)
-     * 期待結果：
-     * ・ミッションステートメント更新ボタンが活性(false)になること
-     */
-    @ExperimentalCoroutinesApi
-    @Test
-    fun isEnableConfirmButtonByFuneralHanSpace() = testScope.runBlockingTest {
-        viewModel = MissionStatementSettingViewModel(null, missionStatementUseCase)
-        setMockObserver()
-        val index = 0
-        val setText = " "
-        MissionStatementDispatcher.changeFuneralText(index, setText)
-        assertEquals(false, viewModel.isEnableConfirmButton.value)
+        // 比較
+        result(expectationsState, expectationsEffect)
+        coVerify(exactly = 1) { (missionStatementUseCase).createMissionStatement(dto) }
     }
-
-    /**
-     * 変更確定ボタン
-     *
-     * 条件：理想の葬儀のみ入力済み(全角スペースのみ)
-     * 期待結果：
-     * ・ミッションステートメント更新ボタンが活性(false)になること
-     */
-    @ExperimentalCoroutinesApi
-    @Test
-    fun isEnableConfirmButtonByFuneralZenSpace() = testScope.runBlockingTest {
-        viewModel = MissionStatementSettingViewModel(null, missionStatementUseCase)
-        setMockObserver()
-        val index = 0
-        val setText = "　"
-        MissionStatementDispatcher.changeFuneralText(index, setText)
-        assertEquals(false, viewModel.isEnableConfirmButton.value)
-    }
-
-    /**
-     * 変更確定ボタン
-     *
-     * 条件：理想の葬儀のみ入力済み(改行のみ)
-     * 期待結果：
-     * ・ミッションステートメント更新ボタンが活性(false)になること
-     */
-    @ExperimentalCoroutinesApi
-    @Test
-    fun isEnableConfirmButtonByFuneralEnter() = testScope.runBlockingTest {
-        viewModel = MissionStatementSettingViewModel(null, missionStatementUseCase)
-        setMockObserver()
-        val index = 0
-        val setText = "\n"
-        MissionStatementDispatcher.changeFuneralText(index, setText)
-        assertEquals(false, viewModel.isEnableConfirmButton.value)
-    }
-
-    /**
-     * 変更確定ボタン
-     *
-     * 条件：理想の葬儀のみ入力済み
-     * 期待結果：
-     * ・ミッションステートメント更新ボタンが活性(true)になること
-     */
-    @ExperimentalCoroutinesApi
-    @Test
-    fun isEnableConfirmButtonByFuneral() = testScope.runBlockingTest {
-        viewModel = MissionStatementSettingViewModel(null, missionStatementUseCase)
-        setMockObserver()
-        val index = 0
-        val setText = "test After"
-        MissionStatementDispatcher.changeFuneralText(index, setText)
-        assertEquals(true, viewModel.isEnableConfirmButton.value)
-    }
-
-    /**
-     * 変更確定ボタン
-     *
-     * 条件：人生の目的のみ入力済み(半角スペース)
-     * 期待結果：
-     * ・ミッションステートメント更新ボタンが活性(false)になること
-     */
-    @ExperimentalCoroutinesApi
-    @Test
-    fun isEnableConfirmButtonByPurposeLifeHanSpace() = testScope.runBlockingTest {
-        viewModel = MissionStatementSettingViewModel(null, missionStatementUseCase)
-        setMockObserver()
-        viewModel.purposeLife.value = " "
-        assertEquals(false, viewModel.isEnableConfirmButton.value)
-    }
-
-    /**
-     * 変更確定ボタン
-     *
-     * 条件：人生の目的のみ入力済み(全角スペース)
-     * 期待結果：
-     * ・ミッションステートメント更新ボタンが活性(false)になること
-     */
-    @ExperimentalCoroutinesApi
-    @Test
-    fun isEnableConfirmButtonByPurposeLifeZenSpace() = testScope.runBlockingTest {
-        viewModel = MissionStatementSettingViewModel(null, missionStatementUseCase)
-        setMockObserver()
-        viewModel.purposeLife.value = "　"
-        assertEquals(false, viewModel.isEnableConfirmButton.value)
-    }
-
-    /**
-     * 変更確定ボタン
-     *
-     * 条件：人生の目的のみ入力済み(改行のみ)
-     * 期待結果：
-     * ・ミッションステートメント更新ボタンが活性(false)になること
-     */
-    @ExperimentalCoroutinesApi
-    @Test
-    fun isEnableConfirmButtonByPurposeLifeEnter() = testScope.runBlockingTest {
-        viewModel = MissionStatementSettingViewModel(null, missionStatementUseCase)
-        setMockObserver()
-        viewModel.purposeLife.value = "\n"
-        assertEquals(false, viewModel.isEnableConfirmButton.value)
-    }
-
-    /**
-     * 変更確定ボタン
-     *
-     * 条件：人生の目的のみ入力済み
-     * 期待結果：
-     * ・ミッションステートメント更新ボタンが活性(true)になること
-     */
-    @ExperimentalCoroutinesApi
-    @Test
-    fun isEnableConfirmButtonByPurposeLife() = testScope.runBlockingTest {
-        viewModel = MissionStatementSettingViewModel(null, missionStatementUseCase)
-        setMockObserver()
-        viewModel.purposeLife.value = "test"
-        assertEquals(true, viewModel.isEnableConfirmButton.value)
-    }
-
-    /**
-     * 変更確定ボタン
-     *
-     * 条件：憲法のみ入力済み(半角スペースのみ)
-     * 期待結果：
-     * ・ミッションステートメント更新ボタンが活性(false)になること
-     */
-    @ExperimentalCoroutinesApi
-    @Test
-    fun isEnableConfirmButtonByConstitutionHanSpace() = testScope.runBlockingTest {
-        viewModel = MissionStatementSettingViewModel(null, missionStatementUseCase)
-        setMockObserver()
-        val index = 0
-        val setText = " "
-        MissionStatementDispatcher.changeConstitutionText(index, setText)
-        assertEquals(false, viewModel.isEnableConfirmButton.value)
-    }
-
-    /**
-     * 変更確定ボタン
-     *
-     * 条件：憲法のみ入力済み(全角スペースのみ)
-     * 期待結果：
-     * ・ミッションステートメント更新ボタンが活性(false)になること
-     */
-    @ExperimentalCoroutinesApi
-    @Test
-    fun isEnableConfirmButtonByConstitutionZenSpace() = testScope.runBlockingTest {
-        viewModel = MissionStatementSettingViewModel(null, missionStatementUseCase)
-        setMockObserver()
-        val index = 0
-        val setText = "　"
-        MissionStatementDispatcher.changeConstitutionText(index, setText)
-        assertEquals(false, viewModel.isEnableConfirmButton.value)
-    }
-
-    /**
-     * 変更確定ボタン
-     *
-     * 条件：憲法のみ入力済み(改行のみ)
-     * 期待結果：
-     * ・ミッションステートメント更新ボタンが活性(false)になること
-     */
-    @ExperimentalCoroutinesApi
-    @Test
-    fun isEnableConfirmButtonByConstitutionEnter() = testScope.runBlockingTest {
-        viewModel = MissionStatementSettingViewModel(null, missionStatementUseCase)
-        setMockObserver()
-        val index = 0
-        val setText = "\n"
-        MissionStatementDispatcher.changeConstitutionText(index, setText)
-        assertEquals(false, viewModel.isEnableConfirmButton.value)
-    }
-
-    /**
-     * 変更確定ボタン
-     *
-     * 条件：憲法のみ入力済み
-     * 期待結果：
-     * ・ミッションステートメント更新ボタンが活性(true)になること
-     */
-    @ExperimentalCoroutinesApi
-    @Test
-    fun isEnableConfirmButtonByConstitution() = testScope.runBlockingTest {
-        viewModel = MissionStatementSettingViewModel(null, missionStatementUseCase)
-        setMockObserver()
-        val index = 0
-        val setText = "test After"
-        MissionStatementDispatcher.changeConstitutionText(index, setText)
-        assertEquals(true, viewModel.isEnableConfirmButton.value)
-    }
-
-    // endregion
 
     // endregion
 }

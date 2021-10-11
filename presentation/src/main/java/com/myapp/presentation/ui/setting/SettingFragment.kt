@@ -134,7 +134,7 @@ class SettingFragment : BaseFragment() {
 
     // イベント発火
     private fun executionEffect(effect: SettingContract.Effect) = when(effect) {
-        is SettingContract.Effect.ErrorShow -> Toasty.error(requireContext(), effect.throwable.message!!, Toast.LENGTH_SHORT, true).show()
+        is SettingContract.Effect.ShowError -> Toasty.error(requireContext(), effect.throwable.message!!, Toast.LENGTH_SHORT, true).show()
         is SettingContract.Effect.NextNavigation -> setAlarmAndBack(effect.value)
     }
 

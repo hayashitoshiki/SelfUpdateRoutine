@@ -2,7 +2,6 @@ package com.myapp.presentation.ui.mission_statement
 
 import androidx.lifecycle.*
 import com.myapp.domain.usecase.MissionStatementUseCase
-import com.myapp.presentation.ui.home.HomeContract
 import com.myapp.presentation.utils.base.BaseAacViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn

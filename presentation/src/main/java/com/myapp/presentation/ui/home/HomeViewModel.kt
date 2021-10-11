@@ -101,11 +101,11 @@ class HomeViewModel @Inject constructor(
     // 格言一覧画面へ遷移
     private fun navigateLearnList() {
         val reportList = state.value?.reportList ?:run {
-            setEffect { HomeContract.Effect.ErrorShow(NullPointerException("レポートリストがありません")) }
+            setEffect { HomeContract.Effect.ShowError(NullPointerException("レポートリストがありません")) }
             return
         }
         if (reportList.isEmpty()) {
-            setEffect { HomeContract.Effect.ErrorShow(NullPointerException("レポートリストがありません")) }
+            setEffect { HomeContract.Effect.ShowError(NullPointerException("レポートリストがありません")) }
             return
         }
         setEffect { HomeContract.Effect.LearnListNavigation(reportList) }
@@ -114,11 +114,11 @@ class HomeViewModel @Inject constructor(
     // 宣言詳細画面へ遷移
     private fun navigateStatementList() {
         val reportList = state.value?.reportList ?:run {
-            setEffect { HomeContract.Effect.ErrorShow(NullPointerException("レポートリストがありません")) }
+            setEffect { HomeContract.Effect.ShowError(NullPointerException("レポートリストがありません")) }
             return
         }
         if (reportList.isEmpty()) {
-            setEffect { HomeContract.Effect.ErrorShow(NullPointerException("レポートリストがありません")) }
+            setEffect { HomeContract.Effect.ShowError(NullPointerException("レポートリストがありません")) }
             return
         }
         setEffect { HomeContract.Effect.StatementListNavigation(reportList) }

@@ -2,8 +2,6 @@ package com.myapp.presentation.ui.mission_statement
 
 import android.content.Context
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
 import com.myapp.presentation.databinding.ItemDiscBinding
 import com.myapp.presentation.utils.base.DiscItem
 
@@ -15,26 +13,16 @@ import com.myapp.presentation.utils.base.DiscItem
 class MissionStatementSettingResultDiscItem(
     private val id: Long,
     private val value: String,
-    private val textColor: LiveData<Int>,
-    private val context: Context,
-    private val viewLifecycleOwner: LifecycleOwner
+    private val textColor: Int,
+    private val context: Context
 ) : DiscItem(value) {
 
     override fun bind(
         binding: ItemDiscBinding,
         position: Int
     ) {
+        val color = ContextCompat.getColor(context, textColor)
         binding.txtValue.text = value
-        textColor.value?.let { setTextColor(it, binding) }
-        textColor.observe(viewLifecycleOwner, { setTextColor(it, binding) })
-    }
-
-    // 文字色設定
-    private fun setTextColor(
-        resId: Int,
-        binding: ItemDiscBinding
-    ) {
-        val color = ContextCompat.getColor(context, resId)
         binding.txtDisc.setTextColor(color)
         binding.txtValue.setTextColor(color)
     }

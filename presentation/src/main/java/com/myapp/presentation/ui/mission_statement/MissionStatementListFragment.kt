@@ -8,7 +8,6 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.myapp.presentation.databinding.FragmentMissionStatementListBinding
-import com.myapp.presentation.ui.home.HomeContract
 import com.myapp.presentation.utils.base.BaseFragment
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.ViewHolder
@@ -54,41 +53,39 @@ class MissionStatementListFragment : BaseFragment() {
         }
     }
 
+    // State反映
     private fun changeState(state: MissionStatementListContract.State) {
-        viewModel.cashState.let { cash ->
-            if (cash == null || state.missionStatement != cash.missionStatement) {
-                val mainVisibility = if (state.missionStatement != null) View.VISIBLE else View.INVISIBLE
-                val notFoundVisibility = if (state.missionStatement == null) View.VISIBLE else View.INVISIBLE
-                binding.layoutMain.visibility = mainVisibility
-                binding.txtNotFoundMessage.visibility = notFoundVisibility
-            }
-            if (cash == null || state.purposeLife != cash.purposeLife) {
-                val visibility = if (state.isEnablePurposeLife) View.VISIBLE else View.INVISIBLE
-                binding.txtValueMissionStatement.text = state.purposeLife
-                binding.cardPurpose.visibility = visibility
-            }
-            if (cash == null || state.funeralList != cash.funeralList) {
-                val visibility = if (state.isEnableFuneralList) View.VISIBLE else View.INVISIBLE
-                val items = state.funeralList.map { MissionStatementListDiscItem(it, requireContext()) }
-                (binding.listFuneral.adapter as GroupAdapter<*>).update(items)
-                binding.cardFuneral.visibility = visibility
-            }
-            if (cash == null || state.constitutionList != cash.constitutionList) {
-                val visibility = if (state.isEnableConstitutionList) View.VISIBLE else View.INVISIBLE
-                val items = state.constitutionList.map { MissionStatementListDiscItem(it, requireContext()) }
-                (binding.listConstitution.adapter as GroupAdapter<*>).update(items)
-                binding.cardConstitution.visibility = visibility
-            }
-        }
+
+        // メインコンテンツ
+        binding.layoutMain.visibility = if (state.missionStatement != null) View.VISIBLE else View.INVISIBLE
+        binding.txtNotFoundMessage.visibility = if (state.missionStatement == null) View.VISIBLE else View.INVISIBLE
+
+        // 人生の目的
+        binding.txtValueMissionStatement.text = state.purposeLife
+        binding.cardPurpose.visibility = if (state.isEnablePurposeLife) View.VISIBLE else View.INVISIBLE
+
+        // 理想の葬式
+        binding.cardFuneral.visibility = if (state.isEnableFuneralList) View.VISIBLE else View.INVISIBLE
+        val funeralListAdapter = binding.listFuneral.adapter as GroupAdapter<*>
+        state.funeralList
+            .map { MissionStatementListDiscItem(it, requireContext()) }
+            .also{ funeralListAdapter.update(it) }
+
+        // 憲法
+        binding.cardConstitution.visibility = if (state.isEnableConstitutionList) View.VISIBLE else View.INVISIBLE
+        val constitutionListAdapter = binding.listConstitution.adapter as GroupAdapter<*>
+        state.constitutionList
+            .map { MissionStatementListDiscItem(it, requireContext()) }
+            .also{ constitutionListAdapter.update(it) }
     }
 
-    // イベント設定
+    // Event設定
     private fun setEvent() {
         // 変更ボタン
         binding.btnChange.setOnClickListener { viewModel.setEvent(MissionStatementListContract.Event.OnClickChangeButton) }
     }
 
-    // エフェクト発火
+    // Effect設定
     private fun executionEffect(effect: MissionStatementListContract.Effect) = when(effect) {
         is MissionStatementListContract.Effect.NavigateMissionStatementSetting -> {
             val action = MissionStatementListFragmentDirections.actionNavConstitutionToNavConstitutionSetting(effect.value)

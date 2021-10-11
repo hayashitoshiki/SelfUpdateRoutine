@@ -94,7 +94,7 @@ class FuneralInputItemViewModelTest {
 
         // 期待結果
         val textValue = "test"
-        val expectationsState = state.copy(value = textValue, isPlusButtonVisibility = true, isMinusButtonVisibility = false)
+        val expectationsState = state.copy(text = textValue, isPlusButtonVisibility = true, isMinusButtonVisibility = false)
         val expectationsEffect = null
         val expectationsAction = null
 
@@ -125,7 +125,7 @@ class FuneralInputItemViewModelTest {
 
         // 期待結果
         val textValue = "test"
-        val expectationsState = state.copy(value = textValue, isPlusButtonVisibility = true, isMinusButtonVisibility = true)
+        val expectationsState = state.copy(text = textValue, isPlusButtonVisibility = true, isMinusButtonVisibility = true)
         val expectationsEffect = null
         val expectationsAction = null
 
@@ -162,9 +162,9 @@ class FuneralInputItemViewModelTest {
 
         // 期待結果
         val afterValue = "test"
-        val expectationsState = state.copy(value = afterValue, isPlusButtonVisibility = true, isMinusButtonVisibility = true)
+        val expectationsState = state.copy(text = afterValue, isPlusButtonVisibility = true, isMinusButtonVisibility = true)
         val expectationsEffect = null
-        val expectationsAction = MissionStatementDispatcherContract.Action.ChangeFuneralText(1, afterValue)
+        val expectationsAction = MissionStatementDispatcherContract.Action.ChangeFuneralText(2, afterValue)
 
         // 実施
         viewModel = FuneralInputItemViewModel(1, 2, "changeText")
@@ -196,9 +196,9 @@ class FuneralInputItemViewModelTest {
 
         // 期待結果
         val afterValue = ""
-        val expectationsState = state.copy(value = afterValue, isPlusButtonVisibility = true, isMinusButtonVisibility = true)
+        val expectationsState = state.copy(text = afterValue, isPlusButtonVisibility = true, isMinusButtonVisibility = true)
         val expectationsEffect = null
-        val expectationsAction = MissionStatementDispatcherContract.Action.ChangeFuneralText(1, afterValue)
+        val expectationsAction = MissionStatementDispatcherContract.Action.ChangeFuneralText(2, afterValue)
 
         // 実施
         viewModel = FuneralInputItemViewModel(1, 2, "changeText")
@@ -231,7 +231,7 @@ class FuneralInputItemViewModelTest {
         // 期待結果
         val textValue = "test"
         val indexValue = 1
-        val expectationsState = state.copy(value = textValue, isPlusButtonVisibility = true, isMinusButtonVisibility = true)
+        val expectationsState = state.copy(text = textValue, isPlusButtonVisibility = true, isMinusButtonVisibility = true)
         val expectationsEffect = null
         val expectationsAction = MissionStatementDispatcherContract.Action.AddFuneral(indexValue + 1)
 
@@ -265,8 +265,8 @@ class FuneralInputItemViewModelTest {
 
         // 期待結果
         val textValue = "test"
-        val indexValue = 1
-        val expectationsState = state.copy(value = textValue, isPlusButtonVisibility = true, isMinusButtonVisibility = true)
+        val indexValue = 2
+        val expectationsState = state.copy(text = textValue, isPlusButtonVisibility = true, isMinusButtonVisibility = true)
         val expectationsEffect = null
         val expectationsAction = MissionStatementDispatcherContract.Action.DeleteFuneral(indexValue)
 

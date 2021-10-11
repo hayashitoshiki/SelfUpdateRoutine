@@ -49,7 +49,7 @@ class SettingViewModel @Inject constructor(private val settingUseCase: SettingUs
                     alarmTimeDiff = alarmTimeDiff
                 )
             }
-        }.onFailure { setEffect { SettingContract.Effect.ErrorShow(it) } }
+        }.onFailure { setEffect { SettingContract.Effect.ShowError(it) } }
 
     }
 
@@ -93,7 +93,7 @@ class SettingViewModel @Inject constructor(private val settingUseCase: SettingUs
 
         runCatching { settingUseCase.updateAlarmDate(nextAlarmTimeInputDto) }
             .onSuccess { setState { copy(alarmTimeDiff = alarmTimeDiff, alarmTimeDiffColor = alarmTimeDiffColor, nextAlarmTime = it.format(formatter)) } }
-            .onFailure { SettingContract.Effect.ErrorShow(it) }
+            .onFailure { SettingContract.Effect.ShowError(it) }
     }
 
     // 確定ボタン活性非活性
@@ -109,6 +109,6 @@ class SettingViewModel @Inject constructor(private val settingUseCase: SettingUs
         val nextAlarmTimeInputDto = NextAlarmTimeInputDto(state.hourDate, state.minutesDate, state.secondsDate, state.alarmMode)
         runCatching { settingUseCase.updateAlarmDate(nextAlarmTimeInputDto) }
             .onSuccess { setEffect { SettingContract.Effect.NextNavigation(it) } }
-            .onFailure { setEffect { SettingContract.Effect.ErrorShow(it) } }
+            .onFailure { setEffect { SettingContract.Effect.ShowError(it) } }
     }
 }

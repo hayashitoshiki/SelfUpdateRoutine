@@ -113,7 +113,7 @@ class HomeFragment : BaseFragment() {
             findNavController().navigate(action)
         }
         is HomeContract.Effect.OnDestroyView -> {}
-        is HomeContract.Effect.ErrorShow -> {
+        is HomeContract.Effect.ShowError -> {
             Timber.tag(this.javaClass.simpleName).d(effect.throwable.message)
         }
     }

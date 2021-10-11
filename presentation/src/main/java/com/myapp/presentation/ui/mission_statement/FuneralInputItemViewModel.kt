@@ -18,15 +18,15 @@ import kotlinx.coroutines.launch
  */
 class FuneralInputItemViewModel @AssistedInject constructor(
     @Assisted index: Int,
-    @Assisted val id: Long,
+    @Assisted id: Long,
     @Assisted text: String
-) : BaseInputTextItemViewModel(index, text) {
+) : BaseInputTextItemViewModel(index, id, text) {
 
     // テキスト変更
     override fun changeText(text: String) {
         viewModelScope.launch {
-            setState { copy(value = text) }
-            MissionStatementDispatcher.setActions(MissionStatementDispatcherContract.Action.ChangeFuneralText(index, text))
+            setState { copy(text = text) }
+            MissionStatementDispatcher.setActions(MissionStatementDispatcherContract.Action.ChangeFuneralText(id, text))
         }
     }
 

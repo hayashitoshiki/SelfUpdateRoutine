@@ -81,7 +81,7 @@ interface HomeContract {
         /**
          * エラー表示
          */
-        data class ErrorShow(val throwable: Throwable) : Effect()
+        data class ShowError(val throwable: Throwable) : Effect()
     }
 
     /**

@@ -51,7 +51,7 @@ interface SettingContract {
         /**
          * 次の画面へ遷移
          */
-        data class ErrorShow(val throwable: Throwable) : Effect()
+        data class ShowError(val throwable: Throwable) : Effect()
     }
 
     /**

@@ -1,7 +1,6 @@
 package com.myapp.presentation.ui.mission_statement
 
 import com.myapp.domain.model.entity.MissionStatement
-import com.myapp.presentation.ui.home.HomeContract
 import com.myapp.presentation.utils.base.BaseContract
 
 interface MissionStatementListContract {

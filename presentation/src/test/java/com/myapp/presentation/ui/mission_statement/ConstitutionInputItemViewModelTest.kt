@@ -95,7 +95,7 @@ class ConstitutionInputItemViewModelTest {
 
         // 期待結果
         val textValue = "test"
-        val expectationsState = state.copy(value = textValue, isPlusButtonVisibility = true, isMinusButtonVisibility = false)
+        val expectationsState = state.copy(text = textValue, isPlusButtonVisibility = true, isMinusButtonVisibility = false)
         val expectationsEffect = null
         val expectationsAction = null
 
@@ -126,7 +126,7 @@ class ConstitutionInputItemViewModelTest {
 
         // 期待結果
         val textValue = "test"
-        val expectationsState = state.copy(value = textValue, isPlusButtonVisibility = true, isMinusButtonVisibility = true)
+        val expectationsState = state.copy(text = textValue, isPlusButtonVisibility = true, isMinusButtonVisibility = true)
         val expectationsEffect = null
         val expectationsAction = null
 
@@ -163,9 +163,9 @@ class ConstitutionInputItemViewModelTest {
 
         // 期待結果
         val afterValue = "test"
-        val expectationsState = state.copy(value = afterValue, isPlusButtonVisibility = true, isMinusButtonVisibility = true)
+        val expectationsState = state.copy(text = afterValue, isPlusButtonVisibility = true, isMinusButtonVisibility = true)
         val expectationsEffect = null
-        val expectationsAction = MissionStatementDispatcherContract.Action.ChangeConstitutionText(1, afterValue)
+        val expectationsAction = MissionStatementDispatcherContract.Action.ChangeConstitutionText(2, afterValue)
 
         // 実施
         viewModel = ConstitutionInputItemViewModel(1, 2, "changeText")
@@ -197,9 +197,9 @@ class ConstitutionInputItemViewModelTest {
 
         // 期待結果
         val afterValue = ""
-        val expectationsState = state.copy(value = afterValue, isPlusButtonVisibility = true, isMinusButtonVisibility = true)
+        val expectationsState = state.copy(text = afterValue, isPlusButtonVisibility = true, isMinusButtonVisibility = true)
         val expectationsEffect = null
-        val expectationsAction = MissionStatementDispatcherContract.Action.ChangeConstitutionText(1, afterValue)
+        val expectationsAction = MissionStatementDispatcherContract.Action.ChangeConstitutionText(2, afterValue)
 
         // 実施
         viewModel = ConstitutionInputItemViewModel(1, 2, "changeText")
@@ -232,7 +232,7 @@ class ConstitutionInputItemViewModelTest {
         // 期待結果
         val textValue = "test"
         val indexValue = 1
-        val expectationsState = state.copy(value = textValue, isPlusButtonVisibility = true, isMinusButtonVisibility = true)
+        val expectationsState = state.copy(text = textValue, isPlusButtonVisibility = true, isMinusButtonVisibility = true)
         val expectationsEffect = null
         val expectationsAction = MissionStatementDispatcherContract.Action.AddConstitution(indexValue + 1)
 
@@ -267,7 +267,7 @@ class ConstitutionInputItemViewModelTest {
         // 期待結果
         val textValue = "test"
         val indexValue = 1
-        val expectationsState = state.copy(value = textValue, isPlusButtonVisibility = true, isMinusButtonVisibility = true)
+        val expectationsState = state.copy(text = textValue, isPlusButtonVisibility = true, isMinusButtonVisibility = true)
         val expectationsEffect = null
         val expectationsAction = MissionStatementDispatcherContract.Action.DeleteConstitution(indexValue)
 

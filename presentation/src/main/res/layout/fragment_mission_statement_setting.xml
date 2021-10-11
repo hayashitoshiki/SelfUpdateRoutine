@@ -2,14 +2,7 @@
 <layout xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <data>
-
-        <import type="com.myapp.domain.model.value.AlarmMode" />
-
-        <variable
-            name="viewModel"
-            type="com.myapp.presentation.ui.mission_statement.MissionStatementSettingViewModel" />
-    </data>
+    <data/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -78,8 +71,7 @@
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/edit_mission_statement"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@={viewModel.purposeLife}" />
+                        android:layout_height="wrap_content" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <TextView
@@ -131,13 +123,12 @@
                     android:layout_height="wrap_content">
 
                     <TextView
-                        android:id="@+id/alarm_title"
+                        android:id="@+id/funeral_title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="24dp"
                         android:text="@string/title_sub_dai"
-                        android:textColor="@{context.getColor(viewModel.funeralListDiffColor)}"
-                        app:layout_constraintStart_toStartOf="parent"
+                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <androidx.recyclerview.widget.RecyclerView
@@ -145,47 +136,43 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="@+id/alarm_title"
-                        app:layout_constraintTop_toBottomOf="@+id/alarm_title" />
+                        app:layout_constraintStart_toStartOf="@+id/funeral_title"
+                        app:layout_constraintTop_toBottomOf="@+id/funeral_title" />
 
                     <TextView
-                        android:id="@+id/mode_title"
+                        android:id="@+id/purpose_title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:text="@string/title_sub_mission_statement"
-                        android:textColor="@{context.getColor(viewModel.purposeLifeDiffColor)}"
-                        app:layout_constraintStart_toStartOf="@+id/alarm_title"
+                        app:layout_constraintStart_toStartOf="@+id/funeral_title"
                         app:layout_constraintTop_toBottomOf="@+id/list_result_funeral" />
 
                     <TextView
-                        android:id="@+id/mode_diff_value"
+                        android:id="@+id/purpose_diff_value"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="@{viewModel.purposeLife}"
-                        android:textColor="@{context.getColor(viewModel.purposeLifeDiffColor)}"
                         app:layout_constraintEnd_toEndOf="@+id/list_result_funeral"
-                        app:layout_constraintStart_toStartOf="@+id/mode_title"
-                        app:layout_constraintTop_toBottomOf="@+id/mode_title" />
+                        app:layout_constraintStart_toStartOf="@+id/purpose_title"
+                        app:layout_constraintTop_toBottomOf="@+id/purpose_title" />
 
                     <TextView
-                        android:id="@+id/next_title"
+                        android:id="@+id/constitution_title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:text="@string/title_sub_constitution"
-                        android:textColor="@{context.getColor(viewModel.constitutionListDiffColor)}"
-                        app:layout_constraintStart_toStartOf="@+id/mode_title"
-                        app:layout_constraintTop_toBottomOf="@+id/mode_diff_value" />
+                        app:layout_constraintStart_toStartOf="@+id/purpose_title"
+                        app:layout_constraintTop_toBottomOf="@+id/purpose_diff_value" />
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/list_result_constitution"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        app:layout_constraintEnd_toEndOf="@+id/mode_diff_value"
-                        app:layout_constraintStart_toStartOf="@+id/mode_diff_value"
-                        app:layout_constraintTop_toBottomOf="@+id/next_title" />
+                        app:layout_constraintEnd_toEndOf="@+id/purpose_diff_value"
+                        app:layout_constraintStart_toStartOf="@+id/purpose_diff_value"
+                        app:layout_constraintTop_toBottomOf="@+id/constitution_title" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </ScrollView>
@@ -196,7 +183,6 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
                 android:text="@string/btn_update"
-                android:enabled="@{viewModel.isEnableConfirmButton()}"
                 style="@style/Widget.MyApp.Button.White"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

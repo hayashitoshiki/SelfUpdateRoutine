@@ -75,9 +75,9 @@ class SettingViewModelTest {
 
         // 比較
         Assert.assertEquals(resultState, state)
-        if (resultEffect is SettingContract.Effect.ErrorShow) {
+        if (resultEffect is SettingContract.Effect.ShowError) {
             val resultMessage = resultEffect.throwable.message
-            val message = (effect as SettingContract.Effect.ErrorShow).throwable.message
+            val message = (effect as SettingContract.Effect.ShowError).throwable.message
             Assert.assertEquals(resultMessage, message)
         } else {
             Assert.assertEquals(resultEffect, effect)
@@ -471,7 +471,7 @@ class SettingViewModelTest {
         }
         settingViewModel = SettingViewModel(settingUseCase)
         settingViewModel.setEvent(SettingContract.Event.CreatedView)
-        val expectationsEffect = SettingContract.Effect.ErrorShow(IllegalArgumentException("test"))
+        val expectationsEffect = SettingContract.Effect.ShowError(IllegalArgumentException("test"))
         val expectationsState = settingViewModel.state.value!!.copy()
         val nextAlarmTimeInputDto = NextAlarmTimeInputDto(
             expectationsState.hourDate, expectationsState.minutesDate, expectationsState.secondsDate,

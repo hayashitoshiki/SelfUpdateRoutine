@@ -5,12 +5,12 @@ interface BaseInputTextItemContract {
     /**
      * リサイクルビュー_テキスト入力用アイテム 状態保持
      *
-     * @property value テキスト
+     * @property text テキスト
      * @property isPlusButtonVisibility ＋ボタン表示制御
      * @property isMinusButtonVisibility ーボタン表示制御
      */
     data class State(
-        val value: String = "",
+        val text: String = "",
         val isPlusButtonVisibility: Boolean = true,
         val isMinusButtonVisibility: Boolean = true
     ) : BaseContract.State

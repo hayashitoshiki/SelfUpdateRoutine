@@ -32,7 +32,7 @@ abstract class BaseAacViewModel<UiState : BaseContract.State, Effect : BaseContr
 
     // 状態管理のキャッシュ
     var cashState: UiState? = null
-    private set
+    protected set
 
     // イベント処理
     private val _event: MutableSharedFlow<Event> = MutableSharedFlow()

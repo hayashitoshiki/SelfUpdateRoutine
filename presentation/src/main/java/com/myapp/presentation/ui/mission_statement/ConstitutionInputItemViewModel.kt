@@ -3,7 +3,6 @@ package com.myapp.presentation.ui.mission_statement
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.myapp.presentation.utils.base.BaseInputTextItemContract
 import com.myapp.presentation.utils.base.BaseInputTextItemViewModel
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -19,15 +18,15 @@ import kotlinx.coroutines.launch
  */
 class ConstitutionInputItemViewModel @AssistedInject constructor(
     @Assisted index: Int,
-    @Assisted val id: Long,
+    @Assisted id: Long,
     @Assisted text: String
-) : BaseInputTextItemViewModel(index, text) {
+) : BaseInputTextItemViewModel(index, id, text) {
 
     // テキスト変更
     override fun changeText(text: String) {
         viewModelScope.launch {
-            setState { copy(value = text) }
-            MissionStatementDispatcher.setActions(MissionStatementDispatcherContract.Action.ChangeConstitutionText(index, text))
+            setState { copy(text = text) }
+            MissionStatementDispatcher.setActions(MissionStatementDispatcherContract.Action.ChangeConstitutionText(id, text))
         }
     }
 

@@ -134,9 +134,9 @@ class HomeViewModelTest {
 
         // 比較
         Assert.assertEquals(resultState, state)
-        if (resultEffect is HomeContract.Effect.ErrorShow) {
+        if (resultEffect is HomeContract.Effect.ShowError) {
             val resultMessage = resultEffect.throwable.message
-            val message = (effect as HomeContract.Effect.ErrorShow).throwable.message
+            val message = (effect as HomeContract.Effect.ShowError).throwable.message
             Assert.assertEquals(resultMessage, message)
         } else {
             Assert.assertEquals(resultEffect, effect)
@@ -489,7 +489,7 @@ class HomeViewModelTest {
         setMissionStatement()
         viewModel = HomeViewModel(reportUseCase, missionStatementUseCase)
         val value = NullPointerException("レポートリストがありません")
-        val expectationsEffect = HomeContract.Effect.ErrorShow(value)
+        val expectationsEffect = HomeContract.Effect.ShowError(value)
         val expectationsState = viewModel.state.value!!.copy()
 
         // 実施
@@ -557,7 +557,7 @@ class HomeViewModelTest {
         setMissionStatement()
         viewModel = HomeViewModel(reportUseCase, missionStatementUseCase)
         val value = NullPointerException("レポートリストがありません")
-        val expectationsEffect = HomeContract.Effect.ErrorShow(value)
+        val expectationsEffect = HomeContract.Effect.ShowError(value)
         val expectationsState = viewModel.state.value!!.copy()
 
         // 実施
