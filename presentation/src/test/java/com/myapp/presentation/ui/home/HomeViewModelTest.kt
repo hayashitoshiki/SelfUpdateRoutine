@@ -1,7 +1,6 @@
 package com.myapp.presentation.ui.home
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.Observer
 import com.myapp.domain.model.entity.FfsReport
 import com.myapp.domain.model.entity.MissionStatement
 import com.myapp.domain.model.entity.Report
@@ -10,7 +9,6 @@ import com.myapp.domain.model.value.HeartScore
 import com.myapp.domain.model.value.ReportDateTime
 import com.myapp.domain.usecase.MissionStatementUseCase
 import com.myapp.domain.usecase.ReportUseCase
-import com.nhaarman.mockito_kotlin.mock
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
@@ -74,27 +72,6 @@ class HomeViewModelTest {
         Dispatchers.setMain(coroutineDispatcher)
     }
 
-    private fun setMockObserver() {
-        val observerString = mock<Observer<String>>()
-        val observerInt = mock<Observer<Int>>()
-        val observerBoolean = mock<Observer<Boolean>>()
-        val observerReport = mock<Observer<List<Report>>>()
-        val observerHomeFragmentMainContainerType = mock<Observer<HomeFragmentMainContainerType<*>>>()
-        viewModel.factComment.observeForever(observerString)
-        viewModel.findComment.observeForever(observerString)
-        viewModel.learnComment.observeForever(observerString)
-        viewModel.statementComment.observeForever(observerString)
-        viewModel.assessmentInputImg.observeForever(observerInt)
-        viewModel.reasonComment.observeForever(observerString)
-        viewModel.improveComment.observeForever(observerString)
-        viewModel.report.observeForever(observerReport)
-        viewModel.mainContainerType.observeForever(observerHomeFragmentMainContainerType)
-        viewModel.missionStatement.observeForever(observerString)
-        viewModel.isFabVisibility.observeForever(observerBoolean)
-        viewModel.isReportListVisibility.observeForever(observerBoolean)
-        viewModel.isNotReportListVisibility.observeForever(observerBoolean)
-    }
-
     private fun setMissionStatement() {
         missionStatementUseCase = mockk<MissionStatementUseCase>().also {
             coEvery { it.getMissionStatement() } returns missionStatement
@@ -128,17 +105,13 @@ class HomeViewModelTest {
     // レポート入力可能時間以前の時間を返却
     private fun setNowTimeByBefore18() {
         mockkStatic(LocalDateTime::class)
-        every {
-            LocalDateTime.now()
-        } returns today.withHour(17)
+        every { LocalDateTime.now() } returns today.withHour(17)
     }
 
     // レポート入力可能時間以降の時間を返却
     private fun setNowTimeByAfter18() {
         mockkStatic(LocalDateTime::class)
-        every {
-            LocalDateTime.now()
-        } returns today.withHour(18)
+        every { LocalDateTime.now() } returns today.withHour(18)
     }
 
     @ExperimentalCoroutinesApi
@@ -148,196 +121,523 @@ class HomeViewModelTest {
         coroutineDispatcher.cleanupTestCoroutines()
     }
 
+    /**
+     * 実行結果比較
+     *
+     * @param state Stateの期待値
+     * @param effect Effectの期待値
+     */
+    @ExperimentalCoroutinesApi
+    private fun result(state: HomeContract.State, effect: HomeContract.Effect?) = testScope.runBlockingTest {
+        val resultState = viewModel.state.value
+        val resultEffect = viewModel.effect.value
+
+        // 比較
+        Assert.assertEquals(resultState, state)
+        if (resultEffect is HomeContract.Effect.ShowError) {
+            val resultMessage = resultEffect.throwable.message
+            val message = (effect as HomeContract.Effect.ShowError).throwable.message
+            Assert.assertEquals(resultMessage, message)
+        } else {
+            Assert.assertEquals(resultEffect, effect)
+        }
+    }
+
     // endregion
 
     // region 初期表示ロジック
+
     /**
      * 初期表示
      *
      * 条件：まだレポートが登録されていない
-     * 期待結果：メインコンテンツの表示タイプがレポート未設定
+     * 期待結果；
+     * ・画面の値
+     * 　　・メインコンテンツの表示タイプがレポート未設定
+     * 　　・レポートリストの表示制御値がfalse
+     * 　　・Fabの表示制御値がfalse
+     * 　　・レポートリスト未登録文言の表示制御値がtrue
+     * ・画面イベント
+     * 　　　ー
+     * ・業務ロジック
+     * 　　　ー
      */
     @ExperimentalCoroutinesApi
     @Test
     fun initByNotReport() = testScope.runBlockingTest {
+
+        // 期待結果
         setReportListByEmpty()
         setMissionStatementByNull()
         viewModel = HomeViewModel(reportUseCase, missionStatementUseCase)
-        setMockObserver()
-        val result = viewModel.mainContainerType.value is HomeFragmentMainContainerType.NotReport
-        Assert.assertEquals(true, result)
+        val expectationsEffect = null
+        val expectationsState = viewModel.state.value!!.copy(
+            isFabVisibility = false,
+            isReportListVisibility = false,
+            isNotReportListVisibility = true,
+            mainContainerType = HomeFragmentMainContainerType.NotReport,
+        )
+
+        // 比較
+        result(expectationsState, expectationsEffect)
     }
 
     /**
      * 初期表示
      *
-     * 条件：レポートが登録されているが昨日の分でかつ、時間が18:00より前でかつ、人生の目標が設定済み
-     * 期待結果：
-     * ・メインコンテンツの表示タイプが目標一覧
-     * ・人生の目標文言が設定されること
+     * 条件：レポートが登録されているが昨日の分でかつ、現在の時間が18:00より前でかつ、人生の目標が設定済み
+     * 期待結果；
+     * ・画面の値
+     * 　　・メインコンテンツの表示タイプが目標一覧
+     * 　　・レポートリストの表示制御値がtrue
+     * 　　・Fabの表示制御値がtrue
+     * 　　・レポートリスト未登録文言の表示制御値がfalse
+     * ・画面イベント
+     * 　　　ー
+     * ・業務ロジック
+     * 　　　ー
      */
     @ExperimentalCoroutinesApi
     @Test
     fun initByYesterdayReportAndMissionReport() = testScope.runBlockingTest {
+
+        // 期待結果
         setReportListByNotToday()
         setNowTimeByBefore18()
         setMissionStatement()
         viewModel = HomeViewModel(reportUseCase, missionStatementUseCase)
-        setMockObserver()
-        val result = viewModel.mainContainerType.value is HomeFragmentMainContainerType.Vision
-        Assert.assertEquals(true, result)
+
+        val expectationsEffect = null
+        val expectationsState = viewModel.state.value!!.copy(
+            isFabVisibility = true,
+            isReportListVisibility = true,
+            isNotReportListVisibility = false,
+            mainContainerType = HomeFragmentMainContainerType.Vision
+        )
+
+        // 比較
+        result(expectationsState, expectationsEffect)
     }
 
     /**
      * 初期表示
      *
-     * 条件：レポートが登録されているが昨日の分でかつ、時間が18:00より前でかつ、人生の目標が未設定
-     * 期待結果：
-     * ・メインコンテンツの表示タイプが目標一覧
-     * ・人生の目標文言が設定されないこと
+     * 条件：レポートが登録されているが昨日の分でかつ、現在の時間が18:00より後
+     * 期待結果；
+     * ・画面の値
+     * 　　・メインコンテンツの表示タイプがレポート入力
+     * 　　・レポートリストの表示制御値がtrue
+     * 　　・Fabの表示制御値がtrue
+     * 　　・レポートリスト未登録文言の表示制御値がfalse
+     * ・画面イベント
+     * 　　　ー
+     * ・業務ロジック
+     * 　　　ー
      */
+    @ExperimentalCoroutinesApi
     @Test
-    fun initByYesterdayReportAndNotMissionStatement() {
-        setNowTimeByBefore18()
-        setReportListByNotToday()
-        setMissionStatementByNull()
-        viewModel = HomeViewModel(reportUseCase, missionStatementUseCase)
-        setMockObserver()
-        val result = viewModel.mainContainerType.value is HomeFragmentMainContainerType.Vision
-        Assert.assertEquals(true, result)
-    }
+    fun initByYesterdayReportAndTimeAfter18() = testScope.runBlockingTest {
 
-    /**
-     * 初期表示
-     *
-     * 条件：レポートが登録されているが昨日の分でかつ、時間が18:00より後
-     * 期待結果：メインコンテンツの表示タイプが目標一覧
-     */
-    @Test
-    fun initByYesterdayReportAndTimeAfter18() {
+        // 期待結果
         setNowTimeByAfter18()
         setReportListByNotToday()
         setMissionStatementByNull()
         viewModel = HomeViewModel(reportUseCase, missionStatementUseCase)
-        setMockObserver()
-        val result = viewModel.mainContainerType.value is HomeFragmentMainContainerType.NotReport
-        Assert.assertEquals(true, result)
+        val expectationsEffect = null
+        val expectationsState = viewModel.state.value!!.copy(
+            isFabVisibility = true,
+            isReportListVisibility = true,
+            isNotReportListVisibility = false,
+            mainContainerType = HomeFragmentMainContainerType.NotReport
+        )
+
+        // 比較
+        result(expectationsState, expectationsEffect)
     }
 
     /**
      * 初期表示
      *
-     * 条件：レポートが今日の分で登録されていてかつ、時間が18:00より前
-     * 期待結果：メインコンテンツの表示タイプが目標一覧
+     * 条件：レポートが今日の分で登録されていてかつ、現在の時間が18:00より前
+     * 期待結果；
+     * ・画面の値
+     * 　　・メインコンテンツの表示タイプが目標一覧
+     * 　　・レポートリストの表示制御値がtrue
+     * 　　・Fabの表示制御値がtrue
+     * 　　・レポートリスト未登録文言の表示制御値がfalse
+     * ・画面イベント
+     * 　　　ー
+     * ・業務ロジック
+     * 　　　ー
      */
+    @ExperimentalCoroutinesApi
     @Test
-    fun initByReportAndBefore18() {
+    fun initByReportAndBefore18() = testScope.runBlockingTest {
+
+        // 期待結果
         setNowTimeByBefore18()
         setReportListByToday()
         setMissionStatementByNull()
         viewModel = HomeViewModel(reportUseCase, missionStatementUseCase)
-        setMockObserver()
-        val result = viewModel.mainContainerType.value is HomeFragmentMainContainerType.Vision
-        Assert.assertEquals(true, result)
+        val expectationsEffect = null
+        val expectationsState = viewModel.state.value!!.copy(
+            isFabVisibility = true,
+            isReportListVisibility = true,
+            isNotReportListVisibility = false,
+            mainContainerType = HomeFragmentMainContainerType.Vision
+        )
+
+        // 比較
+        result(expectationsState, expectationsEffect)
     }
 
     /**
      * 初期表示
      *
-     * 条件：レポートが今日の分で登録されていてかつ、時間が18:00より後
-     * 期待結果：メインコンテンツの表示タイプが今日のレポート
+     * 条件：レポートが今日の分で登録されていてかつ、現在の時間が18:00より後
+     * 期待結果；
+     * ・画面の値
+     * 　　・メインコンテンツの表示タイプがレポート入力
+     * 　　・レポートリストの表示制御値がtrue
+     * 　　・Fabの表示制御値がtrue
+     * 　　・レポートリスト未登録文言の表示制御値がfalse
+     * ・画面イベント
+     * 　　　ー
+     * ・業務ロジック
+     * 　　　ー
      */
+    @ExperimentalCoroutinesApi
     @Test
-    fun initByReportAndAfter18() {
+    fun initByReportAndAfter18() = testScope.runBlockingTest {
+
+        // 期待結果
         setNowTimeByAfter18()
         setReportListByToday()
         setMissionStatementByNull()
         viewModel = HomeViewModel(reportUseCase, missionStatementUseCase)
-        setMockObserver()
-        val result = viewModel.mainContainerType.value is HomeFragmentMainContainerType.Report
-        Assert.assertEquals(true, result)
+        val expectationsEffect = null
+        val expectationsState = viewModel.state.value!!.copy(
+            isFabVisibility = true,
+            isReportListVisibility = true,
+            isNotReportListVisibility = false,
+            mainContainerType = HomeFragmentMainContainerType.Report
+        )
+
+        // 比較
+        result(expectationsState, expectationsEffect)
     }
 
     // endregion
 
-    // region Fabボタンロジック
+    // region 振り返りボタンタップ
 
     /**
-     * 初期表示
+     * 振り返りボタンタップ
      *
-     * 条件：まだレポートが登録されていない
-     * 期待結果：
-     * ・fabボタンが表示されないこと
+     * 条件：なし
+     * 期待結果；
+     * ・画面の値
+     * 　　ー
+     * ・画面イベント
+     * 　　・振り返り画面遷移イベントが走ること
+     * ・業務ロジック
+     * 　　　ー
      */
     @ExperimentalCoroutinesApi
     @Test
-    fun fabByNotReport() = testScope.runBlockingTest {
-        setReportListByEmpty()
-        setMissionStatementByNull()
-        viewModel = HomeViewModel(reportUseCase, missionStatementUseCase)
-        setMockObserver()
-        Assert.assertEquals(false, viewModel.isFabVisibility.value)
-    }
+    fun onClickReportButton() = testScope.runBlockingTest {
 
-    /**
-     * 初期表示
-     *
-     * 条件：まだレポートが登録されていない
-     * 期待結果：
-     * ・fabボタンが表示されないこと
-     */
-    @ExperimentalCoroutinesApi
-    @Test
-    fun fabByReport() = testScope.runBlockingTest {
+        // 期待結果
         setReportListByNotToday()
         setNowTimeByBefore18()
         setMissionStatement()
         viewModel = HomeViewModel(reportUseCase, missionStatementUseCase)
-        setMockObserver()
-        Assert.assertEquals(true, viewModel.isFabVisibility.value)
+        val expectationsEffect = HomeContract.Effect.DiaryReportNavigation
+        val expectationsState = viewModel.state.value!!.copy()
+
+        // 実施
+        viewModel.setEvent(HomeContract.Event.OnClickReportButton)
+
+        // 比較
+        result(expectationsState, expectationsEffect)
     }
 
     // endregion
 
-    // region
+    // region Fabボタン押下
 
     /**
-     * 初期表示
+     * Fabボタン押下
      *
-     * 条件：まだレポートが登録されていない
+     * 条件：Fabを閉じる
      * 期待結果：
-     * ・レポートリストが表示されないこと
-     * ・レポートリスト未登録メッセージが表示されること
+     * ・画面の値
+     * 　　・Fab制御値がfalseになること
+     * ・画面イベント
+     * 　　・Fab制御イベントが引数:falseで走ること
+     * ・業務ロジック
+     * 　　　ー
      */
     @ExperimentalCoroutinesApi
     @Test
-    fun reportListByNotReport() = testScope.runBlockingTest {
-        setReportListByEmpty()
-        setMissionStatementByNull()
-        viewModel = HomeViewModel(reportUseCase, missionStatementUseCase)
-        setMockObserver()
-        Assert.assertEquals(false, viewModel.isReportListVisibility.value)
-        Assert.assertEquals(true, viewModel.isNotReportListVisibility.value)
-    }
+    fun onClickFabByFalse() = testScope.runBlockingTest {
 
-    /**
-     * 初期表示
-     *
-     * 条件：レポートが登録されている
-     * 期待結果：
-     * ・レポートリストが表示されること
-     * ・レポートリスト未登録メッセージが表示されないこと
-     */
-    @ExperimentalCoroutinesApi
-    @Test
-    fun reportListByReport() = testScope.runBlockingTest {
+        // 期待結果
         setReportListByNotToday()
         setNowTimeByBefore18()
         setMissionStatement()
         viewModel = HomeViewModel(reportUseCase, missionStatementUseCase)
-        setMockObserver()
-        Assert.assertEquals(true, viewModel.isReportListVisibility.value)
-        Assert.assertEquals(false, viewModel.isNotReportListVisibility.value)
+        val value = false
+        val expectationsEffect = HomeContract.Effect.ChangeFabEnable(value)
+        val expectationsState = viewModel.state.value!!.copy(isFabCheck = value)
+
+        // 実施
+        viewModel.setEvent(HomeContract.Event.OnClickFabButton)
+        viewModel.setEvent(HomeContract.Event.OnClickFabButton)
+
+        // 比較
+        result(expectationsState, expectationsEffect)
+    }
+
+    /**
+     * Fabボタン押下
+     *
+     * 条件：Fabを開く
+     * 期待結果：
+     * ・画面の値
+     * 　　・Fab制御値がfalseになること
+     * ・画面イベント
+     * 　　・Fab制御イベントが引数:falseで走ること
+     * ・業務ロジック
+     * 　　　ー
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun onClickFabByTrue() = testScope.runBlockingTest {
+
+        // 期待結果
+        setReportListByNotToday()
+        setNowTimeByBefore18()
+        setMissionStatement()
+        viewModel = HomeViewModel(reportUseCase, missionStatementUseCase)
+        val value = true
+        val expectationsEffect = HomeContract.Effect.ChangeFabEnable(value)
+        val expectationsState = viewModel.state.value!!.copy(isFabCheck = value)
+
+        // 実施
+        viewModel.setEvent(HomeContract.Event.OnClickFabButton)
+
+        // 比較
+        result(expectationsState, expectationsEffect)
+    }
+
+    // endregion
+
+    // region Fab_宣言ボタンタップ
+
+    /**
+     * Fab_格言ボタンタップ
+     *
+     * 条件：振り返りレポートあり
+     * 期待結果；
+     * ・画面の値
+     * 　　ー
+     * ・画面イベント
+     * 　　・宣言一覧画面遷移イベントが走ること
+     * ・業務ロジック
+     * 　　　ー
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun onClickFabLearnButton() = testScope.runBlockingTest {
+
+        // 期待結果
+        setReportListByNotToday()
+        setNowTimeByBefore18()
+        setMissionStatement()
+        viewModel = HomeViewModel(reportUseCase, missionStatementUseCase)
+        val value = viewModel.state.value!!.reportList
+        val expectationsEffect = HomeContract.Effect.LearnListNavigation(value)
+        val expectationsState = viewModel.state.value!!.copy()
+
+        // 実施
+        viewModel.setEvent(HomeContract.Event.OnClickFabLearnButton)
+
+        // 比較
+        result(expectationsState, expectationsEffect)
+    }
+
+    /**
+     * Fab_格言ボタンタップ
+     *
+     * 条件：振り返りレポートなし
+     * 期待結果；
+     * ・画面の値
+     * 　　ー
+     * ・画面イベント
+     * 　　・エラー処理イベントが走ること
+     * ・業務ロジック
+     * 　　　ー
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun onClickFabLearnButtonByEmptyReport() = testScope.runBlockingTest {
+
+        // 期待結果
+        setReportListByEmpty()
+        setNowTimeByBefore18()
+        setMissionStatement()
+        viewModel = HomeViewModel(reportUseCase, missionStatementUseCase)
+        val value = NullPointerException("レポートリストがありません")
+        val expectationsEffect = HomeContract.Effect.ShowError(value)
+        val expectationsState = viewModel.state.value!!.copy()
+
+        // 実施
+        viewModel.setEvent(HomeContract.Event.OnClickFabLearnButton)
+
+        // 比較
+        result(expectationsState, expectationsEffect)
+    }
+
+    // endregion
+
+    // region Fab_宣言ボタンタップ
+
+    /**
+     * Fab_宣言ボタンタップ
+     *
+     * 条件：振り返りレポートあり
+     * 期待結果；
+     * ・画面の値
+     * 　　ー
+     * ・画面イベント
+     * 　　・宣言一覧画面遷移イベントが走ること
+     * ・業務ロジック
+     * 　　　ー
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun onClickFabStatementButton() = testScope.runBlockingTest {
+
+        // 期待結果
+        setReportListByNotToday()
+        setNowTimeByBefore18()
+        setMissionStatement()
+        viewModel = HomeViewModel(reportUseCase, missionStatementUseCase)
+        val value = viewModel.state.value!!.reportList
+        val expectationsEffect = HomeContract.Effect.StatementListNavigation(value)
+        val expectationsState = viewModel.state.value!!.copy()
+
+        // 実施
+        viewModel.setEvent(HomeContract.Event.OnClickFabStatementButton)
+
+        // 比較
+        result(expectationsState, expectationsEffect)
+    }
+
+    /**
+     * Fab_宣言ボタンタップ
+     *
+     * 条件：振り返りレポートなし
+     * 期待結果；
+     * ・画面の値
+     * 　　ー
+     * ・画面イベント
+     * 　　・エラー処理イベントが走ること
+     * ・業務ロジック
+     * 　　　ー
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun onClickFabStatementButtonByEmptyReport() = testScope.runBlockingTest {
+
+        // 期待結果
+        setReportListByEmpty()
+        setNowTimeByBefore18()
+        setMissionStatement()
+        viewModel = HomeViewModel(reportUseCase, missionStatementUseCase)
+        val value = NullPointerException("レポートリストがありません")
+        val expectationsEffect = HomeContract.Effect.ShowError(value)
+        val expectationsState = viewModel.state.value!!.copy()
+
+        // 実施
+        viewModel.setEvent(HomeContract.Event.OnClickFabStatementButton)
+
+        // 比較
+        result(expectationsState, expectationsEffect)
+    }
+
+    // endregion
+
+
+    // region 振り返りカードタップ
+
+    /**
+     * 振り返りカードタップ
+     *
+     * 条件：なし
+     * 期待結果；
+     * ・画面の値
+     * 　　ー
+     * ・画面イベント
+     * 　　・Eventの引数で渡した値で振り返り詳細画面遷移イベントが走ること
+     * ・業務ロジック
+     * 　　　ー
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun onClickReportCard() = testScope.runBlockingTest {
+
+        // 期待結果
+        setReportListByNotToday()
+        setNowTimeByBefore18()
+        setMissionStatement()
+        viewModel = HomeViewModel(reportUseCase, missionStatementUseCase)
+        val value = reportByToday
+        val expectationsEffect = HomeContract.Effect.ReportDetailListNavigation(value)
+        val expectationsState = viewModel.state.value!!.copy()
+
+        // 実施
+        viewModel.setEvent(HomeContract.Event.OnClickReportCard(value))
+
+        // 比較
+        result(expectationsState, expectationsEffect)
+    }
+
+    // endregion
+
+    // region 画面破棄
+
+    /**
+     * 画面破棄
+     *
+     * 条件：なし
+     * 期待結果；
+     * ・画面の値
+     * 　　・Fab制御値がfalseになること
+     * ・画面イベント
+     * 　　・画面破棄イベントが走ること
+     * ・業務ロジック
+     * 　　　ー
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun onDestroyView() = testScope.runBlockingTest {
+
+        // 期待結果
+        setReportListByNotToday()
+        setNowTimeByBefore18()
+        setMissionStatement()
+        viewModel = HomeViewModel(reportUseCase, missionStatementUseCase)
+        val value = false
+        val expectationsEffect = HomeContract.Effect.OnDestroyView
+        val expectationsState = viewModel.state.value!!.copy(isFabCheck = value)
+
+        // 実施
+        viewModel.setEvent(HomeContract.Event.OnDestroyView)
+
+        // 比較
+        result(expectationsState, expectationsEffect)
     }
 
     // endregion

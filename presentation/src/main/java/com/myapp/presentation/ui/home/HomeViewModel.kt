@@ -1,15 +1,15 @@
 package com.myapp.presentation.ui.home
 
 import androidx.lifecycle.*
-import com.myapp.domain.model.entity.Report
 import com.myapp.domain.usecase.MissionStatementUseCase
 import com.myapp.domain.usecase.ReportUseCase
-import com.myapp.presentation.utils.img
-import com.myapp.presentation.utils.isToday
+import com.myapp.presentation.utils.base.BaseAacViewModel
+import com.myapp.presentation.utils.expansion.img
+import com.myapp.presentation.utils.expansion.isToday
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import javax.inject.Inject
-import kotlinx.coroutines.launch
 
 /**
  * ホーム画面　画面ロジック
@@ -18,92 +18,116 @@ import kotlinx.coroutines.launch
 class HomeViewModel @Inject constructor(
     private val reportUseCase: ReportUseCase,
     private val missionStatementUseCase: MissionStatementUseCase
-) : ViewModel() {
+) :
+    BaseAacViewModel<HomeContract.State, HomeContract.Effect, HomeContract.Event>() {
 
-    // 事実
-    private val _factComment = MutableLiveData("")
-    val factComment: LiveData<String> = _factComment
+    override fun initState(): HomeContract.State {
+        return HomeContract.State()
+    }
 
-    // 発見
-    private val _findComment = MutableLiveData("")
-    val findComment: LiveData<String> = _findComment
-
-    // 学び
-    private val _learnComment = MutableLiveData("")
-    val learnComment: LiveData<String> = _learnComment
-
-    // 宣言
-    private val _statementComment = MutableLiveData("")
-    val statementComment: LiveData<String> = _statementComment
-
-    // 評価
-    private val _assessmentInputInt = MutableLiveData<Int>()
-    val assessmentInputImg: LiveData<Int> = _assessmentInputInt
-
-    // 理由
-    private val _reasonComment = MutableLiveData("")
-    val reasonComment: LiveData<String> = _reasonComment
-
-    // 改善
-    private val _improveComment = MutableLiveData("")
-    val improveComment: LiveData<String> = _improveComment
-
-    // 過去の振り返りレポートリスト
-    private val _report = MutableLiveData<List<Report>>()
-    val report: LiveData<List<Report>> = _report
-
-    // メインコンテナの表示タイプ
-    private val _mainContainerType = MutableLiveData<HomeFragmentMainContainerType<Report>>()
-    val mainContainerType: LiveData<HomeFragmentMainContainerType<Report>> = _mainContainerType
-
-    // 人生の目的
-    private val _missionStatement = MutableLiveData("")
-    val missionStatement: LiveData<String> = _missionStatement
-
-    // Fabボタン表示非表示制御
-    private val _isFabVisibility = MediatorLiveData<Boolean>()
-    val isFabVisibility: LiveData<Boolean> = _isFabVisibility
-
-    // レポートリスト表示非表示制御
-    private val _isReportListVisibility = MediatorLiveData<Boolean>()
-    val isReportListVisibility: LiveData<Boolean> = _isReportListVisibility
-
-    // レポート未登録メッセージ表示非表示制御
-    private val _isNotReportListVisibility = MediatorLiveData<Boolean>()
-    val isNotReportListVisibility: LiveData<Boolean> = _isNotReportListVisibility
+    override fun handleEvents(event: HomeContract.Event) = when(event) {
+        is HomeContract.Event.OnClickFabButton -> changeFab()
+        is HomeContract.Event.OnClickFabLearnButton ->  navigateLearnList()
+        is HomeContract.Event.OnClickFabStatementButton -> navigateStatementList()
+        is HomeContract.Event.OnClickReportButton -> setEffect { HomeContract.Effect.DiaryReportNavigation }
+        is HomeContract.Event.OnClickReportCard -> setEffect { HomeContract.Effect.ReportDetailListNavigation(event.value) }
+        is HomeContract.Event.OnDestroyView -> onDestroyView()
+    }
 
     init {
-        _isFabVisibility.addSource(_report) { _isFabVisibility.value = _report.value?.isNotEmpty() }
-        _isReportListVisibility.addSource(_report) { _isReportListVisibility.value = _report.value?.isNotEmpty() }
-        _isNotReportListVisibility.addSource(_report) { _isNotReportListVisibility.value = _report.value?.isEmpty() }
-
         viewModelScope.launch {
             val reportList = reportUseCase.getAllReport()
-            _report.value = reportList
+            val isFabVisibility = reportList.isNotEmpty()
+            val isReportListVisibility = reportList.isNotEmpty()
+            val isNotReportListVisibility = reportList.isEmpty()
 
             if (reportList.isEmpty()) {
-                _mainContainerType.value = HomeFragmentMainContainerType.NotReport
+                val mainContainerType = HomeFragmentMainContainerType.NotReport
+                setState {
+                    copy(
+                    reportList = reportList,
+                    isFabVisibility = isFabVisibility,
+                    isReportListVisibility = isReportListVisibility,
+                    isNotReportListVisibility = isNotReportListVisibility,
+                    mainContainerType = mainContainerType
+                    )
+                }
                 return@launch
             }
             val report = reportList.last()
-            _factComment.value = report.ffsReport.factComment
-            _findComment.value = report.ffsReport.findComment
-            _learnComment.value = report.ffsReport.learnComment
-            _statementComment.value = report.ffsReport.statementComment
-            _assessmentInputInt.value = report.weatherReport.heartScore.img
-            _reasonComment.value = report.weatherReport.reasonComment
-            _improveComment.value = report.weatherReport.improveComment
-            if (LocalDateTime.now().hour < 18) {
-                _mainContainerType.value = HomeFragmentMainContainerType.Vision(report)
-                missionStatementUseCase.getMissionStatement()?.purposeLife?.let {
-                    _missionStatement.value = it
+            val factComment = report.ffsReport.factComment
+            val findComment = report.ffsReport.findComment
+            val learnComment = report.ffsReport.learnComment
+            val statementComment = report.ffsReport.statementComment
+            val assessmentImg = report.weatherReport.heartScore.img
+            val reasonComment = report.weatherReport.reasonComment
+            val improveComment = report.weatherReport.improveComment
+            val missionStatement = missionStatementUseCase.getMissionStatement()?.purposeLife ?: ""
+            val mainContainerType =
+                if (LocalDateTime.now().hour < 18) {
+                    HomeFragmentMainContainerType.Vision
+                } else if (!report.ffsReport.dataTime.date.isToday()) {
+                    HomeFragmentMainContainerType.NotReport
+                } else {
+                    HomeFragmentMainContainerType.Report
                 }
-            } else if (!report.ffsReport.dataTime.date.isToday()) {
-                _mainContainerType.value = HomeFragmentMainContainerType.NotReport
-                return@launch
-            } else {
-                _mainContainerType.value = HomeFragmentMainContainerType.Report(report)
+            setState {
+                copy(
+                    fact = factComment,
+                    find = findComment,
+                    learn = learnComment,
+                    statement = statementComment,
+                    assessmentImg = assessmentImg,
+                    reason = reasonComment,
+                    improve = improveComment,
+                    missionStatement = missionStatement,
+                    reportList = reportList,
+                    isFabVisibility = isFabVisibility,
+                    isReportListVisibility = isReportListVisibility,
+                    isNotReportListVisibility = isNotReportListVisibility,
+                    mainContainerType = mainContainerType
+                )
             }
         }
     }
+
+    // Fab表示切り替え
+    private fun changeFab() {
+        val enable = state.value?.isFabCheck ?: false
+        setState { copy(isFabCheck = !enable) }
+        setEffect { HomeContract.Effect.ChangeFabEnable(!enable) }
+    }
+
+    // 格言一覧画面へ遷移
+    private fun navigateLearnList() {
+        val reportList = state.value?.reportList ?:run {
+            setEffect { HomeContract.Effect.ShowError(NullPointerException("レポートリストがありません")) }
+            return
+        }
+        if (reportList.isEmpty()) {
+            setEffect { HomeContract.Effect.ShowError(NullPointerException("レポートリストがありません")) }
+            return
+        }
+        setEffect { HomeContract.Effect.LearnListNavigation(reportList) }
+    }
+
+    // 宣言詳細画面へ遷移
+    private fun navigateStatementList() {
+        val reportList = state.value?.reportList ?:run {
+            setEffect { HomeContract.Effect.ShowError(NullPointerException("レポートリストがありません")) }
+            return
+        }
+        if (reportList.isEmpty()) {
+            setEffect { HomeContract.Effect.ShowError(NullPointerException("レポートリストがありません")) }
+            return
+        }
+        setEffect { HomeContract.Effect.StatementListNavigation(reportList) }
+    }
+
+    // 画面破棄（初期化）処理
+    private fun onDestroyView() {
+        setState { copy(isFabCheck = false) }
+        setEffect { HomeContract.Effect.OnDestroyView }
+    }
 }
+

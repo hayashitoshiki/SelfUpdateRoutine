@@ -2,16 +2,7 @@
 <layout xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <data>
-
-        <import type="android.view.View" />
-
-        <import type="com.myapp.presentation.utils.Status" />
-
-        <variable
-            name="viewModel"
-            type="com.myapp.presentation.ui.mission_statement.MissionStatementListViewModel" />
-    </data>
+    <data/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -23,16 +14,15 @@
             android:layout_height="0dp"
             android:layout_marginBottom="8dp"
             android:orientation="vertical"
-            android:visibility="@{viewModel.status instanceof Status.Success? View.VISIBLE : View.INVISIBLE}"
-            app:layout_constraintBottom_toTopOf="@+id/btn_change"
+           app:layout_constraintBottom_toTopOf="@+id/btn_change"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/card_funeral"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{viewModel.isEnableFuneralList()? View.VISIBLE : View.GONE}"
                 app:cardElevation="8dp"
                 app:cardCornerRadius="10dp"
                 app:cardUseCompatPadding="true">
@@ -69,9 +59,9 @@
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/card_purpose"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{viewModel.isEnablePurposeLife()? View.VISIBLE : View.GONE}"
                 app:cardElevation="8dp"
                 app:cardCornerRadius="10dp"
                 app:cardUseCompatPadding="true">
@@ -100,7 +90,6 @@
                         android:layout_marginBottom="8dp"
                         android:layout_marginStart="8dp"
                         android:layout_marginEnd="8dp"
-                        android:text="@{viewModel.purposeLife}"
                         android:textColor="@color/text_color_dark_primary"
                         android:textSize="@dimen/title_text"
                         android:textStyle="bold|italic"
@@ -112,9 +101,9 @@
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/card_constitution"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{viewModel.isEnableConstitutionList()? View.VISIBLE : View.GONE}"
                 app:cardElevation="8dp"
                 app:cardCornerRadius="10dp"
                 app:cardUseCompatPadding="true">
@@ -156,7 +145,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/txt_no_mission_statement"
-            android:visibility="@{viewModel.status instanceof Status.Failure? View.VISIBLE : View.INVISIBLE}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

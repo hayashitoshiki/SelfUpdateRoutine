@@ -3,7 +3,7 @@ package com.myapp.presentation.ui.mission_statement
 import android.content.Context
 import com.myapp.presentation.R
 import com.myapp.presentation.databinding.ItemInputTextBinding
-import com.myapp.presentation.utils.BaseInputTextItem
+import com.myapp.presentation.utils.base.BaseInputTextItem
 
 /**
  * ミッションステートメント_理想の葬儀リストアイテム
@@ -21,8 +21,6 @@ class FuneralInputItem(
     ) {
         super.bind(binding, position)
         binding.edtInput.hint = context.getString(R.string.hint_funeral)
-        binding.btnPlus.setOnClickListener { viewModel.onClickPlusButton() }
-        binding.btnMinus.setOnClickListener { viewModel.onClickMinusButton() }
     }
 
     override fun getId(): Long = viewModel.id

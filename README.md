@@ -18,11 +18,13 @@ Kotlin
 全体  
 ・Clean Architecture  
 Presentation層  
-・MVVMベース(MVVMをベースにMVPとfluxの思想を一部取込) ＋ 一部疑似Flux  
+・（擬似）MVI ＋ 一部疑似Flux(Dispatcher)  
 <img src="https://github.com/hayashitoshiki/SelfUpdateRoutine/blob/master/picture/SelfUpdateRoutine_%E3%83%A2%E3%82%B8%E3%83%A5%E3%83%BC%E3%83%AB%E6%A7%8B%E6%88%90.png" width="400">　
 ### アーキテクチャ構成図
 <img src="https://github.com/hayashitoshiki/SelfUpdateRoutine/blob/master/picture/SelfUpdateRoutine_%E3%82%A2%E3%83%BC%E3%82%AD%E3%83%86%E3%82%AF%E3%83%81%E3%83%A3.png" >  
- 
+（擬似）MVIの詳細フロー  
+
+https://github.com/hayashitoshiki/ComposeSample/blob/master/README.md  
 
 ## 主な使用技術
  #### ネイティブ(ライブラリ)
@@ -34,6 +36,7 @@ Presentation層
 * Database
   * Room
 * UI
+  * Compose
   * LiveData
   * DataBinding
   * Navigation

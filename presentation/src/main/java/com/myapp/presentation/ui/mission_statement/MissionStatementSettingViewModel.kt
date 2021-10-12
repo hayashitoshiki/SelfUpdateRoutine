@@ -5,7 +5,7 @@ import com.myapp.domain.dto.MissionStatementInputDto
 import com.myapp.domain.model.entity.MissionStatement
 import com.myapp.domain.usecase.MissionStatementUseCase
 import com.myapp.presentation.R
-import com.myapp.presentation.utils.Status
+import com.myapp.presentation.utils.base.BaseAacViewModel
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -20,212 +20,207 @@ import kotlinx.coroutines.launch
 class MissionStatementSettingViewModel @AssistedInject constructor(
     @Assisted private val missionStatement: MissionStatement?,
     private val missionStatementUseCase: MissionStatementUseCase
-) : ViewModel() {
+) : BaseAacViewModel<MissionStatementSettingContract.State, MissionStatementSettingContract.Effect, MissionStatementSettingContract.Event>() {
 
-    // 更新ボタンステータス
-    private val _confirmStatus = MutableLiveData<Status<*>>()
-    val confirmStatus: LiveData<Status<*>> = _confirmStatus
+    override fun initState(): MissionStatementSettingContract.State {
+        return MissionStatementSettingContract.State()
+    }
 
-    // 確定ボタン
-    private val _isEnableConfirmButton = MediatorLiveData<Boolean>()
-    val isEnableConfirmButton: LiveData<Boolean> = _isEnableConfirmButton
-
-    // 理想の葬式
-    private var funeralListCount: Long = 0
-    private val _funeralList = MutableLiveData<MutableList<Pair<Long, String>>>()
-    val funeralList: LiveData<MutableList<Pair<Long, String>>> = _funeralList
-
-    // 変更前と変更後の人生の目的の変化の文字色
-    private val _funeralListDiffColor = MediatorLiveData<Int>()
-    val funeralListDiffColor: LiveData<Int> = _funeralListDiffColor
-
-    // 人生の目的
-    val purposeLife = MutableLiveData<String>()
-
-    // 変更前と変更後の人生の目的の変化の文字色
-    private val _purposeLifeDiffColor = MediatorLiveData<Int>()
-    val purposeLifeDiffColor: LiveData<Int> = _purposeLifeDiffColor
-
-    // 憲法
-    private var constitutionListCount: Long = 0
-    private val _constitutionList = MutableLiveData<MutableList<Pair<Long, String>>>()
-    val constitutionList: LiveData<MutableList<Pair<Long, String>>> = _constitutionList
-
-    // 変更前と変更後の憲法の変化の文字色
-    private val _constitutionListDiffColor = MediatorLiveData<Int>()
-    val constitutionListDiffColor: LiveData<Int> = _constitutionListDiffColor
+    override fun handleEvents(event: MissionStatementSettingContract.Event) = when(event) {
+        is MissionStatementSettingContract.Event.OnChangePurposeText -> changePurposeText(event.value)
+        is MissionStatementSettingContract.Event.OnClickChangeButton -> onClickConfirmButton()
+        is MissionStatementSettingContract.Event.OnDestroyView -> onDestroyView()
+    }
 
     init {
-        MissionStatementDispatcher.funeralText.onEach {
-            _funeralList.value?.also { funeralList ->
-                if (funeralList.size <= it.first) return@onEach
-                val value = funeralList[it.first]
-                funeralList[it.first] = Pair(value.first, it.second)
-                _funeralList.value = funeralList
-                changeButton()
+        var purposeLife = ""
+        var funeralListCount = 1L
+        var funeralList = mutableListOf(Pair(0L, ""))
+        var constitutionListCount = 1L
+        var constitutionList = mutableListOf(Pair(0L, ""))
+        missionStatement?.let {
+            purposeLife = it.purposeLife
+            funeralList = it.funeralList
+                .map { funeral -> Pair(funeralListCount++, funeral) }
+                .toMutableList()
+            constitutionList = it.constitutionList
+                .map { constitution -> Pair(constitutionListCount++, constitution) }
+                .toMutableList()
+        }
+        setState {
+            copy(
+                funeralListCount = funeralListCount,
+                funeralList = funeralList,
+                purposeLife = purposeLife,
+                constitutionListCount = constitutionListCount,
+                constitutionList= constitutionList
+            )
+        }
+
+        MissionStatementDispatcher.action.onEach {
+            when(it) {
+                is MissionStatementDispatcherContract.Action.AddConstitution -> addConstitution(it.index)
+                is MissionStatementDispatcherContract.Action.AddFuneral -> addFuneral(it.index)
+                is MissionStatementDispatcherContract.Action.ChangeConstitutionText -> changeConstitutionText(it.id, it.text)
+                is MissionStatementDispatcherContract.Action.ChangeFuneralText -> changeFuneralText(it.id, it.text)
+                is MissionStatementDispatcherContract.Action.DeleteConstitution -> deleteConstitution(it.index)
+                is MissionStatementDispatcherContract.Action.DeleteFuneral -> deleteFuneral(it.index)
             }
-        }
-            .launchIn(viewModelScope)
+        }.launchIn(viewModelScope)
+    }
 
-        MissionStatementDispatcher.funeralMinusButton.onEach {
-            val list = _funeralList.value ?: return@onEach
-            if (list.size <= it) return@onEach
-            list.removeAt(it)
-            _funeralList.value = list
-        }
-            .launchIn(viewModelScope)
+    private fun changePurposeText(text: String) {
+        setState { copy(purposeLife = text) }
+        changeButton()
+        onChangePurposeLifeTextColor(text)
+    }
 
-        MissionStatementDispatcher.funeralPlusButton.onEach {
-            val list = _funeralList.value ?: return@onEach
-            if (list.size < it) return@onEach
-            list.add(it, Pair(funeralListCount, ""))
-            funeralListCount++
-            _funeralList.value = list
+    private fun changeConstitutionText(id: Long, text: String){
+        state.value?.also { state ->
+            val constitutionList = state.constitutionList.toMutableList()
+            val index = constitutionList.indexOfFirst { it.first == id }
+            if (index == -1) return
+            constitutionList[index] = Pair(id, text)
+            setState { copy(constitutionList = constitutionList) }
+            changeButton()
+            onChangeConstitutionListTextColor(constitutionList)
         }
-            .launchIn(viewModelScope)
+    }
 
-        MissionStatementDispatcher.constitutionText.onEach {
-            _constitutionList.value?.also { constitutionList ->
-                if (constitutionList.size <= it.first) return@onEach
-                val value = constitutionList[it.first]
-                constitutionList[it.first] = Pair(value.first, it.second)
-                _constitutionList.value = constitutionList
-                changeButton()
-            }
+    private fun changeFuneralText(id: Long, text: String){
+        state.value?.also { state ->
+            val funeralList = state.funeralList.toMutableList()
+            val index = funeralList.indexOfFirst { it.first == id }
+            if (index == -1) return
+            funeralList[index] = Pair(id, text)
+            setState { copy(funeralList = funeralList) }
+            changeButton()
+            onChangeFuneralListTextColor(funeralList)
         }
-            .launchIn(viewModelScope)
+    }
 
-        MissionStatementDispatcher.constitutionMinusButton.onEach {
-            val list = _constitutionList.value ?: return@onEach
-            if (list.size <= it) return@onEach
-            list.removeAt(it)
-            _constitutionList.value = list
-        }
-            .launchIn(viewModelScope)
+    private fun addConstitution(index: Int) {
+        val state = state.value ?: return
+        val list = state.constitutionList.toMutableList()
+        if (list.size < index) return
+        list.add(index, Pair(state.constitutionListCount, ""))
+        setState { copy(constitutionListCount = state.constitutionListCount+ 1, constitutionList = list) }
+        changeButton()
+    }
 
-        MissionStatementDispatcher.constitutionPlusButton.onEach {
-            val list = _constitutionList.value ?: return@onEach
-            if (list.size < it) return@onEach
-            list.add(it, Pair(constitutionListCount, ""))
-            constitutionListCount++
-            _constitutionList.value = list
-        }
-            .launchIn(viewModelScope)
+    private fun addFuneral(index: Int) {
+        val state = state.value ?: return
+        val list = state.funeralList.toMutableList()
+        if (list.size < index) return
+        list.add(index, Pair(state.funeralListCount, ""))
+        setState { copy(funeralListCount = state.funeralListCount+ 1, funeralList = list) }
+        changeButton()
+    }
 
-        missionStatement?.also {
-            _funeralList.value = if (it.funeralList.isEmpty()) {
-                val value = mutableListOf(Pair(0L, ""))
-                funeralListCount++
-                value
-            } else {
-                it.funeralList.map { funeral ->
-                    val value = Pair(funeralListCount, funeral)
-                    funeralListCount++
-                    return@map value
-                }
-                    .toMutableList()
-            }
-            purposeLife.value = it.purposeLife
-            _constitutionList.value = if (it.constitutionList.isEmpty()) {
-                val value = mutableListOf(Pair(0L, ""))
-                funeralListCount++
-                value
-            } else {
-                it.constitutionList.map { constitution ->
-                    val value = Pair(constitutionListCount, constitution)
-                    constitutionListCount++
-                    return@map value
-                }
-                    .toMutableList()
-            }
-        } ?: run {
-            _funeralList.value = mutableListOf(Pair(0, ""))
-            purposeLife.value = ""
-            _constitutionList.value = mutableListOf(Pair(0, ""))
-            funeralListCount++
-            constitutionListCount++
-        }
+    private fun deleteFuneral(index: Int) {
+        val list = state.value?.funeralList?.toMutableList() ?: return
+        if (list.size <= index) return
+        list.removeAt(index)
+        setState { copy(funeralList = list) }
+        onChangeFuneralListTextColor(list)
+        changeButton()
+    }
 
-        _isEnableConfirmButton.addSource(_funeralList) { changeButton() }
-        _isEnableConfirmButton.addSource(purposeLife) { changeButton() }
-        _isEnableConfirmButton.addSource(_constitutionList) { changeButton() }
-        _purposeLifeDiffColor.addSource(purposeLife) { onChangePurposeLifeTextColor(it) }
-        _funeralListDiffColor.addSource(_funeralList) { onChangeFuneralListTextColor(it) }
-        _constitutionListDiffColor.addSource(_constitutionList) { onChangeConstitutionListTextColor(it) }
+    private fun deleteConstitution(index: Int) {
+        val list = state.value?.constitutionList?.toMutableList() ?: return
+        if (list.size <= index) return
+        list.removeAt(index)
+        setState { copy(constitutionList = list) }
+        onChangeConstitutionListTextColor(list)
+        changeButton()
     }
 
     // 人生の目的文字色変更
     private fun onChangePurposeLifeTextColor(data: String) {
-        _purposeLifeDiffColor.value =
+        val purposeLifeDiffColor =
             if ((missionStatement == null && data.isNotBlank()) || (missionStatement != null && missionStatement.purposeLife != data)) {
                 R.color.text_color_light_primary
             } else {
                 R.color.text_color_light_secondary
             }
+        setState { copy(purposeLifeDiffColor = purposeLifeDiffColor) }
     }
 
     // 理想の葬式文字色変更
     private fun onChangeFuneralListTextColor(data: MutableList<Pair<Long, String>>) {
-        val funeralList = data.map { it.second }
-            .filter { it.isNotBlank() }
-        _funeralListDiffColor.value =
+        val funeralList = data.map { it.second }.filter { it.isNotBlank() }
+        val funeralListDiffColor =
             if (((missionStatement == null || missionStatement.funeralList.isEmpty()) && funeralList.isEmpty()) || (missionStatement != null && missionStatement.funeralList == funeralList)) {
                 R.color.text_color_light_secondary
             } else {
                 R.color.text_color_light_primary
             }
+        setState { copy(funeralListDiffColor = funeralListDiffColor) }
     }
 
     // 憲法文字色変更
     private fun onChangeConstitutionListTextColor(data: MutableList<Pair<Long, String>>) {
         val constitutionList = data.map { it.second }
             .filter { it.isNotBlank() }
-        _constitutionListDiffColor.value =
+        val constitutionListDiffColor =
             if (((missionStatement == null || missionStatement.constitutionList.isEmpty()) && constitutionList.isEmpty()) || (missionStatement != null && missionStatement.constitutionList == constitutionList)) {
                 R.color.text_color_light_secondary
             } else {
                 R.color.text_color_light_primary
             }
+        setState { copy(constitutionListDiffColor = constitutionListDiffColor) }
     }
 
     // 確定ボタン
     fun onClickConfirmButton() {
-        val funeral = funeralList.value?.map { it.second }
+        val funeral = state.value?.funeralList
+            ?.map { it.second }
             ?.filter { it.isNotBlank() } ?: run {
-            _confirmStatus.value = Status.Failure(IllegalAccessError("理想の葬式データが入っていません"))
+            setEffect { MissionStatementSettingContract.Effect.ShowError(IllegalAccessError("理想の葬式データが入っていません")) }
+            return
+            }
+        val purposeLife = state.value?.purposeLife ?: run {
+            setEffect { MissionStatementSettingContract.Effect.ShowError(IllegalAccessError("人生の目的データが入っていません")) }
             return
         }
-        val purposeLife = purposeLife.value ?: run {
-            _confirmStatus.value = Status.Failure(IllegalAccessError("人生の目的データが入っていません"))
-            return
-        }
-        val constitutionList = constitutionList.value?.map { it.second }
+        val constitutionList = state.value?.constitutionList
+            ?.map { it.second }
             ?.filter { it.isNotBlank() } ?: run {
-            _confirmStatus.value = Status.Failure(IllegalAccessError("憲法データが入っていません"))
+            setEffect { MissionStatementSettingContract.Effect.ShowError(IllegalAccessError("憲法データが入っていません")) }
             return
-        }
+            }
         viewModelScope.launch {
             val dto = MissionStatementInputDto(funeral, purposeLife, constitutionList)
-            missionStatement?.let {
-                missionStatementUseCase.updateMissionStatement(it, dto)
-            } ?: run {
-                missionStatementUseCase.createMissionStatement(dto)
+            runCatching {
+                if (missionStatement != null) missionStatementUseCase.updateMissionStatement(missionStatement, dto)
+                else missionStatementUseCase.createMissionStatement(dto)
             }
-            _confirmStatus.value = Status.Success(missionStatement)
-            MissionStatementDispatcher.updateMissionStatement()
+                .onSuccess {
+                    setEffect { MissionStatementSettingContract.Effect.NavigateMissionStatementSetting }
+                    MissionStatementDispatcher.setActions(MissionStatementDispatcherContract.Action.Update)
+                }
+                .onFailure { setEffect { MissionStatementSettingContract.Effect.ShowError(it) } }
         }
     }
 
     // 登録/更新ボタン活性・非活性変更
     private fun changeButton() {
-        val purposeLife = purposeLife.value ?: return
-        val funeralList = _funeralList.value?.map { it.second }
+        val purposeLife = state.value?.purposeLife ?: return
+        val funeralList = state.value?.funeralList
+            ?.map { it.second }
             ?.filter { it.isNotBlank() } ?: return
-        val constitutionList = _constitutionList.value?.map { it.second }
+        val constitutionList = state.value?.constitutionList
+            ?.map { it.second }
             ?.filter { it.isNotBlank() } ?: return
+        val isEnableConfirmButton =
+            (purposeLife.isNotBlank() || funeralList.isNotEmpty() || constitutionList.isNotEmpty())
+                    && (missionStatement == null || (purposeLife != missionStatement.purposeLife || funeralList != missionStatement.funeralList || constitutionList != missionStatement.constitutionList))
+        setState { copy(isEnableConfirmButton = isEnableConfirmButton) }
+    }
 
-        _isEnableConfirmButton.value =
-            (purposeLife.isNotBlank() || funeralList.isNotEmpty() || constitutionList.isNotEmpty()) && (missionStatement == null || (purposeLife != missionStatement.purposeLife || funeralList != missionStatement.funeralList || constitutionList != missionStatement.constitutionList))
+    private fun onDestroyView() {
+        cashState = null
+        setEffect{ MissionStatementSettingContract.Effect.OnDestroyView }
     }
 
     @AssistedFactory
@@ -244,4 +239,6 @@ class MissionStatementSettingViewModel @AssistedInject constructor(
             }
         }
     }
+
 }
+

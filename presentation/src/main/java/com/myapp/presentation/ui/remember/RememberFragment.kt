@@ -9,16 +9,16 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.myapp.presentation.R
 import com.myapp.presentation.databinding.FragmentRemenberBinding
-import com.myapp.presentation.utils.BaseFragment
+import com.myapp.presentation.utils.base.BaseAacFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 /**
- * 設定画面
+ * 過去の振り返り詳細画面
+ *
  */
 @AndroidEntryPoint
-class RememberFragment : BaseFragment() {
+class RememberFragment : BaseAacFragment<RememberContract.State, RememberContract.Effect, RememberContract.Event>() {
 
     private var _binding: FragmentRemenberBinding? = null
     private val binding get() = _binding!!
@@ -27,7 +27,7 @@ class RememberFragment : BaseFragment() {
 
     @Inject
     lateinit var viewModelFactory: RememberViewModel.Factory
-    private val viewModel: RememberViewModel by viewModels {
+    override val viewModel: RememberViewModel by viewModels {
         RememberViewModel.provideFactory(viewModelFactory, args.report)
     }
 
@@ -42,16 +42,14 @@ class RememberFragment : BaseFragment() {
         return binding.root
     }
 
-    @ExperimentalCoroutinesApi
-    override fun onViewCreated(
-        view: View,
-        savedInstanceState: Bundle?
-    ) {
-        super.onViewCreated(view, savedInstanceState)
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
+
+    override fun setEvent() { }
+
+    override fun setEffect(effect: RememberContract.Effect) {}
+
+    override fun changedState(state: RememberContract.State) {}
 }

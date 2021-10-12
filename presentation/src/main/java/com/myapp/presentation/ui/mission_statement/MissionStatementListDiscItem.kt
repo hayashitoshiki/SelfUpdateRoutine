@@ -5,7 +5,7 @@ import android.graphics.Typeface
 import android.util.TypedValue
 import com.myapp.presentation.R
 import com.myapp.presentation.databinding.ItemDiscBinding
-import com.myapp.presentation.utils.DiscItem
+import com.myapp.presentation.utils.base.DiscItem
 
 /**
  * 「・」から始まる文字列リストアイテム(ミッションステートメント一覧画面用)

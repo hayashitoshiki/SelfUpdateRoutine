@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.myapp.presentation.databinding.FragmentReportDetailListBaseBinding
-import com.myapp.presentation.utils.BaseFragment
+import com.myapp.presentation.utils.base.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 /**

@@ -13,17 +13,16 @@ import com.myapp.data.local.database.entity.mission_statement.FuneralEntity
 import com.myapp.data.local.database.entity.mission_statement.PurposeLifeEntity
 import com.myapp.data.local.database.entity.report.FfsReportEntity
 import com.myapp.data.local.database.entity.report.WeatherReportEntity
-import java.io.IOException
-import java.time.LocalDateTime
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.core.context.stopKoin
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import java.io.IOException
+import java.time.LocalDateTime
 
 /**
  * ROOM　CRUDテスト
@@ -55,7 +54,6 @@ class AppDatabaseTest {
     @After
     @Throws(IOException::class)
     fun tearDown() {
-        stopKoin()
         db.close()
     }
 

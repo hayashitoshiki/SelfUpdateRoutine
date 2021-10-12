@@ -1,21 +1,16 @@
 package com.myapp.presentation.ui.mission_statement
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.Observer
 import com.myapp.domain.model.entity.MissionStatement
 import com.myapp.domain.usecase.MissionStatementUseCase
-import com.nhaarman.mockito_kotlin.mock
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.*
-import org.junit.After
+import org.junit.*
 import org.junit.Assert.assertEquals
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
 import org.junit.rules.TestRule
 
 /**
@@ -37,6 +32,7 @@ class MissionStatementListViewModelTest {
 
     private lateinit var viewModel: MissionStatementListViewModel
     private lateinit var missionStatementUseCase: MissionStatementUseCase
+    private val state = MissionStatementListContract.State()
 
     // region test date
 
@@ -59,17 +55,6 @@ class MissionStatementListViewModelTest {
         }
     }
 
-    private fun setMockObserver() {
-        val observerString = mock<Observer<String>>()
-        val observerStringList = mock<Observer<List<String>>>()
-        val observerBoolean = mock<Observer<Boolean>>()
-        viewModel.funeralList.observeForever(observerStringList)
-        viewModel.purposeLife.observeForever(observerString)
-        viewModel.isEnableFuneralList.observeForever(observerBoolean)
-        viewModel.isEnablePurposeLife.observeForever(observerBoolean)
-        viewModel.isEnableConstitutionList.observeForever(observerBoolean)
-    }
-
     @ExperimentalCoroutinesApi
     @After
     fun tearDown() {
@@ -77,161 +62,528 @@ class MissionStatementListViewModelTest {
     }
 
     /**
-     * 初期表示動作
+     * 実行結果比較
      *
-     * 条件：ミッションステートメントが登録されている
+     * @param state Stateの期待値
+     * @param effect Effectの期待値
+     */
+    @ExperimentalCoroutinesApi
+    private fun result(
+        state: MissionStatementListContract.State,
+        effect: MissionStatementListContract.Effect?
+    ) = testScope.runBlockingTest {
+        val resultState = viewModel.state.value
+        val resultEffect = viewModel.effect.value
+
+        // 比較
+        assertEquals(resultState, state)
+        assertEquals(resultEffect, effect)
+    }
+
+    // region 表示制御
+
+    /**
+     * 初期表示
      *
-     * 期待結果
-     * 各値に下記のデータが格納されること
-     * ・funeralList     ：理想の葬儀リスト
-     * ・missionStatement：人生の目的
-     * ・constitutionLis ：憲法リスト
+     * 条件：ミッションステートメントの全項目が登録されている
+     * 期待結果；
+     * ・画面の値
+     * 　・理想の葬式リスト：取得した理想の葬儀リスト
+     * 　・理想の葬式カード：活性状態
+     * 　・人生の目的　　　：取得した人生の目的
+     * 　・人生の目的カード：活性状態
+     * 　・憲法リスト　　　：取得した憲法リスト
+     * 　・憲法カード　　　：活性状態
+     * ・画面イベント
+     * 　　ー
+     * ・共通処理イベント
+     * 　　ー
+     * ・業務ロジック
+     * 　ー
      */
     @ExperimentalCoroutinesApi
     @Test
     fun initByMissionStatement() = testScope.runBlockingTest {
+
+        // 期待結果
+        val expectationsEffect = null
+        val expectationsState = state.copy(
+            missionStatement = missionStatement,
+            funeralList = missionStatement.funeralList,
+            isEnableFuneralList = true,
+            purposeLife = missionStatement.purposeLife,
+            isEnablePurposeLife = true,
+            constitutionList = missionStatement.constitutionList,
+            isEnableConstitutionList = true
+        )
+
+        //実施
         viewModel = MissionStatementListViewModel(missionStatementUseCase)
-        setMockObserver()
-        assertEquals(missionStatement.funeralList, viewModel.funeralList.value)
-        assertEquals(missionStatement.purposeLife, viewModel.purposeLife.value)
-        assertEquals(missionStatement.constitutionList, viewModel.constitutionList.value)
+
+        // 比較
+        result(expectationsState, expectationsEffect)
     }
 
     /**
-     * 初期表示動作
+     * 初期表示
      *
      * 条件：ミッションステートメントがまだ登録されていない
-     *
-     * 期待結果
-     * 各値に下記のデータが格納されること
-     * ・funeralList     ：空のリスト
-     * ・missionStatement：空
-     * ・constitutionLis ：空のリスト
+     * 期待結果；
+     * ・画面の値
+     * 　・理想の葬式リスト：空
+     * 　・理想の葬式カード：非活性状態
+     * 　・人生の目的　　　：空
+     * 　・人生の目的カード：非活性状態
+     * 　・憲法リスト　　　：空
+     * 　・憲法カード　　　：非活性状態
+     * ・画面イベント
+     * 　　ー
+     * ・共通処理イベント
+     * 　　ー
+     * ・業務ロジック
+     * 　ー
      */
     @ExperimentalCoroutinesApi
     @Test
     fun initByNotMissionStatement() = testScope.runBlockingTest {
+
+        // 期待結果
+        val expectationsEffect = null
+        val expectationsState = state.copy(
+            missionStatement = null,
+            funeralList = listOf(),
+            isEnableFuneralList = false,
+            purposeLife = "",
+            isEnablePurposeLife = false,
+            constitutionList = listOf(),
+            isEnableConstitutionList = false
+        )
+
+        //実施
         missionStatementUseCase = mockk<MissionStatementUseCase>().also {
             coEvery { it.getMissionStatement() } returns null
         }
         viewModel = MissionStatementListViewModel(missionStatementUseCase)
-        setMockObserver()
-        assertEquals(listOf<String>(), viewModel.funeralList.value)
-        assertEquals("", viewModel.purposeLife.value)
-        assertEquals(listOf<String>(), viewModel.constitutionList.value)
+
+        // 比較
+        result(expectationsState, expectationsEffect)
     }
 
     /**
-     * ミッションステートメント更新
+     * 初期表示
      *
-     * 条件：ミッションステートメント編集画面でミッションステートメントが更新されること
-     *
-     * 期待結果
-     * ミッションステートメント取得処理が走ること
+     * 条件：理想の葬式データのみ登録済み
+     * 期待結果；
+     * ・画面の値
+     * 　・理想の葬式リスト：取得した理想の葬式リスト
+     * 　・理想の葬式カード：活性状態
+     * 　・人生の目的　　　：空
+     * 　・人生の目的カード：非活性状態
+     * 　・憲法リスト　　　：空
+     * 　・憲法カード　　　：非活性状態
+     * ・画面イベント
+     * 　　ー
+     * ・共通処理イベント
+     * 　　ー
+     * ・業務ロジック
+     * 　ー
      */
     @ExperimentalCoroutinesApi
     @Test
-    fun updateMissionStatement() = testScope.runBlockingTest {
-        missionStatementUseCase = mockk<MissionStatementUseCase>().also {
-            coEvery { it.getMissionStatement() } returns null
-        }
-        viewModel = MissionStatementListViewModel(missionStatementUseCase)
-        setMockObserver()
-        coVerify(exactly = 1) { (missionStatementUseCase).getMissionStatement() }
-        MissionStatementDispatcher.updateMissionStatement()
-        coVerify(exactly = 2) { (missionStatementUseCase).getMissionStatement() }
-    }
+    fun idEnableFuneralListOnlyTrue() = testScope.runBlockingTest {
 
-    // region　表示制御
+        // 期待結果
+        val expectationsEffect = null
+        val expectationsState = state.copy(
+            missionStatement = missionStatementOnlyFuneralList,
+            funeralList = missionStatementOnlyFuneralList.funeralList,
+            isEnableFuneralList = true,
+            purposeLife = "",
+            isEnablePurposeLife = false,
+            constitutionList = listOf(),
+            isEnableConstitutionList = false
+        )
 
-    /**
-     * ミッションステータス全項目登録済み
-     *
-     * 条件：人生の目的データが存在すること
-     * 期待結果：人生の目的Flgがtrueであること
-     */
-    @Test
-    fun idEnableAllTrue() {
-        missionStatementUseCase = mockk<MissionStatementUseCase>().also {
-            coEvery { it.getMissionStatement() } returns missionStatement
-        }
-        viewModel = MissionStatementListViewModel(missionStatementUseCase)
-        setMockObserver()
-        assertEquals(true, viewModel.isEnableFuneralList.value)
-        assertEquals(true, viewModel.isEnablePurposeLife.value)
-        assertEquals(true, viewModel.isEnableConstitutionList.value)
-    }
-
-    /**
-     * ミッションステータス未登録
-     *
-     * 条件：人生の目的データが存在すること
-     * 期待結果：人生の目的Flgがtrueであること
-     */
-    @Test
-    fun idEnableAllFalse() {
-        missionStatementUseCase = mockk<MissionStatementUseCase>().also {
-            coEvery { it.getMissionStatement() } returns null
-        }
-        viewModel = MissionStatementListViewModel(missionStatementUseCase)
-        setMockObserver()
-        assertEquals(false, viewModel.isEnableFuneralList.value)
-        assertEquals(false, viewModel.isEnablePurposeLife.value)
-        assertEquals(false, viewModel.isEnableConstitutionList.value)
-    }
-
-    /**
-     * ミッションステータス_理想の葬儀のみ登録済み
-     *
-     * 条件：人生の目的データが存在すること
-     * 期待結果：人生の目的Flgがtrueであること
-     */
-    @Test
-    fun idEnableFuneralListOnlyTrue() {
+        //実施
         missionStatementUseCase = mockk<MissionStatementUseCase>().also {
             coEvery { it.getMissionStatement() } returns missionStatementOnlyFuneralList
         }
         viewModel = MissionStatementListViewModel(missionStatementUseCase)
-        setMockObserver()
-        assertEquals(true, viewModel.isEnableFuneralList.value)
-        assertEquals(false, viewModel.isEnablePurposeLife.value)
-        assertEquals(false, viewModel.isEnableConstitutionList.value)
+
+        // 比較
+        result(expectationsState, expectationsEffect)
     }
 
     /**
-     * ミッションステータス_人生の目的のみ登録済み
+     * 初期表示
      *
-     * 条件：人生の目的データが存在すること
-     * 期待結果：人生の目的Flgがtrueであること
+     * 条件：人生の目的データのみ登録済み
+     * 期待結果；
+     * ・画面の値
+     * 　・理想の葬式リスト：空
+     * 　・理想の葬式カード：非活性状態
+     * 　・人生の目的　　　：取得した人生の目的
+     * 　・人生の目的カード：活性状態
+     * 　・憲法リスト　　　：空
+     * 　・憲法カード　　　：非活性状態
+     * ・画面イベント
+     * 　　ー
+     * ・共通処理イベント
+     * 　　ー
+     * ・業務ロジック
+     * 　ー
      */
+    @ExperimentalCoroutinesApi
     @Test
-    fun idEnablePurposeLifeOnlyTrue() {
+    fun idEnablePurposeLifeOnlyTrue() = testScope.runBlockingTest {
+
+        // 期待結果
+        val expectationsEffect = null
+        val expectationsState = state.copy(
+            missionStatement = missionStatementOnlyPurposeLife,
+            funeralList = listOf(),
+            isEnableFuneralList = false,
+            purposeLife = missionStatementOnlyPurposeLife.purposeLife,
+            isEnablePurposeLife = true,
+            constitutionList = listOf(),
+            isEnableConstitutionList = false
+        )
+
+        //実施
         missionStatementUseCase = mockk<MissionStatementUseCase>().also {
             coEvery { it.getMissionStatement() } returns missionStatementOnlyPurposeLife
         }
         viewModel = MissionStatementListViewModel(missionStatementUseCase)
-        setMockObserver()
-        assertEquals(false, viewModel.isEnableFuneralList.value)
-        assertEquals(true, viewModel.isEnablePurposeLife.value)
-        assertEquals(false, viewModel.isEnableConstitutionList.value)
+
+        // 比較
+        result(expectationsState, expectationsEffect)
     }
 
     /**
-     * ミッションステータス_憲法のみ登録済み
+     * 初期表示
      *
-     * 条件：人生の目的データが存在すること
-     * 期待結果：人生の目的Flgがtrueであること
+     * 条件：憲法データのみ登録済み
+     * 期待結果；
+     * ・画面の値
+     * 　・理想の葬式リスト：空
+     * 　・理想の葬式カード：非活性状態
+     * 　・人生の目的　　　：空
+     * 　・人生の目的カード：非活性状態
+     * 　・憲法リスト　　　：取得した憲法リスト
+     * 　・憲法カード　　　：活性状態
+     * ・画面イベント
+     * 　　ー
+     * ・共通処理イベント
+     * 　　ー
+     * ・業務ロジック
+     * 　ー
      */
+    @ExperimentalCoroutinesApi
     @Test
-    fun idEnableConstitutionListOnlyTrue() {
+    fun idEnableConstitutionListOnlyTrue() = testScope.runBlockingTest {
+
+        // 期待結果
+        val expectationsEffect = null
+        val expectationsState = state.copy(
+            missionStatement = missionStatementOnlyConstitutionList,
+            funeralList = listOf(),
+            isEnableFuneralList = false,
+            purposeLife = "",
+            isEnablePurposeLife = false,
+            constitutionList = missionStatementOnlyConstitutionList.constitutionList,
+            isEnableConstitutionList = true
+        )
+
+        //実施
         missionStatementUseCase = mockk<MissionStatementUseCase>().also {
             coEvery { it.getMissionStatement() } returns missionStatementOnlyConstitutionList
         }
         viewModel = MissionStatementListViewModel(missionStatementUseCase)
-        setMockObserver()
-        assertEquals(false, viewModel.isEnableFuneralList.value)
-        assertEquals(false, viewModel.isEnablePurposeLife.value)
-        assertEquals(true, viewModel.isEnableConstitutionList.value)
+
+        // 比較
+        result(expectationsState, expectationsEffect)
+    }
+
+    // endregion
+
+    // region 画面共有アクション
+
+    /**
+     * 画面共有アクション
+     *
+     * 条件：更新アクション発火
+     * 期待結果；
+     * ・画面の値
+     * 　・理想の葬式リスト：更新後の理想の葬式リスト
+     * 　・理想の葬式カード：活性状態
+     * 　・人生の目的　　　：更新後の人生の目的
+     * 　・人生の目的カード：活性状態
+     * 　・憲法リスト　　　：更新後の憲法リスト
+     * 　・憲法カード　　　：活性状態
+     * ・画面イベント
+     * 　　ー
+     * ・共通処理イベント
+     * 　　ー
+     * ・業務ロジック
+     * 　ミッションステートメント取得処理が走ること（初期表示と合計２回走ること）
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun actionByUpdate() = testScope.runBlockingTest {
+
+        // 期待結果
+        val expectationsEffect = null
+        val expectationsState = state.copy(
+            missionStatement = missionStatement,
+            funeralList = missionStatement.funeralList,
+            isEnableFuneralList = true,
+            purposeLife = missionStatement.purposeLife,
+            isEnablePurposeLife = true,
+            constitutionList = missionStatement.constitutionList,
+            isEnableConstitutionList = true
+        )
+
+        //実施
+        viewModel = MissionStatementListViewModel(missionStatementUseCase)
+        MissionStatementDispatcher.setActions(MissionStatementDispatcherContract.Action.Update)
+
+        // 比較
+        result(expectationsState, expectationsEffect)
+        coVerify(exactly = 2) { (missionStatementUseCase).getMissionStatement() }
+    }
+
+    /**
+     * 画面共有アクション
+     *
+     * 条件：理想の葬式テキスト変更アクション発火
+     * 期待結果；
+     * ・画面の値
+     * 　ー
+     * ・画面イベント
+     * 　　ー
+     * ・共通処理イベント
+     * 　　ー
+     * ・業務ロジック
+     * 　ミッションステートメント取得処理が走らないこと（初期表示の１回のみ走ること）
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun actionByChangeFuneralText() = testScope.runBlockingTest {
+
+        // 期待結果
+        val expectationsEffect = null
+        val expectationsState = state.copy(
+            missionStatement = missionStatement,
+            funeralList = missionStatement.funeralList,
+            isEnableFuneralList = true,
+            purposeLife = missionStatement.purposeLife,
+            isEnablePurposeLife = true,
+            constitutionList = missionStatement.constitutionList,
+            isEnableConstitutionList = true
+        )
+
+        //実施
+        viewModel = MissionStatementListViewModel(missionStatementUseCase)
+        MissionStatementDispatcher.setActions(MissionStatementDispatcherContract.Action.ChangeFuneralText(1,"test"))
+
+        // 比較
+        result(expectationsState, expectationsEffect)
+        coVerify(exactly = 1) { (missionStatementUseCase).getMissionStatement() }
+    }
+
+    /**
+     * 画面共有アクション
+     *
+     * 条件：理想の葬式リスト追加発火
+     * 期待結果；
+     * ・画面の値
+     * 　ー
+     * ・画面イベント
+     * 　　ー
+     * ・共通処理イベント
+     * 　　ー
+     * ・業務ロジック
+     * 　ミッションステートメント取得処理が走らないこと（初期表示の１回のみ走ること）
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun actionByAddFuneral() = testScope.runBlockingTest {
+
+        // 期待結果
+        val expectationsEffect = null
+        val expectationsState = state.copy(
+            missionStatement = missionStatement,
+            funeralList = missionStatement.funeralList,
+            isEnableFuneralList = true,
+            purposeLife = missionStatement.purposeLife,
+            isEnablePurposeLife = true,
+            constitutionList = missionStatement.constitutionList,
+            isEnableConstitutionList = true
+        )
+
+        //実施
+        viewModel = MissionStatementListViewModel(missionStatementUseCase)
+        MissionStatementDispatcher.setActions(MissionStatementDispatcherContract.Action.AddFuneral(2))
+
+        // 比較
+        result(expectationsState, expectationsEffect)
+        coVerify(exactly = 1) { (missionStatementUseCase).getMissionStatement() }
+    }
+
+    /**
+     * 画面共有アクション
+     *
+     * 条件：理想の葬式リスト削除発火
+     * 期待結果；
+     * ・画面の値
+     * 　ー
+     * ・画面イベント
+     * 　　ー
+     * ・共通処理イベント
+     * 　　ー
+     * ・業務ロジック
+     * 　ミッションステートメント取得処理が走らないこと（初期表示の１回のみ走ること）
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun actionByDeleteFuneral() = testScope.runBlockingTest {
+
+        // 期待結果
+        val expectationsEffect = null
+        val expectationsState = state.copy(
+            missionStatement = missionStatement,
+            funeralList = missionStatement.funeralList,
+            isEnableFuneralList = true,
+            purposeLife = missionStatement.purposeLife,
+            isEnablePurposeLife = true,
+            constitutionList = missionStatement.constitutionList,
+            isEnableConstitutionList = true
+        )
+
+        //実施
+        viewModel = MissionStatementListViewModel(missionStatementUseCase)
+        MissionStatementDispatcher.setActions(MissionStatementDispatcherContract.Action.DeleteFuneral(2))
+
+        // 比較
+        result(expectationsState, expectationsEffect)
+        coVerify(exactly = 1) { (missionStatementUseCase).getMissionStatement() }
+    }
+
+    /**
+     * 画面共有アクション
+     *
+     * 条件：憲法テキスト変更アクション発火
+     * 期待結果；
+     * ・画面の値
+     * 　ー
+     * ・画面イベント
+     * 　　ー
+     * ・共通処理イベント
+     * 　　ー
+     * ・業務ロジック
+     * 　ミッションステートメント取得処理が走らないこと（初期表示の１回のみ走ること）
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun actionByChangeConstitutionText() = testScope.runBlockingTest {
+
+        // 期待結果
+        val expectationsEffect = null
+        val expectationsState = state.copy(
+            missionStatement = missionStatement,
+            funeralList = missionStatement.funeralList,
+            isEnableFuneralList = true,
+            purposeLife = missionStatement.purposeLife,
+            isEnablePurposeLife = true,
+            constitutionList = missionStatement.constitutionList,
+            isEnableConstitutionList = true
+        )
+
+        //実施
+        viewModel = MissionStatementListViewModel(missionStatementUseCase)
+        MissionStatementDispatcher.setActions(MissionStatementDispatcherContract.Action.ChangeConstitutionText(1,"test"))
+
+        // 比較
+        result(expectationsState, expectationsEffect)
+        coVerify(exactly = 1) { (missionStatementUseCase).getMissionStatement() }
+    }
+
+    /**
+     * 画面共有アクション
+     *
+     * 条件：憲法リスト追加アクション発火
+     * 期待結果；
+     * ・画面の値
+     * 　ー
+     * ・画面イベント
+     * 　　ー
+     * ・共通処理イベント
+     * 　　ー
+     * ・業務ロジック
+     * 　ミッションステートメント取得処理が走らないこと（初期表示の１回のみ走ること）
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun actionByAddConstitution() = testScope.runBlockingTest {
+
+        // 期待結果
+        val expectationsEffect = null
+        val expectationsState = state.copy(
+            missionStatement = missionStatement,
+            funeralList = missionStatement.funeralList,
+            isEnableFuneralList = true,
+            purposeLife = missionStatement.purposeLife,
+            isEnablePurposeLife = true,
+            constitutionList = missionStatement.constitutionList,
+            isEnableConstitutionList = true
+        )
+
+        //実施
+        viewModel = MissionStatementListViewModel(missionStatementUseCase)
+        MissionStatementDispatcher.setActions(MissionStatementDispatcherContract.Action.AddConstitution(2))
+
+        // 比較
+        result(expectationsState, expectationsEffect)
+        coVerify(exactly = 1) { (missionStatementUseCase).getMissionStatement() }
+    }
+
+    /**
+     * 画面共有アクション
+     *
+     * 条件：理想の葬式リスト削除発火
+     * 期待結果；
+     * ・画面の値
+     * 　ー
+     * ・画面イベント
+     * 　　ー
+     * ・共通処理イベント
+     * 　　ー
+     * ・業務ロジック
+     * 　ミッションステートメント取得処理が走らないこと（初期表示の１回のみ走ること）
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun actionByDeleteConstitution() = testScope.runBlockingTest {
+
+        // 期待結果
+        val expectationsEffect = null
+        val expectationsState = state.copy(
+            missionStatement = missionStatement,
+            funeralList = missionStatement.funeralList,
+            isEnableFuneralList = true,
+            purposeLife = missionStatement.purposeLife,
+            isEnablePurposeLife = true,
+            constitutionList = missionStatement.constitutionList,
+            isEnableConstitutionList = true
+        )
+
+        //実施
+        viewModel = MissionStatementListViewModel(missionStatementUseCase)
+        MissionStatementDispatcher.setActions(MissionStatementDispatcherContract.Action.DeleteConstitution(2))
+
+        // 比較
+        result(expectationsState, expectationsEffect)
+        coVerify(exactly = 1) { (missionStatementUseCase).getMissionStatement() }
     }
 
     // endregion

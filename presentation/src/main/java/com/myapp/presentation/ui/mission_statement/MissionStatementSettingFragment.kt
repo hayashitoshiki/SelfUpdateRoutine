@@ -1,6 +1,8 @@
 package com.myapp.presentation.ui.mission_statement
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,10 +11,10 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.myapp.common.listEquals
 import com.myapp.presentation.R
 import com.myapp.presentation.databinding.FragmentMissionStatementSettingBinding
-import com.myapp.presentation.utils.BaseFragment
-import com.myapp.presentation.utils.Status
+import com.myapp.presentation.utils.base.BaseAacFragment
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.ViewHolder
 import dagger.hilt.android.AndroidEntryPoint
@@ -24,13 +26,14 @@ import javax.inject.Inject
  *
  */
 @AndroidEntryPoint
-class MissionStatementSettingFragment : BaseFragment() {
+class MissionStatementSettingFragment :
+    BaseAacFragment<MissionStatementSettingContract.State, MissionStatementSettingContract.Effect, MissionStatementSettingContract.Event>() {
 
     private val args: MissionStatementSettingFragmentArgs by navArgs()
 
     @Inject
     lateinit var viewModelFactory: MissionStatementSettingViewModel.Factory
-    private val viewModel: MissionStatementSettingViewModel by viewModels {
+    override val viewModel: MissionStatementSettingViewModel by viewModels {
         MissionStatementSettingViewModel.provideFactory(viewModelFactory, args.missionStatement)
     }
 
@@ -44,7 +47,6 @@ class MissionStatementSettingFragment : BaseFragment() {
     ): View {
         _binding = FragmentMissionStatementSettingBinding.inflate(inflater, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
-        binding.viewModel = viewModel
         return binding.root
     }
 
@@ -54,99 +56,106 @@ class MissionStatementSettingFragment : BaseFragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.funeralList.observe(viewLifecycleOwner, { setFuneralList(it) })
-        viewModel.constitutionList.observe(viewLifecycleOwner, { setConstitutionList(it) })
-        viewModel.confirmStatus.observe(viewLifecycleOwner, { onStateChanged(it) })
-
         binding.listConstitution.also {
-            val adapter = GroupAdapter<ViewHolder>()
-            val layoutManager = LinearLayoutManager(requireContext())
-            it.adapter = adapter
-            it.layoutManager = layoutManager
+            it.adapter = GroupAdapter<ViewHolder>()
+            it.layoutManager = LinearLayoutManager(requireContext())
         }
         binding.listFuneral.also {
-            val adapter = GroupAdapter<ViewHolder>()
-            val layoutManager = LinearLayoutManager(requireContext())
-            it.adapter = adapter
-            it.layoutManager = layoutManager
+            it.adapter = GroupAdapter<ViewHolder>()
+            it.layoutManager = LinearLayoutManager(requireContext())
         }
         binding.listResultFuneral.also {
-            val adapter = GroupAdapter<ViewHolder>()
-            val layoutManager = LinearLayoutManager(requireContext())
-            it.adapter = adapter
-            it.layoutManager = layoutManager
+            it.adapter = GroupAdapter<ViewHolder>()
+            it.layoutManager = LinearLayoutManager(requireContext())
         }
         binding.listResultConstitution.also {
-            val adapter = GroupAdapter<ViewHolder>()
-            val layoutManager = LinearLayoutManager(requireContext())
-            it.adapter = adapter
-            it.layoutManager = layoutManager
+            it.adapter = GroupAdapter<ViewHolder>()
+            it.layoutManager = LinearLayoutManager(requireContext())
         }
         binding.editMissionStatement.hint = requireContext().getString(R.string.hint_purpose_life)
-        binding.btnChange.setOnClickListener { viewModel.onClickConfirmButton() }
+        viewModel.state.value?.let { state ->
+            setFuneralList(state)
+            binding.purposeDiffValue.text = state.purposeLife
+            binding.editMissionStatement.setText(state.purposeLife)
+            binding.purposeDiffValue.setTextColor(requireContext().resources.getColor(state.purposeLifeDiffColor, null))
+            binding.purposeTitle.setTextColor(requireContext().resources.getColor(state.purposeLifeDiffColor, null))
+            setConstitutionList(state)
+            binding.btnChange.isEnabled = state.isEnableConfirmButton
+        }
+    }
+
+    // State反映
+    override fun changedState(state: MissionStatementSettingContract.State) {
+        viewModel.cashState.let { cash ->
+            if (cash == null || !listEquals(cash.funeralList,state.funeralList)) setFuneralList(state)
+            if (cash == null || state.purposeLife != cash.purposeLife) {
+                binding.purposeDiffValue.text = state.purposeLife
+                binding.purposeDiffValue.setTextColor(requireContext().resources.getColor(state.purposeLifeDiffColor, null))
+                binding.purposeTitle.setTextColor(requireContext().resources.getColor(state.purposeLifeDiffColor, null))
+            }
+            if (cash == null || !listEquals(cash.constitutionList,state.constitutionList)) setConstitutionList(state)
+            if (cash == null || state.isEnableConfirmButton != cash.isEnableConfirmButton) {
+                binding.btnChange.isEnabled = state.isEnableConfirmButton
+            }
+        }
+    }
+
+    // Event設定
+    override fun setEvent() {
+        binding.btnChange.setOnClickListener { viewModel.setEvent(MissionStatementSettingContract.Event.OnClickChangeButton) }
+        binding.editMissionStatement.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                viewModel.setEvent(MissionStatementSettingContract.Event.OnChangePurposeText(s.toString()))
+            }
+            override fun afterTextChanged(s: Editable?) {}
+        })
+    }
+
+    // Effect設定
+    override fun setEffect(effect: MissionStatementSettingContract.Effect) = when(effect) {
+        is MissionStatementSettingContract.Effect.NavigateMissionStatementSetting -> backMissionStatementView()
+        is MissionStatementSettingContract.Effect.OnDestroyView -> {}
+        is MissionStatementSettingContract.Effect.ShowError -> {
+            Toasty.error(requireContext(), effect.value.message!!, Toast.LENGTH_SHORT, true).show()
+        }
     }
 
     // 理想の葬儀リスト設定
-    private fun setFuneralList(data: List<Pair<Long, String>>) {
-        (binding.listFuneral.adapter as GroupAdapter<*>).also { adapter ->
-            if (adapter.itemCount == data.count()) return@also
-            val items = data.mapIndexed { index, s ->
-                val funeralInputItemViewModel = FuneralInputItemViewModel(index, s.first, s.second)
-                FuneralInputItem(requireContext(), funeralInputItemViewModel)
-            }
-            adapter.update(items)
-        }
-        (binding.listResultFuneral.adapter as GroupAdapter<*>).also { adapter ->
-            val items = data.filter { it.second.isNotBlank() }
-                .map {
-                    MissionStatementSettingResultDiscItem(
-                        it.first, it.second, viewModel.constitutionListDiffColor, requireContext(), viewLifecycleOwner
-                    )
-                }
-            adapter.update(items)
-        }
+    private fun setFuneralList(state: MissionStatementSettingContract.State) {
+        binding.funeralTitle.setTextColor(requireContext().resources.getColor(state.funeralListDiffColor, null))
+        val resultAdapter = binding.listResultFuneral.adapter as GroupAdapter<*>
+        val inputAdapter = binding.listFuneral.adapter as GroupAdapter<*>
+        state.funeralList
+            .filter { it.second.isNotBlank() }
+            .map { MissionStatementSettingResultDiscItem(it.first, it.second, state.funeralListDiffColor, requireContext()) }
+            .let{ resultAdapter.update(it) }
+        if (inputAdapter.itemCount == state.funeralList.count()) return
+        state.funeralList
+            .mapIndexed { index, s -> FuneralInputItemViewModel(index, s.first, s.second) }
+            .map{ FuneralInputItem(requireContext(), it)}
+            .let{ inputAdapter.update(it) }
     }
 
     // 憲法リスト設定
-    private fun setConstitutionList(data: List<Pair<Long, String>>) {
-        (binding.listConstitution.adapter as GroupAdapter<*>).also { adapter ->
-            if (adapter.itemCount == data.count()) return@also
-            val items = data.mapIndexed { index, s ->
-                val constitutionInputItemViewModel = ConstitutionInputItemViewModel(index, s.first, s.second)
-                ConstitutionInputItem(requireContext(), constitutionInputItemViewModel)
-            }
-            adapter.update(items)
-        }
-        (binding.listResultConstitution.adapter as GroupAdapter<*>).also { adapter ->
-            val items = data.filter { it.second.isNotBlank() }
-                .map {
-                    MissionStatementSettingResultDiscItem(
-                        it.first, it.second, viewModel.constitutionListDiffColor, requireContext(), viewLifecycleOwner
-                    )
-                }
-            adapter.update(items)
-        }
-    }
-
-    // 保存State変更通知
-    private fun onStateChanged(state: Status<*>) = when (state) {
-        is Status.Loading -> {
-        }
-        is Status.Success -> {
-            backMissionStatementView()
-        }
-        is Status.Failure -> {
-            Toasty.error(requireContext(), state.throwable.message!!, Toast.LENGTH_SHORT, true)
-                .show()
-        }
-        is Status.Non -> {
-        }
+    private fun setConstitutionList(state: MissionStatementSettingContract.State) {
+        binding.constitutionTitle.setTextColor(requireContext().resources.getColor(state.constitutionListDiffColor, null))
+        val resultAdapter = binding.listResultConstitution.adapter as GroupAdapter<*>
+        val inputAdapter = binding.listConstitution.adapter as GroupAdapter<*>
+        state.constitutionList
+            .filter { it.second.isNotBlank() }
+            .map { MissionStatementSettingResultDiscItem(it.first, it.second, state.constitutionListDiffColor, requireContext()) }
+            .let{ resultAdapter.update(it) }
+        if (inputAdapter.itemCount == state.constitutionList.count()) return
+        state.constitutionList
+            .mapIndexed { index, s -> ConstitutionInputItemViewModel(index, s.first, s.second) }
+            .map{ ConstitutionInputItem(requireContext(), it) }
+            .let{ inputAdapter.update(it) }
     }
 
     // ステートメント一覧画面へ戻る
     private fun backMissionStatementView() {
-        Toasty.success(requireContext(), "ミッションステートメントを更新しました！", Toast.LENGTH_SHORT, true)
-            .show()
+        Toasty.success(requireContext(), "ミッションステートメントを更新しました！", Toast.LENGTH_SHORT, true).show()
         findNavController().popBackStack()
     }
 
@@ -154,4 +163,5 @@ class MissionStatementSettingFragment : BaseFragment() {
         super.onDestroyView()
         _binding = null
     }
+
 }

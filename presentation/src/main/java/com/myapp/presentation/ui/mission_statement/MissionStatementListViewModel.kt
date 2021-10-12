@@ -1,86 +1,77 @@
 package com.myapp.presentation.ui.mission_statement
 
 import androidx.lifecycle.*
-import com.myapp.domain.model.entity.MissionStatement
 import com.myapp.domain.usecase.MissionStatementUseCase
-import com.myapp.presentation.utils.Status
+import com.myapp.presentation.utils.base.BaseAacViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * ミッションステートメント一覧画面_画面ロジック
  *
  */
 @HiltViewModel
-class MissionStatementListViewModel @Inject constructor(
-    private val missionStatementUseCase: MissionStatementUseCase
-) :
-    ViewModel() {
+class MissionStatementListViewModel @Inject constructor(private val missionStatementUseCase: MissionStatementUseCase) :
+    BaseAacViewModel<MissionStatementListContract.State, MissionStatementListContract.Effect, MissionStatementListContract.Event>() {
 
-    // 登録済みのミッションステートメント
-    var missionStatement: MissionStatement? = null
+    override fun initState(): MissionStatementListContract.State {
+        return MissionStatementListContract.State()
+    }
 
-    // 理想の葬式
-    private val _funeralList = MutableLiveData(listOf(""))
-    val funeralList: LiveData<List<String>> = _funeralList
-    private val _isEnableFuneralList = MediatorLiveData<Boolean>()
-    val isEnableFuneralList: LiveData<Boolean> = _isEnableFuneralList
-
-    // 人生の目的
-    private val _purposeLife = MutableLiveData("")
-    val purposeLife: LiveData<String> = _purposeLife
-    private val _isEnablePurposeLife = MediatorLiveData<Boolean>()
-    val isEnablePurposeLife: LiveData<Boolean> = _isEnablePurposeLife
-
-    // 憲法
-    private val _constitutionList = MutableLiveData(listOf(""))
-    val constitutionList: LiveData<List<String>> = _constitutionList
-    private val _isEnableConstitutionList = MediatorLiveData<Boolean>()
-    val isEnableConstitutionList: LiveData<Boolean> = _isEnableConstitutionList
-
-    // 　ミッションステートメント取得ステータス
-    private val _status = MutableLiveData<Status<*>>()
-    val status: LiveData<Status<*>> = _status
+    override fun handleEvents(event: MissionStatementListContract.Event) = when(event) {
+        is MissionStatementListContract.Event.OnClickChangeButton -> {
+            setEffect { MissionStatementListContract.Effect.NavigateMissionStatementSetting(state.value?.missionStatement) }
+        }
+        is MissionStatementListContract.Event.OnDestroyView -> onDestroyView()
+    }
 
     init {
-        _isEnableFuneralList.addSource(funeralList) { changeFuneral() }
-        _isEnablePurposeLife.addSource(purposeLife) { changePurposeLife() }
-        _isEnableConstitutionList.addSource(constitutionList) { changeConstitutionList() }
         updateMissionStatement()
-        MissionStatementDispatcher.updateMessage.onEach {
+        MissionStatementDispatcher.action.onEach {
+            if (it !is MissionStatementDispatcherContract.Action.Update) return@onEach
             updateMissionStatement()
-        }
-            .launchIn(viewModelScope)
+        }.launchIn(viewModelScope)
     }
 
     private fun updateMissionStatement() = viewModelScope.launch {
-        missionStatementUseCase.getMissionStatement()
-            ?.let {
-                _funeralList.value = it.funeralList
-                _purposeLife.value = it.purposeLife
-                _constitutionList.value = it.constitutionList
-                missionStatement = it
-                _status.value = Status.Success(it)
-            } ?: run {
-            _funeralList.value = listOf()
-            _purposeLife.value = ""
-            _constitutionList.value = listOf()
-            _status.value = Status.Failure(IllegalAccessException("初回起動"))
+        runCatching { missionStatementUseCase.getMissionStatement() }
+            .onSuccess {
+                it?.let {
+                    setState {
+                        copy(
+                            missionStatement = it,
+                            funeralList = it.funeralList,
+                            isEnableFuneralList = it.funeralList.isNotEmpty(),
+                            purposeLife = it.purposeLife,
+                            isEnablePurposeLife = it.purposeLife.isNotEmpty(),
+                            constitutionList = it.constitutionList,
+                            isEnableConstitutionList = it.constitutionList.isNotEmpty()
+                        )
+                    }
+                } ?: run { setNullMissionStatement() }
+            }
+            .onFailure { setNullMissionStatement() }
+    }
+
+    private fun setNullMissionStatement() {
+        setState {
+            copy(
+                missionStatement = null,
+                funeralList = listOf(),
+                isEnableFuneralList = false,
+                purposeLife = "",
+                isEnablePurposeLife = false,
+                constitutionList = listOf(),
+                isEnableConstitutionList = false
+            )
         }
     }
 
-    private fun changeFuneral() {
-        _isEnableFuneralList.value = _funeralList.value?.isNotEmpty() ?: false
-    }
-
-    private fun changePurposeLife() {
-        _isEnablePurposeLife.value = _purposeLife.value != ""
-    }
-
-    private fun changeConstitutionList() {
-        _isEnableConstitutionList.value = _constitutionList.value?.isNotEmpty() ?: false
+    // 画面破棄（初期化）処理
+    private fun onDestroyView() {
+        setEffect { MissionStatementListContract.Effect.OnDestroyView }
     }
 }
