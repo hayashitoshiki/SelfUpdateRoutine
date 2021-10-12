@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.view.View
 
 /**
- * AAC×Compose用BaseFragment
+ * AAC×MVI用BaseFragment
  *
  * @param UiState Viewの状態
  * @param Effect UIイベント
