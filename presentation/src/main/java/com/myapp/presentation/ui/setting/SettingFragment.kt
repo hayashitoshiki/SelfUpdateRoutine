@@ -17,7 +17,7 @@ import com.myapp.domain.model.value.AlarmMode
 import com.myapp.presentation.R
 import com.myapp.presentation.databinding.FragmentSettingBinding
 import com.myapp.presentation.ui.diary.AlarmNotificationReceiver
-import com.myapp.presentation.utils.base.BaseFragment
+import com.myapp.presentation.utils.base.BaseAacFragment
 import com.myapp.presentation.utils.expansion.text
 import dagger.hilt.android.AndroidEntryPoint
 import es.dmoral.toasty.Toasty
@@ -29,11 +29,11 @@ import java.time.OffsetDateTime
  * 設定画面
  */
 @AndroidEntryPoint
-class SettingFragment : BaseFragment() {
+class SettingFragment : BaseAacFragment<SettingContract.State, SettingContract.Effect, SettingContract.Event>() {
 
     private var _binding: FragmentSettingBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: SettingViewModel by viewModels()
+    override val viewModel: SettingViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -66,14 +66,11 @@ class SettingFragment : BaseFragment() {
             binding.txtModeExplanation.text = requireContext().getString(state.alarmModeExplanation)
             binding.btnOk.isEnabled = state.isEnableConfirmButton
         }
-        setEvent()
-        viewModel.state.observe(viewLifecycleOwner,{changeState(it)})
-        viewModel.effect.observe(viewLifecycleOwner,{executionEffect(it)})
         viewModel.setEvent(SettingContract.Event.CreatedView)
     }
 
     // Viewの各値変更
-    private fun changeState(state: SettingContract.State) {
+    override fun changedState(state: SettingContract.State) {
         viewModel.cashState.let { cash ->
             if (cash == null || state.beforeDate != cash.beforeDate) {
                 binding.timePicker.hour = state.beforeDate.substring(0, 2).toInt()
@@ -105,11 +102,10 @@ class SettingFragment : BaseFragment() {
                 binding.btnOk.isEnabled = state.isEnableConfirmButton
             }
         }
-
     }
 
     // イベント発火
-    private fun setEvent() {
+    override fun setEvent() {
 
         // アラート時間
         binding.timePicker.also {
@@ -133,7 +129,7 @@ class SettingFragment : BaseFragment() {
     }
 
     // イベント発火
-    private fun executionEffect(effect: SettingContract.Effect) = when(effect) {
+    override fun setEffect(effect: SettingContract.Effect) = when(effect) {
         is SettingContract.Effect.ShowError -> Toasty.error(requireContext(), effect.throwable.message!!, Toast.LENGTH_SHORT, true).show()
         is SettingContract.Effect.NextNavigation -> setAlarmAndBack(effect.value)
     }

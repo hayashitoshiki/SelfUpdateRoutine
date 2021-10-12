@@ -8,7 +8,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.myapp.presentation.databinding.FragmentMissionStatementListBinding
-import com.myapp.presentation.utils.base.BaseFragment
+import com.myapp.presentation.utils.base.BaseAacFragment
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.ViewHolder
 import dagger.hilt.android.AndroidEntryPoint
@@ -18,9 +18,10 @@ import dagger.hilt.android.AndroidEntryPoint
  *
  */
 @AndroidEntryPoint
-class MissionStatementListFragment : BaseFragment() {
+class MissionStatementListFragment :
+    BaseAacFragment<MissionStatementListContract.State, MissionStatementListContract.Effect, MissionStatementListContract.Event>() {
 
-    private val viewModel: MissionStatementListViewModel by viewModels()
+    override val viewModel: MissionStatementListViewModel by viewModels()
     private var _binding: FragmentMissionStatementListBinding? = null
     private val binding get() = _binding!!
 
@@ -39,9 +40,6 @@ class MissionStatementListFragment : BaseFragment() {
         savedInstanceState: Bundle?
     ) {
         super.onViewCreated(view, savedInstanceState)
-        setEvent()
-        viewModel.state.observe(viewLifecycleOwner, { changeState(it) })
-        viewModel.effect.observe(viewLifecycleOwner, { executionEffect(it) })
 
         binding.listConstitution.also {
             it.adapter = GroupAdapter<ViewHolder>()
@@ -53,8 +51,7 @@ class MissionStatementListFragment : BaseFragment() {
         }
     }
 
-    // State反映
-    private fun changeState(state: MissionStatementListContract.State) {
+    override fun changedState(state: MissionStatementListContract.State) {
 
         // メインコンテンツ
         binding.layoutMain.visibility = if (state.missionStatement != null) View.VISIBLE else View.INVISIBLE
@@ -80,13 +77,13 @@ class MissionStatementListFragment : BaseFragment() {
     }
 
     // Event設定
-    private fun setEvent() {
+    override fun setEvent() {
         // 変更ボタン
         binding.btnChange.setOnClickListener { viewModel.setEvent(MissionStatementListContract.Event.OnClickChangeButton) }
     }
 
     // Effect設定
-    private fun executionEffect(effect: MissionStatementListContract.Effect) = when(effect) {
+    override fun setEffect(effect: MissionStatementListContract.Effect) = when(effect) {
         is MissionStatementListContract.Effect.NavigateMissionStatementSetting -> {
             val action = MissionStatementListFragmentDirections.actionNavConstitutionToNavConstitutionSetting(effect.value)
             findNavController().navigate(action)
@@ -99,4 +96,5 @@ class MissionStatementListFragment : BaseFragment() {
         super.onDestroyView()
         _binding = null
     }
+
 }

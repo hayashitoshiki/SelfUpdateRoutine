@@ -13,7 +13,7 @@ import com.myapp.domain.model.entity.Report
 import com.myapp.presentation.R
 import com.myapp.presentation.databinding.FragmentHomeBinding
 import com.myapp.presentation.ui.diary.DiaryActivity
-import com.myapp.presentation.utils.base.BaseFragment
+import com.myapp.presentation.utils.base.BaseAacFragment
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.ViewHolder
 import com.xwray.groupie.databinding.BindableItem
@@ -24,9 +24,11 @@ import timber.log.Timber
  * ホーム画面
  */
 @AndroidEntryPoint
-class HomeFragment : BaseFragment() {
+class HomeFragment :
+    BaseAacFragment<HomeContract.State, HomeContract.Effect, HomeContract.Event>() {
 
-    private val viewModel: HomeViewModel by viewModels()
+
+    override val viewModel: HomeViewModel by viewModels()
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
     private lateinit var  lister: OnDiaryCardItemClickListener
@@ -40,9 +42,6 @@ class HomeFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setEvent()
-        viewModel.state.observe(viewLifecycleOwner, { changeState(it) })
-        viewModel.effect.observe(viewLifecycleOwner, { executionEffect(it) })
 
         val adapter = GroupAdapter<ViewHolder>()
         val layoutManager = LinearLayoutManager(requireContext())
@@ -52,12 +51,12 @@ class HomeFragment : BaseFragment() {
     }
 
     // State設定
-    private fun changeState(state: HomeContract.State) {
+    override fun changedState(state: HomeContract.State) {
         setDiaryList(state.reportList)
     }
 
     // イベント設定
-    private fun setEvent() {
+    override fun setEvent() {
 
         // 今日の日記入力ボタン
         binding.btnDiaryInput.setOnClickListener { viewModel.setEvent(HomeContract.Event.OnClickReportButton) }
@@ -82,39 +81,41 @@ class HomeFragment : BaseFragment() {
     // エフェクト設定
     @SuppressLint("TimberExceptionLogging")
     @Suppress("IMPLICIT_CAST_TO_ANY")
-    private fun executionEffect(effect: HomeContract.Effect) = when(effect) {
-        is HomeContract.Effect.ChangeFabEnable -> {
-            if (effect.value) {
-                binding.fabStatement.animate().translationY(resources.getDimension(R.dimen.standard_55))
-                binding.fabLearn.animate().translationY(resources.getDimension(R.dimen.standard_105))
-            } else {
-                binding.fabStatement.animate().translationY(0.toFloat())
-                binding.fabLearn.animate().translationY(0.toFloat())
+    override fun setEffect(effect: HomeContract.Effect) {
+        when(effect) {
+            is HomeContract.Effect.ChangeFabEnable -> {
+                if (effect.value) {
+                    binding.fabStatement.animate().translationY(resources.getDimension(R.dimen.standard_55))
+                    binding.fabLearn.animate().translationY(resources.getDimension(R.dimen.standard_105))
+                } else {
+                    binding.fabStatement.animate().translationY(0.toFloat())
+                    binding.fabLearn.animate().translationY(0.toFloat())
+                }
             }
-        }
-        is HomeContract.Effect.DiaryReportNavigation -> {
-            val intent = Intent(context, DiaryActivity::class.java)
-            startActivity(intent)
-        }
-        is HomeContract.Effect.LearnListNavigation -> {
-            val statementList = effect.value.map { report -> ReportDetail(report.ffsReport.learnComment, report.ffsReport.dataTime) }
-            val data = ReportDetailList(statementList)
-            val action = HomeFragmentDirections.actionNavHomeToNavLearnList(data)
-            findNavController().navigate(action)
-        }
-        is HomeContract.Effect.StatementListNavigation -> {
-            val statementList = effect.value.map { report -> ReportDetail(report.ffsReport.statementComment, report.ffsReport.dataTime) }
-            val data = ReportDetailList(statementList)
-            val action = HomeFragmentDirections.actionNavHomeToNavStatementList(data)
-            findNavController().navigate(action)
-        }
-        is HomeContract.Effect.ReportDetailListNavigation -> {
-            val action = HomeFragmentDirections.actionNavHomeToNavRememner(effect.value)
-            findNavController().navigate(action)
-        }
-        is HomeContract.Effect.OnDestroyView -> {}
-        is HomeContract.Effect.ShowError -> {
-            Timber.tag(this.javaClass.simpleName).d(effect.throwable.message)
+            is HomeContract.Effect.DiaryReportNavigation -> {
+                val intent = Intent(context, DiaryActivity::class.java)
+                startActivity(intent)
+            }
+            is HomeContract.Effect.LearnListNavigation -> {
+                val statementList = effect.value.map { report -> ReportDetail(report.ffsReport.learnComment, report.ffsReport.dataTime) }
+                val data = ReportDetailList(statementList)
+                val action = HomeFragmentDirections.actionNavHomeToNavLearnList(data)
+                findNavController().navigate(action)
+            }
+            is HomeContract.Effect.StatementListNavigation -> {
+                val statementList = effect.value.map { report -> ReportDetail(report.ffsReport.statementComment, report.ffsReport.dataTime) }
+                val data = ReportDetailList(statementList)
+                val action = HomeFragmentDirections.actionNavHomeToNavStatementList(data)
+                findNavController().navigate(action)
+            }
+            is HomeContract.Effect.ReportDetailListNavigation -> {
+                val action = HomeFragmentDirections.actionNavHomeToNavRememner(effect.value)
+                findNavController().navigate(action)
+            }
+            is HomeContract.Effect.OnDestroyView -> {}
+            is HomeContract.Effect.ShowError -> {
+                Timber.tag(this.javaClass.simpleName).d(effect.throwable.message)
+            }
         }
     }
 

@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.myapp.common.listEquals
 import com.myapp.presentation.R
 import com.myapp.presentation.databinding.FragmentMissionStatementSettingBinding
-import com.myapp.presentation.utils.base.BaseFragment
+import com.myapp.presentation.utils.base.BaseAacFragment
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.ViewHolder
 import dagger.hilt.android.AndroidEntryPoint
@@ -26,13 +26,14 @@ import javax.inject.Inject
  *
  */
 @AndroidEntryPoint
-class MissionStatementSettingFragment : BaseFragment() {
+class MissionStatementSettingFragment :
+    BaseAacFragment<MissionStatementSettingContract.State, MissionStatementSettingContract.Effect, MissionStatementSettingContract.Event>() {
 
     private val args: MissionStatementSettingFragmentArgs by navArgs()
 
     @Inject
     lateinit var viewModelFactory: MissionStatementSettingViewModel.Factory
-    private val viewModel: MissionStatementSettingViewModel by viewModels {
+    override val viewModel: MissionStatementSettingViewModel by viewModels {
         MissionStatementSettingViewModel.provideFactory(viewModelFactory, args.missionStatement)
     }
 
@@ -54,10 +55,6 @@ class MissionStatementSettingFragment : BaseFragment() {
         savedInstanceState: Bundle?
     ) {
         super.onViewCreated(view, savedInstanceState)
-
-        setEvent()
-        viewModel.state.observe(viewLifecycleOwner, { changeState(it) })
-        viewModel.effect.observe(viewLifecycleOwner, { executionEffect(it) })
 
         binding.listConstitution.also {
             it.adapter = GroupAdapter<ViewHolder>()
@@ -88,7 +85,7 @@ class MissionStatementSettingFragment : BaseFragment() {
     }
 
     // State反映
-    private fun changeState(state: MissionStatementSettingContract.State) {
+    override fun changedState(state: MissionStatementSettingContract.State) {
         viewModel.cashState.let { cash ->
             if (cash == null || !listEquals(cash.funeralList,state.funeralList)) setFuneralList(state)
             if (cash == null || state.purposeLife != cash.purposeLife) {
@@ -104,7 +101,7 @@ class MissionStatementSettingFragment : BaseFragment() {
     }
 
     // Event設定
-    private fun setEvent() {
+    override fun setEvent() {
         binding.btnChange.setOnClickListener { viewModel.setEvent(MissionStatementSettingContract.Event.OnClickChangeButton) }
         binding.editMissionStatement.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -116,7 +113,7 @@ class MissionStatementSettingFragment : BaseFragment() {
     }
 
     // Effect設定
-    private fun executionEffect(effect: MissionStatementSettingContract.Effect) = when(effect) {
+    override fun setEffect(effect: MissionStatementSettingContract.Effect) = when(effect) {
         is MissionStatementSettingContract.Effect.NavigateMissionStatementSetting -> backMissionStatementView()
         is MissionStatementSettingContract.Effect.OnDestroyView -> {}
         is MissionStatementSettingContract.Effect.ShowError -> {
@@ -166,4 +163,5 @@ class MissionStatementSettingFragment : BaseFragment() {
         super.onDestroyView()
         _binding = null
     }
+
 }
