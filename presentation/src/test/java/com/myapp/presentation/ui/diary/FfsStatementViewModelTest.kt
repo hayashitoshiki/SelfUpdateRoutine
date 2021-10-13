@@ -70,7 +70,7 @@ class FfsStatementViewModelTest {
     /**
      * テキスト変更
      *
-     * 条件：文字入力
+     * 条件：「私は〜ている〜です」の条件にあった文字列入力
      * 期待結果；
      * ・画面の値
      * 　　・入力値が入力した文字に変更されること
@@ -82,11 +82,759 @@ class FfsStatementViewModelTest {
      */
     @ExperimentalCoroutinesApi
     @Test
-    fun changeStatementByInput() = testScope.runBlockingTest {
+    fun changeStatementByInputOK() = testScope.runBlockingTest {
 
         // 期待結果
-        val value = "statement"
-        val expectationsState = state.copy(inputText = value, isButtonEnable = true)
+        val value = "私は成長に貪欲に生きている人間です"
+        val hintText = ""
+        val hintVisibility = false
+        val isButtonEnable = true
+        val expectationsState = state.copy(
+            inputText = value,
+            hintText = hintText,
+            hintVisibility = hintVisibility,
+            isButtonEnable = isButtonEnable)
+        val expectationsEffect = null
+        val expectationsAction = DiaryDispatcherContract.Action.ChangeStatement(value)
+
+        // 実施
+        ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(value))
+
+        // 比較
+        result(expectationsState, expectationsEffect, expectationsAction)
+    }
+
+    /**
+     * テキスト変更
+     *
+     * 条件：文字列の先頭が「私は」の文字列を入力
+     * 期待結果；
+     * ・画面の値
+     * 　　・入力値が入力した文字に変更されること
+     * 　　・次へボタンが活性状態になること
+     * ・画面イベント
+     * 　　・何もイベントが発生しないこと
+     * ・共通処理イベント
+     * 　　・入力した文字を引数に宣言入力アクションが流れること
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun changeStatementByInputStartOk1() = testScope.runBlockingTest {
+
+        // 期待結果
+        val value = "私は"
+        val hintText = "文章は現在進行形にしてください"
+        val hintVisibility = true
+        val isButtonEnable = false
+        val expectationsState = state.copy(
+            inputText = value,
+            hintText = hintText,
+            hintVisibility = hintVisibility,
+            isButtonEnable = isButtonEnable)
+        val expectationsEffect = null
+        val expectationsAction = DiaryDispatcherContract.Action.ChangeStatement(value)
+
+        // 実施
+        ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(value))
+
+        // 比較
+        result(expectationsState, expectationsEffect, expectationsAction)
+    }
+
+    /**
+     * テキスト変更
+     *
+     * 条件：文字列の先頭が「わたしは」の文字列を入力
+     * 期待結果；
+     * ・画面の値
+     * 　　・入力値が入力した文字に変更されること
+     * 　　・次へボタンが活性状態になること
+     * ・画面イベント
+     * 　　・何もイベントが発生しないこと
+     * ・共通処理イベント
+     * 　　・入力した文字を引数に宣言入力アクションが流れること
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun changeStatementByInputStartOk2() = testScope.runBlockingTest {
+
+        // 期待結果
+        val value = "わたしは"
+        val hintText = "文章は現在進行形にしてください"
+        val hintVisibility = true
+        val isButtonEnable = false
+        val expectationsState = state.copy(
+            inputText = value,
+            hintText = hintText,
+            hintVisibility = hintVisibility,
+            isButtonEnable = isButtonEnable)
+        val expectationsEffect = null
+        val expectationsAction = DiaryDispatcherContract.Action.ChangeStatement(value)
+
+        // 実施
+        ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(value))
+
+        // 比較
+        result(expectationsState, expectationsEffect, expectationsAction)
+    }
+
+    /**
+     * テキスト変更
+     *
+     * 条件：文字列の先頭が「わたしは」・「私は」以外の文字列を入力
+     * 期待結果；
+     * ・画面の値
+     * 　　・入力値が入力した文字に変更されること
+     * 　　・次へボタンが活性状態になること
+     * ・画面イベント
+     * 　　・何もイベントが発生しないこと
+     * ・共通処理イベント
+     * 　　・入力した文字を引数に宣言入力アクションが流れること
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun changeStatementByInputStartNG() = testScope.runBlockingTest {
+
+        // 期待結果
+        val value = "僕は"
+        val hintText = "文章の先頭は「わたしは」ではじめてください"
+        val hintVisibility = true
+        val isButtonEnable = false
+        val expectationsState = state.copy(
+            inputText = value,
+            hintText = hintText,
+            hintVisibility = hintVisibility,
+            isButtonEnable = isButtonEnable)
+        val expectationsEffect = null
+        val expectationsAction = DiaryDispatcherContract.Action.ChangeStatement(value)
+
+        // 実施
+        ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(value))
+
+        // 比較
+        result(expectationsState, expectationsEffect, expectationsAction)
+    }
+
+
+    /**
+     * テキスト変更
+     *
+     * 条件：「わたしは〜ている」の文字列を入力
+     * 期待結果；
+     * ・画面の値
+     * 　　・入力値が入力した文字に変更されること
+     * 　　・次へボタンが活性状態になること
+     * ・画面イベント
+     * 　　・何もイベントが発生しないこと
+     * ・共通処理イベント
+     * 　　・入力した文字を引数に宣言入力アクションが流れること
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun changeStatementByInputMiddleOK() = testScope.runBlockingTest {
+
+        // 期待結果
+        val value = "私は貪欲に成長ている"
+        val hintText = "最後は「です」と宣言してください"
+        val hintVisibility = true
+        val isButtonEnable = false
+        val expectationsState = state.copy(
+            inputText = value,
+            hintText = hintText,
+            hintVisibility = hintVisibility,
+            isButtonEnable = isButtonEnable)
+        val expectationsEffect = null
+        val expectationsAction = DiaryDispatcherContract.Action.ChangeStatement(value)
+
+        // 実施
+        ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(value))
+
+        // 比較
+        result(expectationsState, expectationsEffect, expectationsAction)
+    }
+
+    /**
+     * テキスト変更
+     *
+     * 条件：文字列のの中間に「ている」が入っていない文字列を入力
+     * 期待結果；
+     * ・画面の値
+     * 　　・入力値が入力した文字に変更されること
+     * 　　・次へボタンが活性状態になること
+     * ・画面イベント
+     * 　　・何もイベントが発生しないこと
+     * ・共通処理イベント
+     * 　　・入力した文字を引数に宣言入力アクションが流れること
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun changeStatementByInputMiddleNG1() = testScope.runBlockingTest {
+
+        // 期待結果
+        val value = "私は貪欲に成長"
+        val hintText = "文章は現在進行形にしてください"
+        val hintVisibility = true
+        val isButtonEnable = false
+        val expectationsState = state.copy(
+            inputText = value,
+            hintText = hintText,
+            hintVisibility = hintVisibility,
+            isButtonEnable = isButtonEnable)
+        val expectationsEffect = null
+        val expectationsAction = DiaryDispatcherContract.Action.ChangeStatement(value)
+
+        // 実施
+        ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(value))
+
+        // 比較
+        result(expectationsState, expectationsEffect, expectationsAction)
+    }
+
+    /**
+     * テキスト変更
+     *
+     * 条件：「私はている」と繋がっている文字列を入力
+     * 期待結果；
+     * ・画面の値
+     * 　　・入力値が入力した文字に変更されること
+     * 　　・次へボタンが活性状態になること
+     * ・画面イベント
+     * 　　・何もイベントが発生しないこと
+     * ・共通処理イベント
+     * 　　・入力した文字を引数に宣言入力アクションが流れること
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun changeStatementByInputMiddleNG2() = testScope.runBlockingTest {
+
+        // 期待結果
+        val value = "私はている"
+        val hintText = "動詞を入れてください"
+        val hintVisibility = true
+        val isButtonEnable = false
+        val expectationsState = state.copy(
+            inputText = value,
+            hintText = hintText,
+            hintVisibility = hintVisibility,
+            isButtonEnable = isButtonEnable)
+        val expectationsEffect = null
+        val expectationsAction = DiaryDispatcherContract.Action.ChangeStatement(value)
+
+        // 実施
+        ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(value))
+
+        // 比較
+        result(expectationsState, expectationsEffect, expectationsAction)
+    }
+
+    /**
+     * テキスト変更
+     *
+     * 条件：「私はでいる」と繋がっている文字列を入力
+     * 期待結果；
+     * ・画面の値
+     * 　　・入力値が入力した文字に変更されること
+     * 　　・次へボタンが活性状態になること
+     * ・画面イベント
+     * 　　・何もイベントが発生しないこと
+     * ・共通処理イベント
+     * 　　・入力した文字を引数に宣言入力アクションが流れること
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun changeStatementByInputMiddleNG3() = testScope.runBlockingTest {
+
+        // 期待結果
+        val value = "私はている"
+        val hintText = "動詞を入れてください"
+        val hintVisibility = true
+        val isButtonEnable = false
+        val expectationsState = state.copy(
+            inputText = value,
+            hintText = hintText,
+            hintVisibility = hintVisibility,
+            isButtonEnable = isButtonEnable)
+        val expectationsEffect = null
+        val expectationsAction = DiaryDispatcherContract.Action.ChangeStatement(value)
+
+        // 実施
+        ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(value))
+
+        // 比較
+        result(expectationsState, expectationsEffect, expectationsAction)
+    }
+
+    /**
+     * テキスト変更
+     *
+     * 条件：文末が「です」ではない文字列を入力
+     * 期待結果；
+     * ・画面の値
+     * 　　・入力値が入力した文字に変更されること
+     * 　　・次へボタンが活性状態になること
+     * ・画面イベント
+     * 　　・何もイベントが発生しないこと
+     * ・共通処理イベント
+     * 　　・入力した文字を引数に宣言入力アクションが流れること
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun changeStatementByInputEndNG1() = testScope.runBlockingTest {
+
+        // 期待結果
+        val value = "私は貪欲に成長しているんだ"
+        val hintText = "最後は「です」と宣言してください"
+        val hintVisibility = true
+        val isButtonEnable = false
+        val expectationsState = state.copy(
+            inputText = value,
+            hintText = hintText,
+            hintVisibility = hintVisibility,
+            isButtonEnable = isButtonEnable)
+        val expectationsEffect = null
+        val expectationsAction = DiaryDispatcherContract.Action.ChangeStatement(value)
+
+        // 実施
+        ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(value))
+
+        // 比較
+        result(expectationsState, expectationsEffect, expectationsAction)
+    }
+
+    /**
+     * テキスト変更
+     *
+     * 条件：文末が「私は〜ているです」となっている文字列を入力
+     * 期待結果；
+     * ・画面の値
+     * 　　・入力値が入力した文字に変更されること
+     * 　　・次へボタンが活性状態になること
+     * ・画面イベント
+     * 　　・何もイベントが発生しないこと
+     * ・共通処理イベント
+     * 　　・入力した文字を引数に宣言入力アクションが流れること
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun changeStatementByInputEndNG2() = testScope.runBlockingTest {
+
+        // 期待結果
+        val value = "私は貪欲に成長しているです"
+        val hintText = "あなたは何者ですか？"
+        val hintVisibility = true
+        val isButtonEnable = false
+        val expectationsState = state.copy(
+            inputText = value,
+            hintText = hintText,
+            hintVisibility = hintVisibility,
+            isButtonEnable = isButtonEnable)
+        val expectationsEffect = null
+        val expectationsAction = DiaryDispatcherContract.Action.ChangeStatement(value)
+
+        // 実施
+        ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(value))
+
+        // 比較
+        result(expectationsState, expectationsEffect, expectationsAction)
+    }
+
+    /**
+     * テキスト変更
+     *
+     * 条件：文末が「私は〜ている○(一文字)です」の○が男or 女or 人以外になっている文字列を入力
+     * 期待結果；
+     * ・画面の値
+     * 　　・入力値が入力した文字に変更されること
+     * 　　・次へボタンが活性状態になること
+     * ・画面イベント
+     * 　　・何もイベントが発生しないこと
+     * ・共通処理イベント
+     * 　　・入力した文字を引数に宣言入力アクションが流れること
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun changeStatementByInputEndNG3() = testScope.runBlockingTest {
+
+        // 期待結果
+        val value = "私は貪欲に成長している猫です"
+        val hintText = "あなたは何者ですか？"
+        val hintVisibility = true
+        val isButtonEnable = false
+        val expectationsState = state.copy(
+            inputText = value,
+            hintText = hintText,
+            hintVisibility = hintVisibility,
+            isButtonEnable = isButtonEnable)
+        val expectationsEffect = null
+        val expectationsAction = DiaryDispatcherContract.Action.ChangeStatement(value)
+
+        // 実施
+        ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(value))
+
+        // 比較
+        result(expectationsState, expectationsEffect, expectationsAction)
+    }
+
+    /**
+     * テキスト変更
+     *
+     * 条件：文末が「私は〜ている男です」になっている文字列を入力
+     * 期待結果；
+     * ・画面の値
+     * 　　・入力値が入力した文字に変更されること
+     * 　　・次へボタンが活性状態になること
+     * ・画面イベント
+     * 　　・何もイベントが発生しないこと
+     * ・共通処理イベント
+     * 　　・入力した文字を引数に宣言入力アクションが流れること
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun changeStatementByInputEndOK1() = testScope.runBlockingTest {
+
+        // 期待結果
+        val value = "私は貪欲に成長している男です"
+        val hintText = ""
+        val hintVisibility = false
+        val isButtonEnable = true
+        val expectationsState = state.copy(
+            inputText = value,
+            hintText = hintText,
+            hintVisibility = hintVisibility,
+            isButtonEnable = isButtonEnable)
+        val expectationsEffect = null
+        val expectationsAction = DiaryDispatcherContract.Action.ChangeStatement(value)
+
+        // 実施
+        ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(value))
+
+        // 比較
+        result(expectationsState, expectationsEffect, expectationsAction)
+    }
+
+    /**
+     * テキスト変更
+     *
+     * 条件：文末が「私は〜ている女です」になっている文字列を入力
+     * 期待結果；
+     * ・画面の値
+     * 　　・入力値が入力した文字に変更されること
+     * 　　・次へボタンが活性状態になること
+     * ・画面イベント
+     * 　　・何もイベントが発生しないこと
+     * ・共通処理イベント
+     * 　　・入力した文字を引数に宣言入力アクションが流れること
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun changeStatementByInputEndOK2() = testScope.runBlockingTest {
+
+        // 期待結果
+        val value = "私は貪欲に成長している女です"
+        val hintText = ""
+        val hintVisibility = false
+        val isButtonEnable = true
+        val expectationsState = state.copy(
+            inputText = value,
+            hintText = hintText,
+            hintVisibility = hintVisibility,
+            isButtonEnable = isButtonEnable)
+        val expectationsEffect = null
+        val expectationsAction = DiaryDispatcherContract.Action.ChangeStatement(value)
+
+        // 実施
+        ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(value))
+
+        // 比較
+        result(expectationsState, expectationsEffect, expectationsAction)
+    }
+
+    /**
+     * テキスト変更
+     *
+     * 条件：文末が「私は〜ている人です」になっている文字列を入力
+     * 期待結果；
+     * ・画面の値
+     * 　　・入力値が入力した文字に変更されること
+     * 　　・次へボタンが活性状態になること
+     * ・画面イベント
+     * 　　・何もイベントが発生しないこと
+     * ・共通処理イベント
+     * 　　・入力した文字を引数に宣言入力アクションが流れること
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun changeStatementByInputEndOK3() = testScope.runBlockingTest {
+
+        // 期待結果
+        val value = "私は貪欲に成長している人です"
+        val hintText = ""
+        val hintVisibility = false
+        val isButtonEnable = true
+        val expectationsState = state.copy(
+            inputText = value,
+            hintText = hintText,
+            hintVisibility = hintVisibility,
+            isButtonEnable = isButtonEnable)
+        val expectationsEffect = null
+        val expectationsAction = DiaryDispatcherContract.Action.ChangeStatement(value)
+
+        // 実施
+        ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(value))
+
+        // 比較
+        result(expectationsState, expectationsEffect, expectationsAction)
+    }
+
+    /**
+     * テキスト変更
+     *
+     * 条件：文末が「私は〜ている人間です」になっている文字列を入力
+     * 期待結果；
+     * ・画面の値
+     * 　　・入力値が入力した文字に変更されること
+     * 　　・次へボタンが活性状態になること
+     * ・画面イベント
+     * 　　・何もイベントが発生しないこと
+     * ・共通処理イベント
+     * 　　・入力した文字を引数に宣言入力アクションが流れること
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun changeStatementByInputEndOK4() = testScope.runBlockingTest {
+
+        // 期待結果
+        val value = "私は貪欲に成長している人間です"
+        val hintText = ""
+        val hintVisibility = false
+        val isButtonEnable = true
+        val expectationsState = state.copy(
+            inputText = value,
+            hintText = hintText,
+            hintVisibility = hintVisibility,
+            isButtonEnable = isButtonEnable)
+        val expectationsEffect = null
+        val expectationsAction = DiaryDispatcherContract.Action.ChangeStatement(value)
+
+        // 実施
+        ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(value))
+
+        // 比較
+        result(expectationsState, expectationsEffect, expectationsAction)
+    }
+
+    /**
+     * テキスト変更
+     *
+     * 条件：文末が「私は〜ている〜です!」となっている文字列を入力
+     * 期待結果；
+     * ・画面の値
+     * 　　・入力値が入力した文字に変更されること
+     * 　　・次へボタンが活性状態になること
+     * ・画面イベント
+     * 　　・何もイベントが発生しないこと
+     * ・共通処理イベント
+     * 　　・入力した文字を引数に宣言入力アクションが流れること
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun changeStatementByInputEndDecorate1() = testScope.runBlockingTest {
+
+        // 期待結果
+        val value = "私は貪欲に成長している人間です!"
+        val hintText = ""
+        val hintVisibility = false
+        val isButtonEnable = true
+        val expectationsState = state.copy(
+            inputText = value,
+            hintText = hintText,
+            hintVisibility = hintVisibility,
+            isButtonEnable = isButtonEnable)
+        val expectationsEffect = null
+        val expectationsAction = DiaryDispatcherContract.Action.ChangeStatement(value)
+
+        // 実施
+        ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(value))
+
+        // 比較
+        result(expectationsState, expectationsEffect, expectationsAction)
+    }
+
+    /**
+     * テキスト変更
+     *
+     * 条件：文末が「私は〜ている〜です！」となっている文字列を入力
+     * 期待結果；
+     * ・画面の値
+     * 　　・入力値が入力した文字に変更されること
+     * 　　・次へボタンが活性状態になること
+     * ・画面イベント
+     * 　　・何もイベントが発生しないこと
+     * ・共通処理イベント
+     * 　　・入力した文字を引数に宣言入力アクションが流れること
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun changeStatementByInputEndDecorate2() = testScope.runBlockingTest {
+
+        // 期待結果
+        val value = "私は貪欲に成長している人間です！"
+        val hintText = ""
+        val hintVisibility = false
+        val isButtonEnable = true
+        val expectationsState = state.copy(
+            inputText = value,
+            hintText = hintText,
+            hintVisibility = hintVisibility,
+            isButtonEnable = isButtonEnable)
+        val expectationsEffect = null
+        val expectationsAction = DiaryDispatcherContract.Action.ChangeStatement(value)
+
+        // 実施
+        ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(value))
+
+        // 比較
+        result(expectationsState, expectationsEffect, expectationsAction)
+    }
+
+    /**
+     * テキスト変更
+     *
+     * 条件：文末が「私は〜ている〜です.」となっている文字列を入力
+     * 期待結果；
+     * ・画面の値
+     * 　　・入力値が入力した文字に変更されること
+     * 　　・次へボタンが活性状態になること
+     * ・画面イベント
+     * 　　・何もイベントが発生しないこと
+     * ・共通処理イベント
+     * 　　・入力した文字を引数に宣言入力アクションが流れること
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun changeStatementByInputEndDecorate3() = testScope.runBlockingTest {
+
+        // 期待結果
+        val value = "私は貪欲に成長しているです."
+        val hintText = "あなたは何者ですか？"
+        val hintVisibility = true
+        val isButtonEnable = false
+        val expectationsState = state.copy(
+            inputText = value,
+            hintText = hintText,
+            hintVisibility = hintVisibility,
+            isButtonEnable = isButtonEnable)
+        val expectationsEffect = null
+        val expectationsAction = DiaryDispatcherContract.Action.ChangeStatement(value)
+
+        // 実施
+        ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(value))
+
+        // 比較
+        result(expectationsState, expectationsEffect, expectationsAction)
+    }
+
+    /**
+     * テキスト変更
+     *
+     * 条件：文末が「私は〜ている〜です。」となっている文字列を入力
+     * 期待結果；
+     * ・画面の値
+     * 　　・入力値が入力した文字に変更されること
+     * 　　・次へボタンが活性状態になること
+     * ・画面イベント
+     * 　　・何もイベントが発生しないこと
+     * ・共通処理イベント
+     * 　　・入力した文字を引数に宣言入力アクションが流れること
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun changeStatementByInputEndDecorate4() = testScope.runBlockingTest {
+
+        // 期待結果
+        val value = "私は貪欲に成長している人間です。"
+        val hintText = ""
+        val hintVisibility = false
+        val isButtonEnable = true
+        val expectationsState = state.copy(
+            inputText = value,
+            hintText = hintText,
+            hintVisibility = hintVisibility,
+            isButtonEnable = isButtonEnable)
+        val expectationsEffect = null
+        val expectationsAction = DiaryDispatcherContract.Action.ChangeStatement(value)
+
+        // 実施
+        ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(value))
+
+        // 比較
+        result(expectationsState, expectationsEffect, expectationsAction)
+    }
+
+    /**
+     * テキスト変更
+     *
+     * 条件：文末が「私は〜ている〜です★」となっている文字列を入力
+     * 期待結果；
+     * ・画面の値
+     * 　　・入力値が入力した文字に変更されること
+     * 　　・次へボタンが活性状態になること
+     * ・画面イベント
+     * 　　・何もイベントが発生しないこと
+     * ・共通処理イベント
+     * 　　・入力した文字を引数に宣言入力アクションが流れること
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun changeStatementByInputEndDecorate5() = testScope.runBlockingTest {
+
+        // 期待結果
+        val value = "私は貪欲に成長している人間です★"
+        val hintText = ""
+        val hintVisibility = false
+        val isButtonEnable = true
+        val expectationsState = state.copy(
+            inputText = value,
+            hintText = hintText,
+            hintVisibility = hintVisibility,
+            isButtonEnable = isButtonEnable)
+        val expectationsEffect = null
+        val expectationsAction = DiaryDispatcherContract.Action.ChangeStatement(value)
+
+        // 実施
+        ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(value))
+
+        // 比較
+        result(expectationsState, expectationsEffect, expectationsAction)
+    }
+
+    /**
+     * テキスト変更
+     *
+     * 条件：文末が「私は〜ている〜です☆」となっている文字列を入力
+     * 期待結果；
+     * ・画面の値
+     * 　　・入力値が入力した文字に変更されること
+     * 　　・次へボタンが活性状態になること
+     * ・画面イベント
+     * 　　・何もイベントが発生しないこと
+     * ・共通処理イベント
+     * 　　・入力した文字を引数に宣言入力アクションが流れること
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun changeStatementByInputEndDecorate6() = testScope.runBlockingTest {
+
+        // 期待結果
+        val value = "私は貪欲に成長している人間です☆"
+        val hintText = ""
+        val hintVisibility = false
+        val isButtonEnable = true
+        val expectationsState = state.copy(
+            inputText = value,
+            hintText = hintText,
+            hintVisibility = hintVisibility,
+            isButtonEnable = isButtonEnable)
         val expectationsEffect = null
         val expectationsAction = DiaryDispatcherContract.Action.ChangeStatement(value)
 
@@ -117,7 +865,14 @@ class FfsStatementViewModelTest {
         // 期待結果
         val initValue = "learn"
         val value = ""
-        val expectationsState = state.copy(inputText = value, isButtonEnable = false)
+        val hintText = ""
+        val hintVisibility = false
+        val isButtonEnable = false
+        val expectationsState = state.copy(
+            inputText = value,
+            hintText = hintText,
+            hintVisibility = hintVisibility,
+            isButtonEnable = isButtonEnable)
         val expectationsEffect = null
         val expectationsAction = DiaryDispatcherContract.Action.ChangeStatement(value)
 

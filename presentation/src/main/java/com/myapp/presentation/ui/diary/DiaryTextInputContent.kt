@@ -31,6 +31,7 @@ sealed class DiaryTextInputContentTag(value: String) : LayoutTag(value) {
     // Text
     object TxtSection : DiaryTextInputContentTag("txt_section")
     object TxtTitle : DiaryTextInputContentTag("txt_title")
+    object TxtHint : DiaryTextInputContentTag("txt_hint")
 
     // EditText
     object EdtInput : DiaryTextInputContentTag("edt_input")
@@ -54,7 +55,7 @@ fun DiaryTextInputContent(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
-        val (txtSection, txtTitle, edtInput, btnOk) = createRefs()
+        val (txtSection, txtTitle, edtInput, hint, btnOk) = createRefs()
         Text(
             text = section,
             fontSize = 24.sp,
@@ -84,7 +85,10 @@ fun DiaryTextInputContent(
                 }
                 .testTag(DiaryTextInputContentTag.TxtTitle.value),
         )
-        OutlinedTextField(value = state.inputText, onValueChange = { onChangeText(it) },
+        OutlinedTextField(
+            value = state.inputText,
+            onValueChange = { onChangeText(it) },
+            isError = state.hintVisibility,
             modifier = Modifier
                 .constrainAs(edtInput) {
                     top.linkTo(txtTitle.bottom)
@@ -93,6 +97,18 @@ fun DiaryTextInputContent(
                     bottom.linkTo(parent.bottom)
                 }
                 .testTag(DiaryTextInputContentTag.EdtInput.value))
+        if (state.hintVisibility) {
+            Text(
+                text = state.hintText,
+                color = MaterialTheme.colors.error,
+                style = MaterialTheme.typography.caption,
+                modifier = Modifier.constrainAs(hint) {
+                    top.linkTo(edtInput.bottom)
+                    start.linkTo(edtInput.start)
+                }
+                    .testTag(DiaryTextInputContentTag.TxtHint.value)
+            )
+        }
         Button(
             onClick = { onClickOkButton() },
             shape = MaterialTheme.shapes.large,
