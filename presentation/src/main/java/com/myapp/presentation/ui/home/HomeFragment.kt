@@ -16,7 +16,6 @@ import com.myapp.presentation.ui.diary.DiaryActivity
 import com.myapp.presentation.utils.base.BaseAacFragment
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.ViewHolder
-import com.xwray.groupie.databinding.BindableItem
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 
@@ -26,7 +25,6 @@ import timber.log.Timber
 @AndroidEntryPoint
 class HomeFragment :
     BaseAacFragment<HomeContract.State, HomeContract.Effect, HomeContract.Event>() {
-
 
     override val viewModel: HomeViewModel by viewModels()
     private var _binding: FragmentHomeBinding? = null
@@ -44,15 +42,19 @@ class HomeFragment :
         super.onViewCreated(view, savedInstanceState)
 
         val adapter = GroupAdapter<ViewHolder>()
-        val layoutManager = LinearLayoutManager(requireContext())
-        layoutManager.orientation = LinearLayoutManager.HORIZONTAL
+        val layoutManager = LinearLayoutManager(requireContext()).also{
+            it.orientation = LinearLayoutManager.HORIZONTAL
+            it.stackFromEnd = true
+        }
         binding.listDiary.adapter = adapter
         binding.listDiary.layoutManager = layoutManager
     }
 
     // State設定
     override fun changedState(state: HomeContract.State) {
-        setDiaryList(state.reportList)
+        if (viewModel.cashState == null || viewModel.cashState!!.reportList.size != viewModel.state.value?.reportList?.size){
+            setDiaryList(state.reportList)
+        }
     }
 
     // イベント設定
@@ -97,39 +99,34 @@ class HomeFragment :
                 startActivity(intent)
             }
             is HomeContract.Effect.LearnListNavigation -> {
-                val statementList = effect.value.map { report -> ReportDetail(report.ffsReport.learnComment, report.ffsReport.dataTime) }
-                val data = ReportDetailList(statementList)
-                val action = HomeFragmentDirections.actionNavHomeToNavLearnList(data)
-                findNavController().navigate(action)
+                effect.value
+                    .map{ ReportDetail(it.ffsReport.learnComment, it.ffsReport.dataTime) }
+                    .let{ ReportDetailList(it)}
+                    .let{ HomeFragmentDirections.actionNavHomeToNavLearnList(it) }
+                    .let{ findNavController().navigate(it) }
             }
             is HomeContract.Effect.StatementListNavigation -> {
-                val statementList = effect.value.map { report -> ReportDetail(report.ffsReport.statementComment, report.ffsReport.dataTime) }
-                val data = ReportDetailList(statementList)
-                val action = HomeFragmentDirections.actionNavHomeToNavStatementList(data)
-                findNavController().navigate(action)
+                effect.value
+                    .map{ ReportDetail(it.ffsReport.statementComment, it.ffsReport.dataTime) }
+                    .let{ ReportDetailList(it) }
+                    .let{ HomeFragmentDirections.actionNavHomeToNavStatementList(it) }
+                    .let{ findNavController().navigate(it) }
             }
             is HomeContract.Effect.ReportDetailListNavigation -> {
-                val action = HomeFragmentDirections.actionNavHomeToNavRememner(effect.value)
-                findNavController().navigate(action)
+                effect.value
+                    .let{ HomeFragmentDirections.actionNavHomeToNavRememner(it) }
+                    .let{ findNavController().navigate(it) }
             }
             is HomeContract.Effect.OnDestroyView -> {}
-            is HomeContract.Effect.ShowError -> {
-                Timber.tag(this.javaClass.simpleName).d(effect.throwable.message)
-            }
+            is HomeContract.Effect.ShowError -> Timber.tag(this.javaClass.simpleName).d(effect.throwable.message)
         }
     }
 
     // レポートリスト設定
     private fun setDiaryList(data: List<Report>) {
-        val adapter = GroupAdapter<ViewHolder>()
-        val items = mutableListOf<BindableItem<*>>()
-        data.forEach { report ->
-            val diaryCardViewModel = DiaryCardViewModel(report)
-            val item = DiaryCardItem(diaryCardViewModel, viewLifecycleOwner, lister)
-            items.add(item)
-        }
-        binding.listDiary.adapter = adapter
-        adapter.update(items)
+        val adapter = binding.listDiary.adapter as GroupAdapter<*>
+        data.map{ DiaryCardItem(DiaryCardViewModel(it), viewLifecycleOwner, lister) }
+            .let{ adapter.update(it) }
     }
 
     override fun onDestroyView() {

@@ -128,6 +128,7 @@ class HomeViewModel @Inject constructor(
     private fun onDestroyView() {
         setState { copy(isFabCheck = false) }
         setEffect { HomeContract.Effect.OnDestroyView }
+        cashState = null
     }
 }
 
