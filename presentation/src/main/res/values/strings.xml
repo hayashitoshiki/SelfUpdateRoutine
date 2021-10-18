@@ -11,6 +11,7 @@
     <string name="menu_home">ホーム</string>
     <string name="menu_setting">設定</string>
     <string name="menu_remember">詳細</string>
+    <string name="menu_account">アカウント</string>
     <string name="menu_mission_statement_list">ミッションステートメント</string>
     <string name="menu_mission_statement_setting">ミッションステートメント編集</string>
     <string name="menu_constitution_statement_list">宣言</string>
@@ -101,6 +102,12 @@
     <string name="bth_daly_input">日記入力へ</string>
     <string name="btn_plus">＋</string>
     <string name="btn_minus">ー</string>
+
+    <!-- 認証系機能 -->
+    <string name="btn_sign_in">ログイン</string>
+    <string name="btn_sign_out">ログアウト</string>
+    <string name="btn_sign_up">アカウント作成</string>
+    <string name="btn_account_delete">アカウント削除</string>
 
     <!-- ラジオボタン -->
     <string name="radio_btn_daly_diary">今日の日記</string>
