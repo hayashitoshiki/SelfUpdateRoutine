@@ -42,7 +42,10 @@ class AccountFragment : BaseAacFragment<AccountContract.State, AccountContract.E
             findNavController().navigate(directions)
         }
         is AccountContract.Effect.NavigateSignOut -> TODO()
-        is AccountContract.Effect.NavigateSignUp -> TODO()
+        is AccountContract.Effect.NavigateSignUp -> {
+            val directions = AccountFragmentDirections.actionNavAccountToNavSignUp()
+            findNavController().navigate(directions)
+        }
         is AccountContract.Effect.ShowError -> TODO()
         is AccountContract.Effect.OnDestroyView -> { }
     }
