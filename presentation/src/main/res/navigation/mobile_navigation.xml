@@ -29,7 +29,16 @@
         android:id="@+id/nav_account"
         android:name="com.myapp.presentation.ui.account.AccountFragment"
         android:label="@string/menu_account"
-        tools:layout="@layout/fragment_account" />
+        tools:layout="@layout/fragment_account" >
+        <action
+            android:id="@+id/action_nav_account_to_nav_sign_in"
+            app:destination="@id/nav_sign_in" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_sign_in"
+        android:name="com.myapp.presentation.ui.account.SignInFragment"
+        tools:layout="@layout/fragment_sign_in" />
 
     <fragment
         android:id="@+id/nav_setting"

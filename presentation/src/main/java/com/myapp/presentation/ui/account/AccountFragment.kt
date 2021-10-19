@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.myapp.presentation.R
 import com.myapp.presentation.databinding.FragmentAccountBinding
 import com.myapp.presentation.utils.base.BaseAacFragment
@@ -36,15 +37,19 @@ class AccountFragment : BaseAacFragment<AccountContract.State, AccountContract.E
 
     override fun setEffect(effect: AccountContract.Effect) = when(effect) {
         is AccountContract.Effect.NavigateDelete -> TODO()
-        is AccountContract.Effect.NavigateSignIn -> TODO()
+        is AccountContract.Effect.NavigateSignIn -> {
+            val directions = AccountFragmentDirections.actionNavAccountToNavSignIn()
+            findNavController().navigate(directions)
+        }
         is AccountContract.Effect.NavigateSignOut -> TODO()
         is AccountContract.Effect.NavigateSignUp -> TODO()
         is AccountContract.Effect.ShowError -> TODO()
-        AccountContract.Effect.OnDestroyView -> { }
+        is AccountContract.Effect.OnDestroyView -> { }
     }
 
     override fun changedState(state: AccountContract.State) {
-        if (state.isSignIn) {binding.btnSignIn.visibility = View.GONE
+        if (state.isSignIn) {
+            binding.btnSignIn.visibility = View.GONE
             binding.btnSignUp.visibility = View.GONE
             binding.btnSignOut.visibility = View.VISIBLE
             binding.btnDelete.visibility = View.VISIBLE
