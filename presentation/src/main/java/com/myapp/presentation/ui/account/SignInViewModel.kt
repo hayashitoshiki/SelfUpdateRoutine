@@ -1,7 +1,13 @@
 package com.myapp.presentation.ui.account
 
+import androidx.lifecycle.viewModelScope
+import com.myapp.domain.dto.AuthInputDto
+import com.myapp.domain.model.value.Email
+import com.myapp.domain.model.value.Password
+import com.myapp.domain.usecase.AuthUseCase
 import com.myapp.presentation.utils.base.BaseAacViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -9,7 +15,7 @@ import javax.inject.Inject
  *
  */
 @HiltViewModel
-class SignInViewModel @Inject constructor() :
+class SignInViewModel @Inject constructor(private val authUseCase: AuthUseCase) :
     BaseAacViewModel<SignInContract.State, SignInContract.Effect, SignInContract.Event>() {
 
     override fun initState(): SignInContract.State {
@@ -58,8 +64,17 @@ class SignInViewModel @Inject constructor() :
      *
      */
     private fun signIn() {
-        // TODO : ログイン処理
-        setEffect{ SignInContract.Effect.NavigateHome }
+        val state = state.value ?: return
+        viewModelScope.launch {
+            runCatching {
+                val email = Email(state.emailText)
+                val password = Password(state.passwordText)
+                val authInputDto = AuthInputDto(email, password)
+                authUseCase.signIn(authInputDto)
+            }
+                .onSuccess {  setEffect { SignInContract.Effect.NavigateHome } }
+                .onFailure { setEffect{ SignInContract.Effect.ShowError(it) } }
+        }
     }
 
     /**

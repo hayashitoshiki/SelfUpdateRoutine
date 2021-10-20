@@ -11,14 +11,14 @@ interface SignUpContract {
      * @property email2Text メールアドレス
      * @property password1Text パスワード
      * @property password2Text パスワード
-     * @property isSignInEnable ログインボタン活性・非活性
+     * @property isSignUpEnable ログインボタン活性・非活性
      */
     data class State(
         val email1Text: String = "",
         val email2Text: String = "",
         val password1Text: String = "",
         val password2Text: String = "",
-        val isSignInEnable: Boolean = false
+        val isSignUpEnable: Boolean = false
     ) : BaseContract.State
 
     /**

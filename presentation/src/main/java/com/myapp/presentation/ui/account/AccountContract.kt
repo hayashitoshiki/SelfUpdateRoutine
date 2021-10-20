@@ -29,16 +29,6 @@ interface AccountContract {
         object NavigateSignIn : Effect()
 
         /**
-         * ログアウトボタン押下
-         */
-        object NavigateSignOut : Effect()
-
-        /**
-         * アカウント削除ボタン押下
-         */
-        object NavigateDelete : Effect()
-
-        /**
          * エラー表示
          */
         data class ShowError(val throwable: Throwable) : Effect()
@@ -54,6 +44,11 @@ interface AccountContract {
      *
      */
     sealed class Event : BaseContract.Event {
+
+        /**
+         * ライフサイクル(onViewCreated)
+         */
+        object OnViewCreated : Event()
 
         /**
          * アカウント作成ボタン押下

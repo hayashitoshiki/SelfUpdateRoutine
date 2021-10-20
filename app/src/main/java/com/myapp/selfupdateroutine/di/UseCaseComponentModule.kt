@@ -24,4 +24,7 @@ abstract class UseCaseComponentModule {
 
     @Binds
     abstract fun bindSettingUseCaseImp(settingUseCaseImp: SettingUseCaseImp): SettingUseCase
+
+    @Binds
+    abstract fun bindAuthUseCaseImp(authUseCaseImp: AuthUseCaseImp): AuthUseCase
 }

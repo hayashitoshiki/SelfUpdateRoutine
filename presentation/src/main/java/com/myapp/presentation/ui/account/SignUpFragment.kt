@@ -11,12 +11,14 @@ import androidx.navigation.fragment.findNavController
 import com.myapp.presentation.R
 import com.myapp.presentation.databinding.FragmentSignUpBinding
 import com.myapp.presentation.utils.base.BaseAacFragment
+import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 
 /**
  * アカウント作成画面
  *
  */
+@AndroidEntryPoint
 class SignUpFragment :
     BaseAacFragment<SignUpContract.State, SignUpContract.Effect, SignUpContract.Event>() {
 
@@ -57,8 +59,8 @@ class SignUpFragment :
                 binding.edtPassword1.setText(state.password1Text)
                 binding.edtPassword2.setText(state.password2Text)
             }
-            if (cash == null || state.isSignInEnable != cash.isSignInEnable) {
-                binding.btnSignIn.isEnabled = state.isSignInEnable
+            if (cash == null || state.isSignUpEnable != cash.isSignUpEnable) {
+                binding.btnSignIn.isEnabled = state.isSignUpEnable
             }
         }
     }

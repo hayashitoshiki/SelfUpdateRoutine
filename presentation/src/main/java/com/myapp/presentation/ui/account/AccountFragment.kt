@@ -10,10 +10,16 @@ import androidx.navigation.fragment.findNavController
 import com.myapp.presentation.R
 import com.myapp.presentation.databinding.FragmentAccountBinding
 import com.myapp.presentation.utils.base.BaseAacFragment
+import dagger.hilt.android.AndroidEntryPoint
 
+/**
+ * アカウント管理画面
+ *
+ */
+@AndroidEntryPoint
 class AccountFragment : BaseAacFragment<AccountContract.State, AccountContract.Effect, AccountContract.Event>() {
 
-    override val viewModel: AccountViewModel  by viewModels()
+    override val viewModel: AccountViewModel by viewModels()
 
     private var _binding: FragmentAccountBinding? = null
     private val binding get() = _binding!!
@@ -28,6 +34,11 @@ class AccountFragment : BaseAacFragment<AccountContract.State, AccountContract.E
         return binding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        viewModel.setEvent(AccountContract.Event.OnViewCreated)
+    }
+
     override fun setEvent() {
         binding.btnSignIn.setOnClickListener { viewModel.setEvent(AccountContract.Event.OnClickSignInButton) }
         binding.btnSignOut.setOnClickListener { viewModel.setEvent(AccountContract.Event.OnClickSignOutButton) }
@@ -36,17 +47,15 @@ class AccountFragment : BaseAacFragment<AccountContract.State, AccountContract.E
     }
 
     override fun setEffect(effect: AccountContract.Effect) = when(effect) {
-        is AccountContract.Effect.NavigateDelete -> TODO()
         is AccountContract.Effect.NavigateSignIn -> {
             val directions = AccountFragmentDirections.actionNavAccountToNavSignIn()
             findNavController().navigate(directions)
         }
-        is AccountContract.Effect.NavigateSignOut -> TODO()
         is AccountContract.Effect.NavigateSignUp -> {
             val directions = AccountFragmentDirections.actionNavAccountToNavSignUp()
             findNavController().navigate(directions)
         }
-        is AccountContract.Effect.ShowError -> TODO()
+        is AccountContract.Effect.ShowError -> {}
         is AccountContract.Effect.OnDestroyView -> { }
     }
 
@@ -67,6 +76,7 @@ class AccountFragment : BaseAacFragment<AccountContract.State, AccountContract.E
     // 画面破棄（初期化）処理
     override fun onDestroyView() {
         super.onDestroyView()
+        viewModel.setEvent(AccountContract.Event.OnDestroyView)
         _binding = null
     }
 }

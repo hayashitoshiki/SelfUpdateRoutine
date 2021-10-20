@@ -1,13 +1,21 @@
 package com.myapp.presentation.ui.account
 
+import androidx.lifecycle.viewModelScope
+import com.myapp.domain.dto.AuthInputDto
+import com.myapp.domain.model.value.Email
+import com.myapp.domain.model.value.Password
+import com.myapp.domain.usecase.AuthUseCase
 import com.myapp.presentation.utils.base.BaseAacViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
  * アカウント作成画面　画面ロジック
  *
  */
-class SignUpViewModel @Inject constructor() :
+@HiltViewModel
+class SignUpViewModel @Inject constructor(private val authUseCase: AuthUseCase) :
     BaseAacViewModel<SignUpContract.State, SignUpContract.Effect, SignUpContract.Event>() {
 
     override fun initState(): SignUpContract.State {
@@ -19,7 +27,7 @@ class SignUpViewModel @Inject constructor() :
         is SignUpContract.Event.OnChangeEmail2 -> changeEmail2(event.email)
         is SignUpContract.Event.OnChangePassword1 -> changePassword1(event.password)
         is SignUpContract.Event.OnChangePassword2 -> changePassword2(event.password)
-        is SignUpContract.Event.OnClickSignInButton -> signIn()
+        is SignUpContract.Event.OnClickSignInButton -> signUp()
         is SignUpContract.Event.OnDestroyView -> onDestroyView()
     }
 
@@ -69,19 +77,36 @@ class SignUpViewModel @Inject constructor() :
      */
     private fun changeSignInEnable() {
         val state = state.value ?: return
-        val isSignInEnable =
-            state.email1Text.isNotEmpty() && state.email2Text.isNotEmpty() && state.email1Text == state.email2Text
-                    && state.password1Text.isNotEmpty() && state.password2Text.isNotEmpty() && state.password1Text == state.password2Text
-        setState { copy(isSignInEnable = isSignInEnable) }
+        val isSignUpEnable = when {
+            state.email1Text.isEmpty() -> false
+            state.email2Text.isEmpty() -> false
+            !Email.check(state.email1Text) -> false
+            state.email1Text != state.email2Text -> false
+            state.password1Text.isEmpty() -> false
+            state.password2Text.isEmpty() -> false
+            !Password.check(state.password1Text) -> false
+            state.password1Text != state.password2Text -> false
+            else -> true
+        }
+        setState { copy(isSignUpEnable = isSignUpEnable) }
     }
 
     /**
-     * ログイン処理
+     * アカウント登録処理
      *
      */
-    private fun signIn() {
-        // TODO : アカウント作成処理
-        setEffect{ SignUpContract.Effect.NavigateHome }
+    private fun signUp() {
+        val state = state.value ?: return
+        viewModelScope.launch {
+            runCatching {
+                val email = Email(state.email1Text)
+                val password = Password(state.password1Text)
+                val authInputDto = AuthInputDto(email, password)
+                authUseCase.signUp(authInputDto)
+            }
+                .onSuccess { setEffect { SignUpContract.Effect.NavigateHome } }
+                .onFailure { setEffect{ SignUpContract.Effect.ShowError(it) } }
+        }
     }
 
     /**

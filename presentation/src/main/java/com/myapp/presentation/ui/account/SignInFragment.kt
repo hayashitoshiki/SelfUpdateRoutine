@@ -11,12 +11,14 @@ import androidx.navigation.fragment.findNavController
 import com.myapp.presentation.R
 import com.myapp.presentation.databinding.FragmentSignInBinding
 import com.myapp.presentation.utils.base.BaseAacFragment
+import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 
 /**
  * ログイン画面
  *
  */
+@AndroidEntryPoint
 class SignInFragment :
     BaseAacFragment<SignInContract.State, SignInContract.Effect, SignInContract.Event>() {
 
