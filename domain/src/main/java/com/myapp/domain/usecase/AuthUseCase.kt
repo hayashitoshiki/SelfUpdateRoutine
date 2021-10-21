@@ -1,6 +1,7 @@
 package com.myapp.domain.usecase
 
 import com.myapp.domain.dto.AuthInputDto
+import com.myapp.domain.dto.SignInDto
 
 /**
  * 認証系機能
@@ -18,9 +19,9 @@ interface AuthUseCase {
     /**
      * ログイン
      *
-     * @param authInputDto 認証用Input値
+     * @param signInDto 認証用Input値
      */
-    suspend fun signIn(authInputDto: AuthInputDto)
+    suspend fun signIn(signInDto: SignInDto)
 
     /**
      * 新規登録

@@ -24,8 +24,10 @@ class RemoteAccountRepositoryImpTest {
     private lateinit var firebaseService: FireBaseService
     private lateinit var remoteAccountRepository: RemoteAccountRepository
 
-    private val email = Email("123@nr.jp")
-    private val password = Password("123Abc")
+    private val email = "123@nr.jp"
+    private val emailVo = Email("123@nr.jp")
+    private val password = "123@nr.jp"
+    private val passwordVo = Password("123Abc")
     private val expectedError1 = IllegalAccessError("失敗1")
     private val expectedError2 = IllegalAccessError("失敗2")
     private val expectedError3 = IllegalAccessError("失敗3")
@@ -49,7 +51,7 @@ class RemoteAccountRepositoryImpTest {
         firebaseService = mockk<FireBaseService>().also {
             every { it.firstCheck() } returns true
             coEvery { it.signIn(email, password) } returns Unit
-            coEvery { it.signUp(email, password) } returns Unit
+            coEvery { it.signUp(emailVo, passwordVo) } returns Unit
             coEvery { it.signOut() } returns Unit
             coEvery { it.delete() } returns Unit
         }
@@ -60,7 +62,7 @@ class RemoteAccountRepositoryImpTest {
         firebaseService = mockk<FireBaseService>().also {
             every { it.firstCheck() } returns false
             coEvery { it.signIn(email, password) } throws expectedError1
-            coEvery { it.signUp(email, password) } throws expectedError2
+            coEvery { it.signUp(emailVo, passwordVo) } throws expectedError2
             coEvery { it.signOut() } throws expectedError3
             coEvery { it.delete() } throws expectedError4
         }
@@ -114,8 +116,6 @@ class RemoteAccountRepositoryImpTest {
      */
     @Test
     fun signInByStateNotSignIn() = runBlocking {
-        val email = Email("123@nr.jp")
-        val password = Password("123Abc")
         setCallBackTrueMock()
         initUseCase()
 
@@ -134,8 +134,6 @@ class RemoteAccountRepositoryImpTest {
      */
     @Test
     fun signInByStateSignIn() = runBlocking {
-        val email = Email("123@nr.jp")
-        val password = Password("123Abc")
         setCallBackException()
         initUseCase()
         runCatching { remoteAccountRepository.signIn(email, password) }
@@ -200,14 +198,12 @@ class RemoteAccountRepositoryImpTest {
      */
     @Test
     fun signUpByStateNotSignIn() = runBlocking {
-        val email = Email("123@nr.jp")
-        val password = Password("123Abc")
         setCallBackTrueMock()
         initUseCase()
 
-        remoteAccountRepository.signUp(email, password)
+        remoteAccountRepository.signUp(emailVo, passwordVo)
 
-        coVerify(exactly = 1) { (firebaseService).signUp(email, password) }
+        coVerify(exactly = 1) { (firebaseService).signUp(emailVo, passwordVo) }
     }
 
     /**

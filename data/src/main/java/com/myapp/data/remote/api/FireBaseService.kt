@@ -21,7 +21,7 @@ interface FireBaseService {
      * ログイン
      *
      */
-    suspend fun signIn(email: Email, password: Password)
+    suspend fun signIn(email: String, password: String)
 
     /**
      * ログアウト

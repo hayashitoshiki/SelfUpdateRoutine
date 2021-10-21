@@ -1,6 +1,7 @@
 package com.myapp.domain.usecase
 
 import com.myapp.domain.dto.AuthInputDto
+import com.myapp.domain.dto.SignInDto
 import com.myapp.domain.model.value.Email
 import com.myapp.domain.model.value.Password
 import com.myapp.domain.repository.RemoteAccountRepository
@@ -24,9 +25,12 @@ class AuthUseCaseImpTest {
     private lateinit var authUseCase: AuthUseCase
     private lateinit var remoteAccountRepository: RemoteAccountRepository
 
-    private val email = Email("123@nr.jp")
-    private val password = Password("123Abc")
-    private val dto = AuthInputDto(email, password)
+    private val email = "123@nr.jp"
+    private val emailVo = Email("123@nr.jp")
+    private val password = "123Abc"
+    private val passwordVo = Password("123Abc")
+    private val signInDto = SignInDto(email, password)
+    private val authDto = AuthInputDto(emailVo, passwordVo)
     private val expectedError1 = IllegalAccessError("失敗1")
     private val expectedError2 = IllegalAccessError("失敗2")
     private val expectedError3 = IllegalAccessError("失敗3")
@@ -50,7 +54,7 @@ class AuthUseCaseImpTest {
         remoteAccountRepository = mockk<RemoteAccountRepository>().also {
             every { it.autoAuth() } returns true
             coEvery { it.signIn(email, password) } throws expectedError1
-            coEvery { it.signUp(email, password) } throws expectedError2
+            coEvery { it.signUp(emailVo, passwordVo) } throws expectedError2
             coEvery { it.signOut() } returns Unit
             coEvery { it.delete() } returns Unit
         }
@@ -61,7 +65,7 @@ class AuthUseCaseImpTest {
         remoteAccountRepository = mockk<RemoteAccountRepository>().also {
             every { it.autoAuth() } returns false
             coEvery { it.signIn(email, password) } returns Unit
-            coEvery { it.signUp(email, password) } returns Unit
+            coEvery { it.signUp(emailVo, passwordVo) } returns Unit
             coEvery { it.signOut() } throws expectedError3
             coEvery { it.delete() } throws expectedError4
         }
@@ -115,13 +119,10 @@ class AuthUseCaseImpTest {
      */
     @Test
     fun signInByStateNotSignIn() = runBlocking {
-        val email = Email("123@nr.jp")
-        val password = Password("123Abc")
-        val dto = AuthInputDto(email, password)
         setStateSignOutMock()
         initUseCase()
 
-        authUseCase.signIn(dto)
+        authUseCase.signIn(signInDto)
 
         coVerify(exactly = 1) { (remoteAccountRepository).signIn(email, password) }
     }
@@ -136,13 +137,10 @@ class AuthUseCaseImpTest {
      */
     @Test
     fun signInByStateSignIn() = runBlocking {
-        val email = Email("123@nr.jp")
-        val password = Password("123Abc")
-        val dto = AuthInputDto(email, password)
         setStateSignInMock()
         initUseCase()
 
-        runCatching { authUseCase.signIn(dto) }
+        runCatching { authUseCase.signIn(signInDto) }
             .onSuccess { fail() }
             .onFailure { assertEquals(expectedError1.message, it.message) }
 
@@ -209,9 +207,9 @@ class AuthUseCaseImpTest {
         setStateSignOutMock()
         initUseCase()
 
-        authUseCase.signUp(dto)
+        authUseCase.signUp(authDto)
 
-        coVerify(exactly = 1) { (remoteAccountRepository).signUp(email, password) }
+        coVerify(exactly = 1) { (remoteAccountRepository).signUp(emailVo, passwordVo) }
     }
 
     /**

@@ -19,8 +19,8 @@ class FireBaseServiceImp @Inject constructor(private val auth: FirebaseAuth) : F
     }
 
     // ログイン機能
-    override suspend fun signIn(email: Email, password: Password) = suspendCoroutine<Unit> { continuation ->
-        auth.signInWithEmailAndPassword(email.value, password.value).addOnCompleteListener { task ->
+    override suspend fun signIn(email: String, password: String) = suspendCoroutine<Unit> { continuation ->
+        auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 continuation.resume(Unit)
             } else {

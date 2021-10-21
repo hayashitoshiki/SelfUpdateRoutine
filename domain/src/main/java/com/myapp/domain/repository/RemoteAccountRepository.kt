@@ -21,7 +21,7 @@ interface RemoteAccountRepository {
      * @param email メールアドレス
      * @param password パスワード
      */
-    suspend fun signIn(email: Email, password: Password)
+    suspend fun signIn(email: String, password: String)
 
     /**
      * 新規登録

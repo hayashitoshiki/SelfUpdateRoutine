@@ -13,7 +13,7 @@ class RemoteAccountRepositoryImp @Inject constructor(private val fireBaseService
     override fun autoAuth(): Boolean = fireBaseService.firstCheck()
 
     // ログイン
-    override suspend fun signIn(email: Email, password: Password) {
+    override suspend fun signIn(email: String, password: String) {
         fireBaseService.signIn(email, password)
     }
 

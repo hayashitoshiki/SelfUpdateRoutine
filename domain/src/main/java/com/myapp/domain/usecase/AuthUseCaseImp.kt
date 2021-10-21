@@ -1,6 +1,7 @@
 package com.myapp.domain.usecase
 
 import com.myapp.domain.dto.AuthInputDto
+import com.myapp.domain.dto.SignInDto
 import com.myapp.domain.repository.RemoteAccountRepository
 import javax.inject.Inject
 
@@ -11,8 +12,8 @@ class AuthUseCaseImp @Inject constructor(private val remoteUserRepository: Remot
     override fun autoAuth(): Boolean = remoteUserRepository.autoAuth()
 
     // ログイン
-    override suspend fun signIn(authInputDto: AuthInputDto) {
-        remoteUserRepository.signIn(authInputDto.email, authInputDto.password)
+    override suspend fun signIn(signInDto: SignInDto) {
+        remoteUserRepository.signIn(signInDto.email, signInDto.password)
     }
 
     // ログアウト

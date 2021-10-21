@@ -2,6 +2,7 @@ package com.myapp.presentation.ui.account
 
 import androidx.lifecycle.viewModelScope
 import com.myapp.domain.dto.AuthInputDto
+import com.myapp.domain.dto.SignInDto
 import com.myapp.domain.model.value.Email
 import com.myapp.domain.model.value.Password
 import com.myapp.domain.usecase.AuthUseCase
@@ -65,14 +66,10 @@ class SignInViewModel @Inject constructor(private val authUseCase: AuthUseCase) 
      */
     private fun signIn() {
         val state = state.value ?: return
+        val authInputDto = SignInDto(state.emailText, state.passwordText)
         viewModelScope.launch {
-            runCatching {
-                val email = Email(state.emailText)
-                val password = Password(state.passwordText)
-                val authInputDto = AuthInputDto(email, password)
-                authUseCase.signIn(authInputDto)
-            }
-                .onSuccess {  setEffect { SignInContract.Effect.NavigateHome } }
+            runCatching { authUseCase.signIn(authInputDto) }
+                .onSuccess { setEffect { SignInContract.Effect.NavigateHome } }
                 .onFailure { setEffect{ SignInContract.Effect.ShowError(it) } }
         }
     }
