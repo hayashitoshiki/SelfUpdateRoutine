@@ -12,7 +12,7 @@ class AuthUseCaseImp @Inject constructor(private val remoteUserRepository: Remot
 
     // ログイン
     override suspend fun signIn(authInputDto: AuthInputDto) {
-        remoteUserRepository.signIn(authInputDto.email.value, authInputDto.password.value)
+        remoteUserRepository.signIn(authInputDto.email, authInputDto.password)
     }
 
     // ログアウト
@@ -22,7 +22,7 @@ class AuthUseCaseImp @Inject constructor(private val remoteUserRepository: Remot
 
     // アカウント作成
     override suspend fun signUp(authInputDto: AuthInputDto) {
-        remoteUserRepository.signUp(authInputDto.email.value, authInputDto.password.value)
+        remoteUserRepository.signUp(authInputDto.email, authInputDto.password)
     }
 
     // アカウント削除

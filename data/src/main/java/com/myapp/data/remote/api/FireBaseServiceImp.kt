@@ -1,6 +1,8 @@
 package com.myapp.data.remote.api
 
 import com.google.firebase.auth.FirebaseAuth
+import com.myapp.domain.model.value.Email
+import com.myapp.domain.model.value.Password
 import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -17,8 +19,8 @@ class FireBaseServiceImp @Inject constructor(private val auth: FirebaseAuth) : F
     }
 
     // ログイン機能
-    override suspend fun signIn(email: String, password: String) = suspendCoroutine<Unit> { continuation ->
-        auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+    override suspend fun signIn(email: Email, password: Password) = suspendCoroutine<Unit> { continuation ->
+        auth.signInWithEmailAndPassword(email.value, password.value).addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 continuation.resume(Unit)
             } else {
@@ -34,8 +36,8 @@ class FireBaseServiceImp @Inject constructor(private val auth: FirebaseAuth) : F
     }
 
     // アカウント作成
-    override suspend fun signUp(email: String, password: String) = suspendCoroutine<Unit> { continuation ->
-        auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+    override suspend fun signUp(email: Email, password: Password) = suspendCoroutine<Unit> { continuation ->
+        auth.createUserWithEmailAndPassword(email.value, password.value).addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 continuation.resume(Unit)
             } else {

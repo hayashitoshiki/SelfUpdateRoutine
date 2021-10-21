@@ -1,5 +1,8 @@
 package com.myapp.data.remote.api
 
+import com.myapp.domain.model.value.Email
+import com.myapp.domain.model.value.Password
+
 /**
  * Firebaseアクセス定義
  *
@@ -18,7 +21,7 @@ interface FireBaseService {
      * ログイン
      *
      */
-    suspend fun signIn(email: String, password: String)
+    suspend fun signIn(email: Email, password: Password)
 
     /**
      * ログアウト
@@ -30,7 +33,7 @@ interface FireBaseService {
      * 新規登録
      *
      */
-    suspend fun signUp(email: String, password: String)
+    suspend fun signUp(email: Email, password: Password)
 
     /**
      * アカウント削除

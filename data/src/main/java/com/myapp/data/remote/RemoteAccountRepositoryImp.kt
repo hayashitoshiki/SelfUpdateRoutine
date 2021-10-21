@@ -1,6 +1,8 @@
 package com.myapp.data.remote
 
 import com.myapp.data.remote.api.FireBaseService
+import com.myapp.domain.model.value.Email
+import com.myapp.domain.model.value.Password
 import com.myapp.domain.repository.RemoteAccountRepository
 import javax.inject.Inject
 
@@ -11,7 +13,7 @@ class RemoteAccountRepositoryImp @Inject constructor(private val fireBaseService
     override fun autoAuth(): Boolean = fireBaseService.firstCheck()
 
     // ログイン
-    override suspend fun signIn(email: String, password: String) {
+    override suspend fun signIn(email: Email, password: Password) {
         fireBaseService.signIn(email, password)
     }
 
@@ -21,7 +23,7 @@ class RemoteAccountRepositoryImp @Inject constructor(private val fireBaseService
     }
 
     // アカウント作成
-    override suspend fun signUp(email: String, password: String) {
+    override suspend fun signUp(email: Email, password: Password) {
         fireBaseService.signUp(email, password)
     }
 
