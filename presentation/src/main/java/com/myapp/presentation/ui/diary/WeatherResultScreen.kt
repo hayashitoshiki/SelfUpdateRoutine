@@ -126,11 +126,11 @@ fun WeatherResultContent(
         )
         WeatherValues(
             factSection, WeatherResultContentTag.TxtReasonSection, factTitle, WeatherResultContentTag.TxtReasonTitle,
-            state.fact, WeatherResultContentTag.TxtReasonValue
+            state.reason, WeatherResultContentTag.TxtReasonValue
         )
         WeatherValues(
             improveSection, WeatherResultContentTag.TxtImproveSection, improveTitle, WeatherResultContentTag.TxtImproveTitle,
-            state.learn, WeatherResultContentTag.TxtImproveValue
+            state.improve, WeatherResultContentTag.TxtImproveValue
         )
 
         Box(Modifier.fillMaxWidth()) {
