@@ -5,6 +5,10 @@ import com.myapp.domain.dto.AuthInputDto
 import com.myapp.domain.model.value.Email
 import com.myapp.domain.model.value.Password
 import com.myapp.domain.usecase.AuthUseCase
+import com.myapp.presentation.ui.MainDispatcher
+import com.myapp.presentation.ui.MainDispatcherContract
+import com.myapp.presentation.ui.mission_statement.MissionStatementDispatcher
+import com.myapp.presentation.ui.mission_statement.MissionStatementDispatcherContract
 import com.myapp.presentation.utils.base.BaseAacViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -104,7 +108,10 @@ class SignUpViewModel @Inject constructor(private val authUseCase: AuthUseCase) 
                 val authInputDto = AuthInputDto(email, password)
                 authUseCase.signUp(authInputDto)
             }
-                .onSuccess { setEffect { SignUpContract.Effect.NavigateHome } }
+                .onSuccess {
+                    setEffect { SignUpContract.Effect.NavigateHome }
+                    MainDispatcher.setActions(MainDispatcherContract.Action.AuthUpdate)
+                }
                 .onFailure { setEffect { SignUpContract.Effect.ShowError(it) } }
         }
     }

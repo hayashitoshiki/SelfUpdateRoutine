@@ -2,6 +2,8 @@ package com.myapp.presentation.ui.account
 
 import androidx.lifecycle.viewModelScope
 import com.myapp.domain.usecase.AuthUseCase
+import com.myapp.presentation.ui.MainDispatcher
+import com.myapp.presentation.ui.MainDispatcherContract
 import com.myapp.presentation.utils.base.BaseAacViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -44,7 +46,10 @@ class AccountViewModel @Inject constructor(private val authUseCase: AuthUseCase)
     private fun signOut() {
         viewModelScope.launch {
             runCatching { authUseCase.signOut() }
-                .onSuccess { setState { copy(isSignIn = false) } }
+                .onSuccess {
+                    setState { copy(isSignIn = false) }
+                    MainDispatcher.setActions(MainDispatcherContract.Action.AuthUpdate)
+                }
                 .onFailure { setEffect{ AccountContract.Effect.ShowError(it) } }
         }
     }
@@ -56,7 +61,10 @@ class AccountViewModel @Inject constructor(private val authUseCase: AuthUseCase)
     private fun accountDelete() {
         viewModelScope.launch {
             runCatching { authUseCase.delete() }
-                .onSuccess { setState { copy(isSignIn = false) } }
+                .onSuccess {
+                    setState { copy(isSignIn = false) }
+                    MainDispatcher.setActions(MainDispatcherContract.Action.AuthUpdate)
+                }
                 .onFailure { setEffect{ AccountContract.Effect.ShowError(it) } }
         }
     }

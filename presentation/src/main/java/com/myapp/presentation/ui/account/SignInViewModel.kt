@@ -6,6 +6,8 @@ import com.myapp.domain.dto.SignInDto
 import com.myapp.domain.model.value.Email
 import com.myapp.domain.model.value.Password
 import com.myapp.domain.usecase.AuthUseCase
+import com.myapp.presentation.ui.MainDispatcher
+import com.myapp.presentation.ui.MainDispatcherContract
 import com.myapp.presentation.utils.base.BaseAacViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -69,7 +71,10 @@ class SignInViewModel @Inject constructor(private val authUseCase: AuthUseCase) 
         val authInputDto = SignInDto(state.emailText, state.passwordText)
         viewModelScope.launch {
             runCatching { authUseCase.signIn(authInputDto) }
-                .onSuccess { setEffect { SignInContract.Effect.NavigateHome } }
+                .onSuccess {
+                    setEffect { SignInContract.Effect.NavigateHome }
+                    MainDispatcher.setActions(MainDispatcherContract.Action.AuthUpdate)
+                }
                 .onFailure { setEffect{ SignInContract.Effect.ShowError(it) } }
         }
     }

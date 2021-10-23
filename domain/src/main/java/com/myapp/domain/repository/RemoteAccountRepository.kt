@@ -1,5 +1,6 @@
 package com.myapp.domain.repository
 
+import com.myapp.domain.model.entity.Account
 import com.myapp.domain.model.value.Email
 import com.myapp.domain.model.value.Password
 
@@ -14,6 +15,13 @@ interface RemoteAccountRepository {
      *
      */
     fun autoAuth(): Boolean
+
+    /**
+     * アカウント情報取得
+     *
+     * @return アカウント情報
+     */
+    fun getAccountDetail() : Account?
 
     /**
      * ログイン

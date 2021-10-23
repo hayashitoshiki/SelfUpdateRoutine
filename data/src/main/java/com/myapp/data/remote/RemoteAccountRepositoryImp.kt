@@ -1,6 +1,7 @@
 package com.myapp.data.remote
 
 import com.myapp.data.remote.api.FireBaseService
+import com.myapp.domain.model.entity.Account
 import com.myapp.domain.model.value.Email
 import com.myapp.domain.model.value.Password
 import com.myapp.domain.repository.RemoteAccountRepository
@@ -15,6 +16,11 @@ class RemoteAccountRepositoryImp @Inject constructor(private val fireBaseService
     // ログイン
     override suspend fun signIn(email: String, password: String) {
         fireBaseService.signIn(email, password)
+    }
+
+    // アカウント情報取得
+    override fun getAccountDetail() : Account? {
+        return fireBaseService.getAccountDetail()
     }
 
     // ログアウト

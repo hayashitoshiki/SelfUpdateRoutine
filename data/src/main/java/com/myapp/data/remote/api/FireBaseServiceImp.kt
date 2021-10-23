@@ -1,6 +1,7 @@
 package com.myapp.data.remote.api
 
 import com.google.firebase.auth.FirebaseAuth
+import com.myapp.domain.model.entity.Account
 import com.myapp.domain.model.value.Email
 import com.myapp.domain.model.value.Password
 import javax.inject.Inject
@@ -16,6 +17,12 @@ class FireBaseServiceImp @Inject constructor(private val auth: FirebaseAuth) : F
     // 自動ログイン認証
     override fun firstCheck(): Boolean {
         return auth.currentUser != null
+    }
+
+    // アカウント情報取得
+    override fun getAccountDetail() : Account? {
+        val account = auth.currentUser ?: return null
+        return Account(account.displayName ?: "", account.email ?: "")
     }
 
     // ログイン機能

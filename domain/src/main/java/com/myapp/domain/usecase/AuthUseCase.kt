@@ -2,6 +2,7 @@ package com.myapp.domain.usecase
 
 import com.myapp.domain.dto.AuthInputDto
 import com.myapp.domain.dto.SignInDto
+import com.myapp.domain.model.entity.Account
 
 /**
  * 認証系機能
@@ -15,6 +16,13 @@ interface AuthUseCase {
      * @return 自動ログイン判定結果
      */
     fun autoAuth(): Boolean
+
+    /**
+     * アカウント情報取得
+     *
+     * @return アカウント情報
+     */
+    fun getAccountDetail() : Account?
 
     /**
      * ログイン

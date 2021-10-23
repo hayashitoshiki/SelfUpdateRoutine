@@ -1,5 +1,6 @@
 package com.myapp.data.remote.api
 
+import com.myapp.domain.model.entity.Account
 import com.myapp.domain.model.value.Email
 import com.myapp.domain.model.value.Password
 
@@ -16,6 +17,13 @@ interface FireBaseService {
      *
      */
     fun firstCheck(): Boolean
+
+    /**
+     * アカウント情報取得
+     *
+     * @return アカウント情報
+     */
+    fun getAccountDetail() : Account?
 
     /**
      * ログイン

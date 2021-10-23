@@ -5,8 +5,10 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.AppLaunchChecker
+import androidx.databinding.DataBindingUtil
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -17,6 +19,7 @@ import com.google.android.material.navigation.NavigationView
 import com.myapp.domain.usecase.AlarmNotificationUseCase
 import com.myapp.presentation.R
 import com.myapp.presentation.databinding.ActivityMainBinding
+import com.myapp.presentation.databinding.NavHeaderMainBinding
 import com.myapp.presentation.ui.diary.AlarmNotificationReceiver
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.OffsetDateTime
@@ -30,6 +33,7 @@ class MainActivity : AppCompatActivity() {
     private var _binding: ActivityMainBinding? = null
     private val binding get() = _binding!!
 
+    private val viewModel: MainViewModel by viewModels()
     @Inject
     lateinit var alarmNotificationUseCase: AlarmNotificationUseCase
 
@@ -38,9 +42,11 @@ class MainActivity : AppCompatActivity() {
 
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
+        val navViewHeaderBinding : NavHeaderMainBinding = DataBindingUtil.inflate(layoutInflater, R.layout.nav_header_main, binding.navView, false)
+        navViewHeaderBinding.viewModel = viewModel
+        navViewHeaderBinding.lifecycleOwner = this
         setSupportActionBar(binding.appBarMain.toolbar)
-
+        binding.navView.addHeaderView(navViewHeaderBinding.root)
         if (AppLaunchChecker.hasStartedFromLauncher(this)) {
             Timber.tag(this.javaClass.simpleName)
                 .d("２回目以降起動")
