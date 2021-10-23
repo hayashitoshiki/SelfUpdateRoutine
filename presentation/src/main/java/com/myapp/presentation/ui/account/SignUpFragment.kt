@@ -42,7 +42,7 @@ class SignUpFragment :
         binding.edtEmail2.doAfterTextChanged { viewModel.setEvent(SignUpContract.Event.OnChangeEmail2(it.toString())) }
         binding.edtPassword1.doAfterTextChanged { viewModel.setEvent(SignUpContract.Event.OnChangePassword1(it.toString())) }
         binding.edtPassword2.doAfterTextChanged { viewModel.setEvent(SignUpContract.Event.OnChangePassword2(it.toString())) }
-        binding.btnSignIn.setOnClickListener { viewModel.setEvent(SignUpContract.Event.OnClickSignInButton) }
+        binding.btnSignIn.setOnClickListener { viewModel.setEvent(SignUpContract.Event.OnClickSignUpButton) }
     }
 
     override fun setEffect(effect: SignUpContract.Effect) = when(effect){

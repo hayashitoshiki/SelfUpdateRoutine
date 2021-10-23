@@ -27,12 +27,12 @@ class SignUpViewModel @Inject constructor(private val authUseCase: AuthUseCase) 
         is SignUpContract.Event.OnChangeEmail2 -> changeEmail2(event.email)
         is SignUpContract.Event.OnChangePassword1 -> changePassword1(event.password)
         is SignUpContract.Event.OnChangePassword2 -> changePassword2(event.password)
-        is SignUpContract.Event.OnClickSignInButton -> signUp()
+        is SignUpContract.Event.OnClickSignUpButton -> signUp()
         is SignUpContract.Event.OnDestroyView -> onDestroyView()
     }
 
     /**
-     * メールアドレス1変更
+     * メールアドレス変更
      *
      * @param email メールアドレス
      */
@@ -105,7 +105,7 @@ class SignUpViewModel @Inject constructor(private val authUseCase: AuthUseCase) 
                 authUseCase.signUp(authInputDto)
             }
                 .onSuccess { setEffect { SignUpContract.Effect.NavigateHome } }
-                .onFailure { setEffect{ SignUpContract.Effect.ShowError(it) } }
+                .onFailure { setEffect { SignUpContract.Effect.ShowError(it) } }
         }
     }
 

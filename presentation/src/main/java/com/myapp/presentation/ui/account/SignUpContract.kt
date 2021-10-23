@@ -72,7 +72,7 @@ interface SignUpContract {
         /**
          * アカウント作成ボタン押下
          */
-        object OnClickSignInButton : Event()
+        object OnClickSignUpButton : Event()
 
         /**
          * ライフサイクル(onDestroyView)

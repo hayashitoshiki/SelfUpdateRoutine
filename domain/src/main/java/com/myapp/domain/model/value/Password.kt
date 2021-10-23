@@ -26,7 +26,7 @@ value class Password(val value: String) {
          */
         fun check(value: String) : Boolean{
             return ValidateUtil.isContainsBigAlphabet(value) && ValidateUtil.isContainsSmallAlphabet(value)
-                    && !ValidateUtil.isContainsBigAlphabet(value)
+                    && ValidateUtil.isContainsNumber(value) && value.length >= 6
         }
     }
 }

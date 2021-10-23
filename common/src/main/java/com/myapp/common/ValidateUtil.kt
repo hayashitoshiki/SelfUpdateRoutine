@@ -46,7 +46,7 @@ object ValidateUtil {
      * @return メールアドレスかの判定結果
      */
     fun isEmail(value: String): Boolean {
-        val validate = Regex("^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*\$")
+        val validate = Regex("[a-zA-Z0-9._-]+@[a-z]{2,}+\\.+[a-z]{2,}")
         return validate.containsMatchIn(value)
     }
 }
