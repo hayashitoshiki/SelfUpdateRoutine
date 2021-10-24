@@ -1,4 +1,4 @@
-package com.myapp.data.local
+package com.myapp.data
 
 import com.myapp.common.getDateTimeNow
 import com.myapp.data.local.database.entity.mission_statement.ConstitutionEntity
@@ -11,6 +11,7 @@ import com.myapp.domain.model.entity.MissionStatement
 import com.myapp.domain.model.entity.WeatherReport
 import com.myapp.domain.model.value.HeartScore
 import com.myapp.domain.model.value.ReportDateTime
+import java.time.LocalDateTime
 
 /**
  * DomainModel ←→ DataBase Entity　コンバーダー
@@ -46,6 +47,26 @@ object Converter {
     }
 
     /**
+     * 感情日記Hash-> 感情日記オブジェクト
+     *
+     * @param weatherReportHash 感情日記Hash
+     * @return 感情日記オブジェクト
+     */
+    fun weatherReportFromWeatherReportHash(weatherReportHash: Map<String, Any>): WeatherReport {
+        val heartScore = weatherReportHash["heart_core"].toString().toInt()
+        val reasonComment = weatherReportHash["reason_comment"].toString()
+        val improveComment = weatherReportHash["improve_comment"].toString()
+        val year = (weatherReportHash["create_time"] as Map<*, *>)["year"].toString().toInt()
+        val month = (weatherReportHash["create_time"] as Map<*, *>)["monthValue"].toString().toInt()
+        val day = (weatherReportHash["create_time"] as Map<*, *>)["dayOfMonth"].toString().toInt()
+        val hour = (weatherReportHash["create_time"] as Map<*, *>)["hour"].toString().toInt()
+        val minute = (weatherReportHash["create_time"] as Map<*, *>)["minute"].toString().toInt()
+        val second = (weatherReportHash["create_time"] as Map<*, *>)["second"].toString().toInt()
+        val createTime = LocalDateTime.of(year, month, day, hour, minute, second)
+        return WeatherReport(ReportDateTime(createTime), HeartScore(heartScore), reasonComment, improveComment)
+    }
+
+    /**
      * FFS式日記オブジェクト -> FFS式日記Entity
      *
      * @param ffsReport FFS式日記オブジェクト
@@ -69,6 +90,28 @@ object Converter {
             ReportDateTime(ffsReportEntity.createTime), ffsReportEntity.factComment, ffsReportEntity.findComment,
             ffsReportEntity.learnComment, ffsReportEntity.statementComment
         )
+    }
+
+
+    /**
+     * 感情日記Hash-> 感情日記オブジェクト
+     *
+     * @param ffsReportHash 感情日記Hash
+     * @return 感情日記オブジェクト
+     */
+    fun ffsReportFromFfsReportHash(ffsReportHash: Map<String, Any>): FfsReport {
+        val factComment = ffsReportHash["fact_comment"].toString()
+        val findComment = ffsReportHash["find_comment"].toString()
+        val learnComment = ffsReportHash["learn_comment"].toString()
+        val statementComment = ffsReportHash["statement_comment"].toString()
+        val year = (ffsReportHash["create_time"] as Map<*, *>)["year"].toString().toInt()
+        val month = (ffsReportHash["create_time"] as Map<*, *>)["monthValue"].toString().toInt()
+        val day = (ffsReportHash["create_time"] as Map<*, *>)["dayOfMonth"].toString().toInt()
+        val hour = (ffsReportHash["create_time"] as Map<*, *>)["hour"].toString().toInt()
+        val minute = (ffsReportHash["create_time"] as Map<*, *>)["minute"].toString().toInt()
+        val second = (ffsReportHash["create_time"] as Map<*, *>)["second"].toString().toInt()
+        val createTime = LocalDateTime.of(year, month, day, hour, minute, second)
+        return FfsReport(ReportDateTime(createTime), factComment, findComment, learnComment, statementComment)
     }
 
     // endregion

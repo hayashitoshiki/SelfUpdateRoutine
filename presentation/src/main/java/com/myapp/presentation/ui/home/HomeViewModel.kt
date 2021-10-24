@@ -3,10 +3,14 @@ package com.myapp.presentation.ui.home
 import androidx.lifecycle.*
 import com.myapp.domain.usecase.MissionStatementUseCase
 import com.myapp.domain.usecase.ReportUseCase
+import com.myapp.presentation.ui.MainDispatcher
+import com.myapp.presentation.ui.MainDispatcherContract
 import com.myapp.presentation.utils.base.BaseAacViewModel
 import com.myapp.presentation.utils.expansion.img
 import com.myapp.presentation.utils.expansion.isToday
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import javax.inject.Inject
@@ -35,52 +39,24 @@ class HomeViewModel @Inject constructor(
     }
 
     init {
-        viewModelScope.launch {
-            val reportList = reportUseCase.getAllReport()
-            val isFabVisibility = reportList.isNotEmpty()
-            val isReportListVisibility = reportList.isNotEmpty()
-            val isNotReportListVisibility = reportList.isEmpty()
-
-            if (reportList.isEmpty()) {
-                val mainContainerType = HomeFragmentMainContainerType.NotReport
-                setState {
-                    copy(
-                    reportList = reportList,
-                    isFabVisibility = isFabVisibility,
-                    isReportListVisibility = isReportListVisibility,
-                    isNotReportListVisibility = isNotReportListVisibility,
-                    mainContainerType = mainContainerType
-                    )
-                }
-                return@launch
+        updateReportList()
+        MainDispatcher.action.onEach {
+            when(it) {
+                is MainDispatcherContract.Action.AuthUpdate -> updateReportList()
             }
-            val report = reportList.last()
-            val factComment = report.ffsReport.factComment
-            val findComment = report.ffsReport.findComment
-            val learnComment = report.ffsReport.learnComment
-            val statementComment = report.ffsReport.statementComment
-            val assessmentImg = report.weatherReport.heartScore.img
-            val reasonComment = report.weatherReport.reasonComment
-            val improveComment = report.weatherReport.improveComment
-            val missionStatement = missionStatementUseCase.getMissionStatement()?.purposeLife ?: ""
-            val mainContainerType =
-                if (LocalDateTime.now().hour < 18) {
-                    HomeFragmentMainContainerType.Vision
-                } else if (!report.ffsReport.dataTime.date.isToday()) {
-                    HomeFragmentMainContainerType.NotReport
-                } else {
-                    HomeFragmentMainContainerType.Report
-                }
+        }.launchIn(viewModelScope)
+    }
+
+    private fun updateReportList() = viewModelScope.launch {
+        val reportList = reportUseCase.getAllReport()
+        val isFabVisibility = reportList.isNotEmpty()
+        val isReportListVisibility = reportList.isNotEmpty()
+        val isNotReportListVisibility = reportList.isEmpty()
+
+        if (reportList.isEmpty()) {
+            val mainContainerType = HomeFragmentMainContainerType.NotReport
             setState {
                 copy(
-                    fact = factComment,
-                    find = findComment,
-                    learn = learnComment,
-                    statement = statementComment,
-                    assessmentImg = assessmentImg,
-                    reason = reasonComment,
-                    improve = improveComment,
-                    missionStatement = missionStatement,
                     reportList = reportList,
                     isFabVisibility = isFabVisibility,
                     isReportListVisibility = isReportListVisibility,
@@ -88,6 +64,41 @@ class HomeViewModel @Inject constructor(
                     mainContainerType = mainContainerType
                 )
             }
+            return@launch
+        }
+        val report = reportList.last()
+        val factComment = report.ffsReport.factComment
+        val findComment = report.ffsReport.findComment
+        val learnComment = report.ffsReport.learnComment
+        val statementComment = report.ffsReport.statementComment
+        val assessmentImg = report.weatherReport.heartScore.img
+        val reasonComment = report.weatherReport.reasonComment
+        val improveComment = report.weatherReport.improveComment
+        val missionStatement = missionStatementUseCase.getMissionStatement()?.purposeLife ?: ""
+        val mainContainerType =
+            if (LocalDateTime.now().hour < 18) {
+                HomeFragmentMainContainerType.Vision
+            } else if (!report.ffsReport.dataTime.date.isToday()) {
+                HomeFragmentMainContainerType.NotReport
+            } else {
+                HomeFragmentMainContainerType.Report
+            }
+        setState {
+            copy(
+                fact = factComment,
+                find = findComment,
+                learn = learnComment,
+                statement = statementComment,
+                assessmentImg = assessmentImg,
+                reason = reasonComment,
+                improve = improveComment,
+                missionStatement = missionStatement,
+                reportList = reportList,
+                isFabVisibility = isFabVisibility,
+                isReportListVisibility = isReportListVisibility,
+                isNotReportListVisibility = isNotReportListVisibility,
+                mainContainerType = mainContainerType
+            )
         }
     }
 

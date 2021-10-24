@@ -20,4 +20,10 @@ interface LocalReportRepository {
      * @return 取得した全レポート
      */
     suspend fun getAllReport(): List<Report>
+
+    /**
+     * 全レポート削除
+     *
+     */
+    suspend fun deleteAll()
 }

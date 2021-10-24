@@ -1,5 +1,6 @@
 plugins {
     id 'com.android.application'
+    id 'com.google.gms.google-services'
 }
 
 android {
@@ -10,6 +11,13 @@ android {
 }
 
 dependencies {
+    // firebase
+    implementation platform('com.google.firebase:firebase-bom:28.4.2')
+    implementation 'com.google.firebase:firebase-analytics-ktx'
+    implementation 'com.google.firebase:firebase-auth:21.0.1'
+    // cloud firestore
+    implementation 'com.google.firebase:firebase-firestore-ktx'
+
     implementation project(":domain")
     implementation project(":data")
     implementation project(":presentation")

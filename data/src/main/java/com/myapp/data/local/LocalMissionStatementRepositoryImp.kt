@@ -1,6 +1,7 @@
 package com.myapp.data.local
 
 import com.myapp.common.getDateTimeNow
+import com.myapp.data.Converter
 import com.myapp.data.local.database.dao.mission_statement.ConstitutionDao
 import com.myapp.data.local.database.dao.mission_statement.FuneralDao
 import com.myapp.data.local.database.dao.mission_statement.PurposeLifeDao
@@ -43,5 +44,12 @@ class LocalMissionStatementRepositoryImp @Inject constructor(
         val purposeLife = purposeLifeDao.get()
         val constitutionList = constitutionDao.getAll()
         return Converter.missionStatementFromEntity(funeralList, purposeLife, constitutionList)
+    }
+
+    // 全ミッションステートメント削除
+    override suspend fun deleteAll() {
+        funeralDao.deleteAll()
+        purposeLifeDao.deleteAll()
+        constitutionDao.deleteAll()
     }
 }

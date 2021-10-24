@@ -16,4 +16,8 @@ interface FfsReportDao {
 
     @Query("SELECT * FROM ffs_report")
     suspend fun getAll(): Array<FfsReportEntity>
+
+    @Query("DELETE FROM ffs_report")
+    suspend fun deleteAll()
+
 }
