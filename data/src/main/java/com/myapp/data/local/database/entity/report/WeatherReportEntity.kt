@@ -7,32 +7,29 @@ import java.time.LocalDateTime
 
 /**
  * 感情日記_テーブル
+ *
+ * @property id ID
+ * @property heartScore 今日の天気（感情）
+ * @property reasonComment 理由
+ * @property improveComment 明日への改善点
+ * @property createTime 生成日時
  */
 @Entity(tableName = "emotion_report")
 data class WeatherReportEntity(
-
-    /**
-     * ID
-     */
     @PrimaryKey(autoGenerate = true) val id: Long?,
-
-    /**
-     * 今日の天気（感情）
-     */
     @ColumnInfo(name = "heart_core") val heartScore: Int,
-
-    /**
-     * 理由
-     */
     @ColumnInfo(name = "reason_comment") val reasonComment: String,
-
-    /**
-     * 明日への改善点
-     */
     @ColumnInfo(name = "improve_comment") val improveComment: String,
-
-    /**
-     * 生成日時
-     */
     @ColumnInfo(name = "create_time") val createTime: LocalDateTime
-)
+) {
+    fun toFireBaseData(email: String): HashMap<String,Any>{
+        return hashMapOf(
+            "email" to email,
+            "id" to id.toString(),
+            "heart_core" to heartScore,
+            "reason_comment" to reasonComment,
+            "improve_comment" to improveComment,
+            "create_time" to createTime
+        )
+    }
+}

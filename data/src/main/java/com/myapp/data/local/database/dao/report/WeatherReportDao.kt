@@ -16,4 +16,7 @@ interface WeatherReportDao {
 
     @Query("SELECT * FROM emotion_report")
     suspend fun getAll(): Array<WeatherReportEntity>
+
+    @Query("DELETE FROM emotion_report")
+    suspend fun deleteAll()
 }

@@ -1,5 +1,6 @@
 package com.myapp.data.local
 
+import com.myapp.data.Converter
 import com.myapp.data.local.database.dao.report.FfsReportDao
 import com.myapp.data.local.database.dao.report.WeatherReportDao
 import com.myapp.domain.model.entity.Report
@@ -33,4 +34,10 @@ class LocalReportRepositoryImp @Inject constructor(
         }
         return reportList
     }
+
+    override suspend fun deleteAll() {
+        weatherReportDao.deleteAll()
+        ffsReportDao.deleteAll()
+    }
+
 }
