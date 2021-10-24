@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
@@ -47,8 +48,8 @@ class SignInFragment :
         is SignInContract.Effect.NavigateHome -> backHome()
         is SignInContract.Effect.OnDestroyView -> { }
         is SignInContract.Effect.ShowError -> Timber.tag(this.javaClass.simpleName).d(effect.throwable)
+        is SignInContract.Effect.ShorProgressBer -> showProgressBar(effect.value)
     }
-
     override fun changedState(state: SignInContract.State) {
         viewModel.cashState.let{ cash ->
             if (cash == null) {
@@ -59,6 +60,14 @@ class SignInFragment :
                 binding.btnSignIn.isEnabled = state.isSignInEnable
             }
         }
+    }
+
+    // プログレスバー表示制御
+    private fun showProgressBar(value: Boolean) {
+        binding.progressBar.isVisible = value
+        binding.edtPassword.isEnabled = !value
+        binding.edtEmail.isEnabled = !value
+        binding.btnSignIn.isEnabled = !value
     }
 
     // ホーム画面遷移

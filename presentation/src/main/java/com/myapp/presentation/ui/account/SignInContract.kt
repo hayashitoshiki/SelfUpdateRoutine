@@ -29,6 +29,13 @@ interface SignInContract {
         object NavigateHome : Effect()
 
         /**
+         * ProgressBarの表示制御
+         *
+         * @property value 表示切り替え
+         */
+        data class ShorProgressBer(val value: Boolean) : Effect()
+
+        /**
          * エラー表示
          */
         data class ShowError(val throwable: Throwable) : Effect()
@@ -47,11 +54,13 @@ interface SignInContract {
 
         /**
          * メールアドレス変更
+         * @property email メールアドレス
          */
         data class OnChangeEmail(val email: String) : Event()
 
         /**
          * パスワード変更
+         * @property password パスワード
          */
         data class OnChangePassword(val password: String) : Event()
 

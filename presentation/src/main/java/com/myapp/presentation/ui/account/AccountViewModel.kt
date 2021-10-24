@@ -23,7 +23,8 @@ class AccountViewModel @Inject constructor(private val authUseCase: AuthUseCase)
 
     override fun handleEvents(event: AccountContract.Event) = when(event) {
         is AccountContract.Event.OnViewCreated -> checkAuth()
-        is AccountContract.Event.OnClickDeleteButton -> accountDelete()
+        is AccountContract.Event.OnClickDeleteButton -> setEffect{ AccountContract.Effect.ShorDeleteConfirmDialog }
+        is AccountContract.Event.OnClickDeleteConfirmOkButton -> accountDelete()
         is AccountContract.Event.OnClickSignInButton -> setEffect{ AccountContract.Effect.NavigateSignIn }
         is AccountContract.Event.OnClickSignOutButton -> signOut()
         is AccountContract.Event.OnClickSignUpButton -> setEffect{ AccountContract.Effect.NavigateSignUp }

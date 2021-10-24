@@ -223,9 +223,38 @@ class AccountViewModelTest {
     // region アカウント削除
 
     /**
+     * アカウント削除
+     *
+     * 条件：アカウント削除ボタン押下
+     * 期待結果；
+     * ・画面の値
+     * 　　ー
+     * ・画面イベント
+     * 　　・アカウント削除確認ダイアログ表示イベント発生すること
+     * ・業務ロジック
+     * 　　ー
+     */
+    @ExperimentalCoroutinesApi
+    @Test
+    fun onClickDeleteButton() {
+        // 期待値
+        val expectationsEffect = AccountContract.Effect.ShorDeleteConfirmDialog
+        val expectationsState = state.copy(isSignIn =  true)
+
+        //実施
+        setStateSignInMock()
+        initViewModel()
+        viewModel.setEvent( AccountContract.Event.OnViewCreated)
+        viewModel.setEvent( AccountContract.Event.OnClickDeleteButton)
+
+        // 検証
+        result(expectationsState, expectationsEffect)
+    }
+
+    /**
      * アカウント削除処理
      *
-     * 条件：ログイン状態
+     * 条件：アカウント削除確認画面OKボタン押下_ログイン状態
      * 期待結果；
      * ・画面の値
      * 　　・ログイン状態がfalseとなること
@@ -245,7 +274,7 @@ class AccountViewModelTest {
         setStateSignInMock()
         initViewModel()
         viewModel.setEvent( AccountContract.Event.OnViewCreated)
-        viewModel.setEvent( AccountContract.Event.OnClickDeleteButton)
+        viewModel.setEvent( AccountContract.Event.OnClickDeleteConfirmOkButton)
 
         // 検証
         result(expectationsState, expectationsEffect)
@@ -255,7 +284,7 @@ class AccountViewModelTest {
     /**
      * アカウント削除処理
      *
-     * 条件：未ログイン状態
+     * 条件：アカウント削除確認画面OKボタン押下_未ログイン状態
      * 期待結果；
      * ・画面の値
      * 　　・値が変わらないこと
@@ -275,7 +304,7 @@ class AccountViewModelTest {
         setStateSignOutMock()
         initViewModel()
         viewModel.setEvent( AccountContract.Event.OnViewCreated)
-        viewModel.setEvent( AccountContract.Event.OnClickDeleteButton)
+        viewModel.setEvent( AccountContract.Event.OnClickDeleteConfirmOkButton)
 
         // 検証
         result(expectationsState, expectationsEffect)

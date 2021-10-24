@@ -1,9 +1,11 @@
 package com.myapp.presentation.ui.account
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -11,6 +13,9 @@ import com.myapp.presentation.R
 import com.myapp.presentation.databinding.FragmentAccountBinding
 import com.myapp.presentation.utils.base.BaseAacFragment
 import dagger.hilt.android.AndroidEntryPoint
+import android.content.DialogInterface
+import timber.log.Timber
+
 
 /**
  * アカウント管理画面
@@ -55,22 +60,28 @@ class AccountFragment : BaseAacFragment<AccountContract.State, AccountContract.E
             val directions = AccountFragmentDirections.actionNavAccountToNavSignUp()
             findNavController().navigate(directions)
         }
-        is AccountContract.Effect.ShowError -> {}
+        is AccountContract.Effect.ShowError -> { Timber.e(effect.throwable)}
+        is AccountContract.Effect.ShorDeleteConfirmDialog -> { showDeleteConfirmDialog() }
         is AccountContract.Effect.OnDestroyView -> { }
     }
 
     override fun changedState(state: AccountContract.State) {
-        if (state.isSignIn) {
-            binding.btnSignIn.visibility = View.GONE
-            binding.btnSignUp.visibility = View.GONE
-            binding.btnSignOut.visibility = View.VISIBLE
-            binding.btnDelete.visibility = View.VISIBLE
-        } else {
-            binding.btnSignIn.visibility = View.VISIBLE
-            binding.btnSignUp.visibility = View.VISIBLE
-            binding.btnSignOut.visibility = View.GONE
-            binding.btnDelete.visibility = View.GONE
-        }
+        binding.btnSignIn.isVisible = !state.isSignIn
+        binding.btnSignUp.isVisible = !state.isSignIn
+        binding.btnSignOut.isVisible = state.isSignIn
+        binding.btnDelete.isVisible = state.isSignIn
+    }
+
+    // 削除確認ダイアログ表示
+    private fun showDeleteConfirmDialog() {
+        AlertDialog.Builder(activity)
+            .setTitle("！！注意！！")
+            .setMessage("アカウントを削除してもよろしいですか？")
+            .setPositiveButton("はい") { _, _ ->
+                viewModel.setEvent(AccountContract.Event.OnClickDeleteConfirmOkButton)
+            }
+            .setNegativeButton("いいえ",null)
+            .show()
     }
 
     // 画面破棄（初期化）処理

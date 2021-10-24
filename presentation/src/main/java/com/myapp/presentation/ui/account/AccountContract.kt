@@ -34,6 +34,11 @@ interface AccountContract {
         data class ShowError(val throwable: Throwable) : Effect()
 
         /**
+         * アカウント削除確認ダイアログ表示
+         */
+        object ShorDeleteConfirmDialog : Effect()
+
+        /**
          * ライフサイクル(onDestroyView)
          */
         object OnDestroyView : Effect()
@@ -69,6 +74,11 @@ interface AccountContract {
          * アカウント削除ボタン押下
          */
         object OnClickDeleteButton : Event()
+
+        /**
+         * アカウント削除確認ダイアロ_グOkボタン押下
+         */
+        object OnClickDeleteConfirmOkButton : Event()
 
         /**
          * ライフサイクル(onDestroyView)
