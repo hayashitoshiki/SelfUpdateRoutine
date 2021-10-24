@@ -49,7 +49,9 @@ https://github.com/hayashitoshiki/ComposeSample/blob/master/README.md
   * LeakCanary
   * ktLint
 #### バックエンド
-なし　
+*  FireBase
+    *  Authentication
+    *  Cloud Firestore
 
 ## 画面イメージ
 <img src="https://github.com/hayashitoshiki/SelfUpdateRoutine/blob/master/picture/home.png" width="200">　
