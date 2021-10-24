@@ -45,4 +45,11 @@ class LocalMissionStatementRepositoryImp @Inject constructor(
         val constitutionList = constitutionDao.getAll()
         return Converter.missionStatementFromEntity(funeralList, purposeLife, constitutionList)
     }
+
+    // 全ミッションステートメント削除
+    override suspend fun deleteAll() {
+        funeralDao.deleteAll()
+        purposeLifeDao.deleteAll()
+        constitutionDao.deleteAll()
+    }
 }

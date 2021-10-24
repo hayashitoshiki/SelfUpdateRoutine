@@ -21,4 +21,8 @@ interface PurposeLifeDao {
 
     @Query("SELECT * FROM purpose_life WHERE id = 1")
     suspend fun get(): PurposeLifeEntity?
+
+    @Query("DELETE FROM purpose_life")
+    suspend fun deleteAll()
+
 }

@@ -21,4 +21,10 @@ interface LocalMissionStatementRepository {
      * @return　取得したミッションステートメント
      */
     suspend fun getMissionStatement(): MissionStatement?
+
+    /**
+     * 全ミッションステートメント削除
+     *
+     */
+    suspend fun deleteAll()
 }

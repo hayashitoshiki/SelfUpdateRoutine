@@ -11,11 +11,13 @@ class RemoteReportRepositoryImp @Inject constructor(
 ) : RemoteReportRepository {
 
     // 振り返り日記保存
-    override suspend fun saveReport(report: Report, email: String) {
-        val emotionsReportEntity = Converter.weatherReportEntityFromWeatherReport(report.weatherReport)
-        val ffsReportEntity = Converter.ffsReportEntityFromFfsReport(report.ffsReport)
-        fireBaseService.addWeather(emotionsReportEntity, email)
-        fireBaseService.addFfs(ffsReportEntity, email)
+    override suspend fun saveReport(reportList: List<Report>, email: String) {
+        reportList.forEach {
+            val emotionsReportEntity = Converter.weatherReportEntityFromWeatherReport(it.weatherReport)
+            val ffsReportEntity = Converter.ffsReportEntityFromFfsReport(it.ffsReport)
+            fireBaseService.addWeather(emotionsReportEntity, email)
+            fireBaseService.addFfs(ffsReportEntity, email)
+        }
     }
 
     // 全振り返り日記取得

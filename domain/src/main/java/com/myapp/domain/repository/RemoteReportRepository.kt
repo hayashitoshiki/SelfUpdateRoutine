@@ -12,7 +12,7 @@ interface RemoteReportRepository {
      *
      * @param report 保存するレポート
      */
-    suspend fun saveReport(report: Report, email: String)
+    suspend fun saveReport(reportList: List<Report>, email: String)
 
     /**
      * 全レポート取得
