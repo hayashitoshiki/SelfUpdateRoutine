@@ -1,6 +1,8 @@
 package com.myapp.presentation.ui.setting
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.myapp.common.getStrHHmm
+import com.myapp.common.getStrHMMddEHHmm
 import com.myapp.domain.dto.NextAlarmTimeInputDto
 import com.myapp.domain.model.value.AlarmMode
 import com.myapp.domain.usecase.SettingUseCase
@@ -16,8 +18,6 @@ import org.junit.*
 import org.junit.rules.TestRule
 import java.time.LocalDateTime
 import java.time.LocalTime
-import java.time.format.DateTimeFormatter
-import java.util.*
 
 /**
  * 設定画面　UIロジック仕様
@@ -29,6 +29,7 @@ class SettingViewModelTest {
     private lateinit var settingUseCase: SettingUseCase
     private val initLocalDataTime = LocalDateTime.now().with(LocalTime.of(22, 20, 0))
     private val updateLocalDataTime = LocalDateTime.now().with(LocalTime.of(22, 25, 0))
+    private val nextAlarmDataTime = LocalDateTime.now().with(LocalTime.of(23, 22, 22))
 
     @ExperimentalCoroutinesApi
     private val coroutineDispatcher = TestCoroutineDispatcher()
@@ -49,7 +50,23 @@ class SettingViewModelTest {
             coEvery { it.getAlarmDate() } returns initLocalDataTime
             coEvery { it.getAlarmMode() } returns AlarmMode.NORMAL
             coEvery { it.updateAlarmDate(any()) } returns updateLocalDataTime
+            coEvery { it.getNextAlarmDate(any()) } returns nextAlarmDataTime
         }
+        initViewModel()
+    }
+
+    // アラームタイムが初期値を返すようにモック化
+    private fun setGetNextAlarmByInit() {
+        settingUseCase = mockk<SettingUseCase>().also {
+            coEvery { it.getAlarmDate() } returns initLocalDataTime
+            coEvery { it.getAlarmMode() } returns AlarmMode.NORMAL
+            coEvery { it.updateAlarmDate(any()) } returns updateLocalDataTime
+            coEvery { it.getNextAlarmDate(any()) } returns initLocalDataTime
+        }
+    }
+
+    // ViewMode　初期化
+    private fun initViewModel() {
         settingViewModel = SettingViewModel(settingUseCase)
     }
 
@@ -74,13 +91,13 @@ class SettingViewModelTest {
         val resultEffect = settingViewModel.effect.value
 
         // 比較
-        Assert.assertEquals(resultState, state)
+        Assert.assertEquals(state, resultState)
         if (resultEffect is SettingContract.Effect.ShowError) {
             val resultMessage = resultEffect.throwable.message
             val message = (effect as SettingContract.Effect.ShowError).throwable.message
-            Assert.assertEquals(resultMessage, message)
+            Assert.assertEquals(message, resultMessage)
         } else {
-            Assert.assertEquals(resultEffect, effect)
+            Assert.assertEquals(effect, resultEffect)
         }
     }
 
@@ -98,7 +115,7 @@ class SettingViewModelTest {
      * ・画面イベント
      * 　　・何もイベントが発生しないこと
      * ・業務ロジック
-     * 　　　ー
+     * 　　・次回のアラーム時間取得処理が呼ばれること
      */
     @ExperimentalCoroutinesApi
     @Test
@@ -107,14 +124,17 @@ class SettingViewModelTest {
         // 期待結果
         settingViewModel.setEvent(SettingContract.Event.CreatedView)
         val value = initLocalDataTime.minute + 3
-        val expectationsEffect = null
+        val nextAlarmTimeInputDto = NextAlarmTimeInputDto(initLocalDataTime.hour, value, initLocalDataTime.second, AlarmMode.NORMAL)
         val alarmTimeDiff = settingViewModel.state.value!!.beforeDate + " -> " + String.format(
             "%02d", settingViewModel.state.value!!.hourDate
         ) + ":" + String.format("%02d", value)
-        val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("M月d日(E) HH:mm", Locale.JAPANESE)
+        val expectationsEffect = null
         val expectationsState = settingViewModel.state.value!!.copy(
-            minutesDate = value, alarmTimeDiff = alarmTimeDiff, alarmTimeDiffColor = R.color.text_color_light_primary,
-            isEnableConfirmButton = true, nextAlarmTime = updateLocalDataTime.format(formatter)
+            minutesDate = value,
+            alarmTimeDiff = alarmTimeDiff,
+            alarmTimeDiffColor = R.color.text_color_light_primary,
+            isEnableConfirmButton = true,
+            nextAlarmTime = nextAlarmDataTime.getStrHMMddEHHmm()
         )
 
         // 実施
@@ -122,6 +142,7 @@ class SettingViewModelTest {
 
         // 比較
         result(expectationsState, expectationsEffect)
+        coVerify(exactly = 1) { (settingUseCase).getNextAlarmDate(nextAlarmTimeInputDto) }
     }
 
     /**
@@ -136,24 +157,26 @@ class SettingViewModelTest {
      * ・画面イベント
      * 　　・何もイベントが発生しないこと
      * ・業務ロジック
-     * 　　　ー
+     * 　　・次回のアラーム時間取得処理が呼ばれること
      */
     @ExperimentalCoroutinesApi
     @Test
     fun changeAlarmMinuteByEqual() = testScope.runBlockingTest {
 
         // 期待結果
+        setGetNextAlarmByInit()
+        initViewModel()
         settingViewModel.setEvent(SettingContract.Event.CreatedView)
         val value = initLocalDataTime.minute + 3
+        val nextAlarmTimeInputDto = NextAlarmTimeInputDto(initLocalDataTime.hour, initLocalDataTime.minute, initLocalDataTime.second, AlarmMode.NORMAL)
+        val alarmTimeDiff = initLocalDataTime.getStrHHmm() + " -> " + initLocalDataTime.getStrHHmm()
         val expectationsEffect = null
-        val alarmTimeDiff = settingViewModel.state.value!!.beforeDate + " -> " + String.format(
-            "%02d", settingViewModel.state.value!!.hourDate
-        ) + ":" + String.format("%02d", initLocalDataTime.minute)
-        val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("M月d日(E) HH:mm", Locale.JAPANESE)
         val expectationsState = settingViewModel.state.value!!.copy(
-            minutesDate = initLocalDataTime.minute, alarmTimeDiff = alarmTimeDiff,
-            alarmTimeDiffColor = R.color.text_color_light_secondary, isEnableConfirmButton = false,
-            nextAlarmTime = updateLocalDataTime.format(formatter)
+            minutesDate = initLocalDataTime.minute,
+            alarmTimeDiff = alarmTimeDiff,
+            alarmTimeDiffColor = R.color.text_color_light_secondary,
+            isEnableConfirmButton = false,
+            nextAlarmTime = initLocalDataTime.getStrHMMddEHHmm()
         )
 
         // 実施
@@ -162,6 +185,7 @@ class SettingViewModelTest {
 
         // 比較
         result(expectationsState, expectationsEffect)
+        coVerify(exactly = 1) { (settingUseCase).getNextAlarmDate(nextAlarmTimeInputDto) }
     }
 
     // endregion
@@ -180,7 +204,7 @@ class SettingViewModelTest {
      * ・画面イベント
      * 　　・何もイベントが発生しないこと
      * ・業務ロジック
-     * 　　　ー
+     * 　　・次回のアラーム時間取得処理が呼ばれること
      */
     @ExperimentalCoroutinesApi
     @Test
@@ -189,14 +213,17 @@ class SettingViewModelTest {
         // 期待結果
         settingViewModel.setEvent(SettingContract.Event.CreatedView)
         val value = initLocalDataTime.hour + 1
-        val expectationsEffect = null
+        val nextAlarmTimeInputDto = NextAlarmTimeInputDto(value, initLocalDataTime.minute, initLocalDataTime.second, AlarmMode.NORMAL)
         val alarmTimeDiff = settingViewModel.state.value!!.beforeDate + " -> " + String.format(
             "%02d", value
         ) + ":" + String.format("%02d", settingViewModel.state.value!!.minutesDate)
-        val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("M月d日(E) HH:mm", Locale.JAPANESE)
+        val expectationsEffect = null
         val expectationsState = settingViewModel.state.value!!.copy(
-            hourDate = value, alarmTimeDiff = alarmTimeDiff, alarmTimeDiffColor = R.color.text_color_light_primary,
-            isEnableConfirmButton = true, nextAlarmTime = updateLocalDataTime.format(formatter)
+            hourDate = value,
+            alarmTimeDiff = alarmTimeDiff,
+            alarmTimeDiffColor = R.color.text_color_light_primary,
+            isEnableConfirmButton = true,
+            nextAlarmTime = nextAlarmDataTime.getStrHMMddEHHmm()
         )
 
         // 実施
@@ -204,6 +231,7 @@ class SettingViewModelTest {
 
         // 比較
         result(expectationsState, expectationsEffect)
+        coVerify(exactly = 1) { (settingUseCase).getNextAlarmDate(nextAlarmTimeInputDto) }
     }
 
     /**
@@ -218,24 +246,26 @@ class SettingViewModelTest {
      * ・画面イベント
      * 　　・何もイベントが発生しないこと
      * ・業務ロジック
-     * 　　　ー
+     * 　　・次回のアラーム時間取得処理が呼ばれること
      */
     @ExperimentalCoroutinesApi
     @Test
     fun changeAlarmHourByEqual() = testScope.runBlockingTest {
 
         // 期待結果
+        setGetNextAlarmByInit()
+        initViewModel()
         settingViewModel.setEvent(SettingContract.Event.CreatedView)
         val value = initLocalDataTime.hour + 1
+        val nextAlarmTimeInputDto = NextAlarmTimeInputDto(initLocalDataTime.hour, initLocalDataTime.minute, initLocalDataTime.second, AlarmMode.NORMAL)
+        val alarmTimeDiff = initLocalDataTime.getStrHHmm() + " -> " + initLocalDataTime.getStrHHmm()
         val expectationsEffect = null
-        val alarmTimeDiff = settingViewModel.state.value!!.beforeDate + " -> " + String.format(
-            "%02d", settingViewModel.state.value!!.hourDate
-        ) + ":" + String.format("%02d", initLocalDataTime.minute)
-        val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("M月d日(E) HH:mm", Locale.JAPANESE)
         val expectationsState = settingViewModel.state.value!!.copy(
-            hourDate = initLocalDataTime.hour, alarmTimeDiff = alarmTimeDiff,
-            alarmTimeDiffColor = R.color.text_color_light_secondary, isEnableConfirmButton = false,
-            nextAlarmTime = updateLocalDataTime.format(formatter)
+            hourDate = initLocalDataTime.hour,
+            alarmTimeDiff = alarmTimeDiff,
+            alarmTimeDiffColor = R.color.text_color_light_secondary,
+            isEnableConfirmButton = false,
+            nextAlarmTime = initLocalDataTime.getStrHMMddEHHmm()
         )
 
         // 実施
@@ -244,6 +274,7 @@ class SettingViewModelTest {
 
         // 比較
         result(expectationsState, expectationsEffect)
+        coVerify(exactly = 1) { (settingUseCase).getNextAlarmDate(nextAlarmTimeInputDto) }
     }
 
     // endregion
@@ -317,8 +348,10 @@ class SettingViewModelTest {
         val alarmMode = AlarmMode.NORMAL
         val expectationsEffect = null
         val expectationsState = settingViewModel.state.value!!.copy(
-            alarmMode = alarmMode, alarmModeExplanation = alarmMode.explanation,
-            alarmModeDiffColor = R.color.text_color_light_primary, isEnableConfirmButton = true
+            alarmMode = alarmMode,
+            alarmModeExplanation = alarmMode.explanation,
+            alarmModeDiffColor = R.color.text_color_light_primary,
+            isEnableConfirmButton = true
         )
 
         // 実施
@@ -357,7 +390,7 @@ class SettingViewModelTest {
         val alarmMode = AlarmMode.HARD
         val expectationsEffect = null
         val expectationsState =
-            settingViewModel.state.value!!.copy(alarmMode = alarmMode, alarmModeExplanation = alarmMode.explanation)
+            settingViewModel.state.value!!.copy(beforeAlarmMode = alarmMode, alarmMode = alarmMode, alarmModeExplanation = alarmMode.explanation)
 
         // 実施
         settingViewModel.setEvent(SettingContract.Event.OnChangeAlarmMode(alarmMode))
@@ -395,8 +428,10 @@ class SettingViewModelTest {
         val alarmMode = AlarmMode.HARD
         val expectationsEffect = null
         val expectationsState = settingViewModel.state.value!!.copy(
-            alarmMode = alarmMode, alarmModeExplanation = alarmMode.explanation,
-            alarmModeDiffColor = R.color.text_color_light_primary, isEnableConfirmButton = true
+            alarmMode = alarmMode,
+            alarmModeExplanation = alarmMode.explanation,
+            alarmModeDiffColor = R.color.text_color_light_primary,
+            isEnableConfirmButton = true
         )
 
         // 実施

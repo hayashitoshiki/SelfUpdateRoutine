@@ -51,12 +51,15 @@ class SettingFragment : BaseAacFragment<SettingContract.State, SettingContract.E
         savedInstanceState: Bundle?
     ) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel.setEvent(SettingContract.Event.CreatedView)
         viewModel.state.value?.let { state ->
             binding.timePicker.hour = state.beforeDate.substring(0, 2).toInt()
             binding.timePicker.minute = state.beforeDate.substring(3, 5).toInt()
             binding.alarmValue.text = state.alarmTimeDiff
             binding.alarmValue.setTextColor(resources.getColor(state.alarmTimeDiffColor, null))
             binding.alarmTitle.setTextColor(resources.getColor(state.alarmTimeDiffColor, null))
+            binding.nextTitle.setTextColor(resources.getColor(state.alarmTimeDiffColor, null))
+            binding.nextValue.setTextColor(resources.getColor(state.alarmTimeDiffColor, null))
             binding.nextValue.text = state.nextAlarmTime
             binding.radioHard.isChecked = state.alarmMode == AlarmMode.HARD
             binding.radioNormal.isChecked = state.alarmMode == AlarmMode.NORMAL
@@ -66,7 +69,6 @@ class SettingFragment : BaseAacFragment<SettingContract.State, SettingContract.E
             binding.txtModeExplanation.text = requireContext().getString(state.alarmModeExplanation)
             binding.btnOk.isEnabled = state.isEnableConfirmButton
         }
-        viewModel.setEvent(SettingContract.Event.CreatedView)
     }
 
     // Viewの各値変更
@@ -82,6 +84,8 @@ class SettingFragment : BaseAacFragment<SettingContract.State, SettingContract.E
             if (cash == null || state.alarmTimeDiffColor != cash.alarmTimeDiffColor) {
                 binding.alarmValue.setTextColor(resources.getColor(state.alarmTimeDiffColor, null))
                 binding.alarmTitle.setTextColor(resources.getColor(state.alarmTimeDiffColor, null))
+                binding.nextTitle.setTextColor(resources.getColor(state.alarmTimeDiffColor, null))
+                binding.nextValue.setTextColor(resources.getColor(state.alarmTimeDiffColor, null))
             }
             if (cash == null || state.nextAlarmTime != cash.nextAlarmTime) {
                 binding.nextValue.text = state.nextAlarmTime

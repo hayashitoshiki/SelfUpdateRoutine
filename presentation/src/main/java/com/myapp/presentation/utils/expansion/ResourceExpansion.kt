@@ -11,6 +11,19 @@ import com.myapp.domain.model.value.HeartScore
 import com.myapp.presentation.R
 
 /**
+ * 活性状態に応じた白系のテキストカラーを返す
+ *
+ * @param enable 活性・非活性
+ * @return テキストカラー
+ */
+fun getLightTextColorByEnable(enable: Boolean) : Int {
+    return if (enable) {
+        R.color.text_color_light_secondary
+    } else {
+        R.color.text_color_light_primary
+    }
+}
+/**
  * 今日の天気画像
  */
 @get: DrawableRes
