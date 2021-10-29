@@ -5,6 +5,7 @@ import com.myapp.data.local.database.dao.report.FfsReportDao
 import com.myapp.data.local.database.dao.report.WeatherReportDao
 import com.myapp.domain.model.entity.Report
 import com.myapp.domain.repository.LocalReportRepository
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 class LocalReportRepositoryImp @Inject constructor(
@@ -26,13 +27,19 @@ class LocalReportRepositoryImp @Inject constructor(
             .map { Converter.weatherReportFromWeatherReportEntity(it) }
         val ffsReportList = ffsReportDao.getAll()
             .map { Converter.ffsReportFromFfsReportEntity(it) }
-        val reportList = mutableListOf<Report>()
-        for (index in emotionsReportList.indices) {
-            if (ffsReportList.size > index) {
-                reportList.add(Report(ffsReportList[index], emotionsReportList[index]))
-            }
+        return ffsReportList.mapNotNull { ffsReport ->
+            emotionsReportList
+                .firstOrNull { it.dataTime.date.toLocalDate() == ffsReport.dataTime.date.toLocalDate() }
+                ?.let { Report(ffsReport, it) }
         }
-        return reportList
+    }
+
+    // 登録してあるレポートの最後に登録した日付を返す
+    override suspend fun getLastSaveDate(): LocalDateTime? {
+        return getAllReport().let {
+            if (it.isEmpty()) null
+            else it.last().ffsReport.dataTime.date
+        }
     }
 
     override suspend fun deleteAll() {

@@ -4,6 +4,7 @@ import com.myapp.data.Converter
 import com.myapp.data.remote.api.FireBaseService
 import com.myapp.domain.model.entity.Report
 import com.myapp.domain.repository.RemoteReportRepository
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 class RemoteReportRepositoryImp @Inject constructor(
@@ -24,14 +25,29 @@ class RemoteReportRepositoryImp @Inject constructor(
     override suspend fun getAllReport(email: String): List<Report> {
         val emotionsReportList = fireBaseService.getWeatherAll(email)
             .map { Converter.weatherReportFromWeatherReportHash(it) }
+            .sortedBy { it.dataTime.date }
         val ffsReportList = fireBaseService.getFfsAll(email)
             .map { Converter.ffsReportFromFfsReportHash(it) }
-        val reportList = mutableListOf<Report>()
-        for (index in emotionsReportList.indices) {
-            if (ffsReportList.size > index) {
-                reportList.add(Report(ffsReportList[index], emotionsReportList[index]))
-            }
+            .sortedBy { it.dataTime.date }
+        return ffsReportList.mapNotNull { ffsReport ->
+            emotionsReportList
+                .firstOrNull { it.dataTime.date.toLocalDate() == ffsReport.dataTime.date.toLocalDate() }
+                ?.let { Report(ffsReport, it) }
         }
-        return reportList
+    }
+
+    // 指定日以降の振り返り日記取得
+    override suspend fun getReportByAfterDate(email: String, date: LocalDateTime): List<Report> {
+        val ffsReportList = fireBaseService.getFfsByAfterDate(email, date)
+            .map { Converter.ffsReportFromFfsReportHash(it) }
+            .sortedBy { it.dataTime.date }
+        val emotionsReportList = fireBaseService.getWeatherByAfterDate(email, date)
+            .map { Converter.weatherReportFromWeatherReportHash(it) }
+            .sortedBy { it.dataTime.date }
+        return ffsReportList.mapNotNull { ffsReport ->
+            emotionsReportList
+                .firstOrNull { it.dataTime.date.toLocalDate() == ffsReport.dataTime.date.toLocalDate() }
+                ?.let { Report(ffsReport, it) }
+        }
     }
 }

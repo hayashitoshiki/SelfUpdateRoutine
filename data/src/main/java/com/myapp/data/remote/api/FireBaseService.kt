@@ -80,5 +80,7 @@ interface FireBaseService {
     // 感情日記データ全件取得
     suspend fun getWeatherByAfterDate(email: String) : List<Map<String, Any>>
 
+    suspend fun getWeatherByAfterDate(email: String, date: LocalDateTime) : List<Map<String, Any>>
+
     // endregion
 }

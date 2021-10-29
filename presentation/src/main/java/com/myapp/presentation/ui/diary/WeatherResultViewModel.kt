@@ -44,7 +44,7 @@ class WeatherResultViewModel @Inject constructor(private val reportUseCase: Repo
     }
 
     // 振り返り日記登録
-    private fun saveReport() {
+    private fun saveReport() = viewModelScope.launch {
         runCatching {
             if (state.value.fact.isEmpty()) throw IllegalAccessError("事実データが入っていません")
             if (state.value.find.isEmpty()) throw IllegalAccessError("発見データが入っていません")
@@ -57,8 +57,9 @@ class WeatherResultViewModel @Inject constructor(private val reportUseCase: Repo
                 state.value.fact, state.value.find, state.value.learn, state.value.statement, state.value.assessment,
                 state.value.reason, state.value.improve
             )
-            viewModelScope.launch { reportUseCase.saveReport(allReportInputDto) }
-        }.onSuccess { setEffect { WeatherResultContract.Effect.SaveResult(Status.Success(null)) } }
+            reportUseCase.saveReport(allReportInputDto)
+        }
+            .onSuccess { setEffect { WeatherResultContract.Effect.SaveResult(Status.Success(null)) } }
             .onFailure { setEffect { WeatherResultContract.Effect.SaveResult(Status.Failure(it)) } }
     }
 

@@ -1,5 +1,6 @@
 package com.myapp.data.remote.api
 
+import android.annotation.SuppressLint
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -129,6 +130,10 @@ class FireBaseServiceImp @Inject constructor(private val auth: FirebaseAuth) : F
     override suspend fun getWeatherByAfterDate(email: String) : List<Map<String, Any>> {
         return getDataAll(Table.WEATHER_TABLE, email)
     }
+    // 指定日以降に登録されたのFFS式４行日記テーブル取得
+    override suspend fun getWeatherByAfterDate(email: String, date: LocalDateTime) : List<Map<String, Any>> {
+        return getDataByAlreadyDate(Table.WEATHER_TABLE, email, date)
+    }
 
     // データ登録
     private suspend fun addData(table: Table, data: HashMap<String,Any>) = suspendCoroutine<Unit> { continuation ->
@@ -145,18 +150,16 @@ class FireBaseServiceImp @Inject constructor(private val auth: FirebaseAuth) : F
     }
 
     // データ全権取得
+    @SuppressLint("BinaryOperationInTimber")
     private suspend fun getDataAll(table: Table, email: String) = suspendCoroutine<List<Map<String, Any>>> { continuation ->
         db.collection(table.tableName)
             .whereEqualTo("email", email)
             .get()
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    Timber.d("table:" + table.tableName+ "redsult:" + task.result)
                     val resultDat = task.result
-                        ?.map { document ->
-                            Timber.d("data[]:" + document.data)
-                            document.data }
-                        ?.toList()
+                        ?.map { document -> document.data }
+                        ?.also { Timber.d("table:" + table.tableName+"data[]:" + it) }
                             ?: listOf<Map<String,Any>>()
                     continuation.resume(resultDat)
                 } else {
@@ -167,16 +170,17 @@ class FireBaseServiceImp @Inject constructor(private val auth: FirebaseAuth) : F
     }
 
     // 指定日以降のデータリスト取得
+    @SuppressLint("BinaryOperationInTimber")
     private suspend fun getDataByAlreadyDate(table: Table, email: String, createAt: LocalDateTime) = suspendCoroutine<List<Map<String, Any>>> { continuation ->
         db.collection(table.tableName)
-          //  .where("create_time", ">=", createAt)
             .whereEqualTo("email", email)
+            .whereGreaterThan("create_time", createAt)
             .get()
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     val resultDat = task.result
                         ?.map { document -> document.data }
-                        ?.toList()
+                        ?.also { Timber.d("table:" + table.tableName+"data[]:" + it) }
                             ?: listOf<Map<String,Any>>()
                     continuation.resume(resultDat)
                 } else {

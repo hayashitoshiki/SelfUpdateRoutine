@@ -7,6 +7,9 @@ import com.myapp.domain.repository.LocalSettingRepository
 import com.myapp.domain.repository.RemoteAccountRepository
 import com.myapp.domain.repository.RemoteReportRepository
 import com.myapp.domain.translator.ReportTranslator
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
 import javax.inject.Inject
 
 // 今日の振り返り機能
@@ -20,12 +23,24 @@ class ReportUseCaseImp @Inject constructor(
     // 振り返り日記を登録する
     override suspend fun saveReport(allReportInputDto: AllReportInputDto) {
         val report = ReportTranslator.allReportConvert(allReportInputDto)
+
+        // 最終登録時間設定
         localSettingRepository.setLastReportSaveDateTime(report.ffsReport.dataTime.date)
-        localReportRepository.saveReport(report)
+
+        // ログイン済みならリモードデータとの同期処理実施
         if (remoteAccountRepository.autoAuth()) {
             val email = remoteAccountRepository.getAccountDetail()?.email ?: return
+            val date = localReportRepository.getLastSaveDate() ?: LocalDateTime.now().with(LocalDate.of(200, 1, 1))
+            val reportList = remoteReportRepository.getReportByAfterDate(email, date)
+            if (reportList.isNotEmpty()) {
+                reportList.forEach{ localReportRepository.saveReport(it) }
+                if (reportList.last().ffsReport.dataTime.date >= LocalDateTime.now().with(LocalTime.of(0, 0, 0))) {
+                    return
+                }
+            }
             remoteReportRepository.saveReport(listOf(report), email)
         }
+        localReportRepository.saveReport(report)
     }
 
     // 振り返り日記の詳細を返す
