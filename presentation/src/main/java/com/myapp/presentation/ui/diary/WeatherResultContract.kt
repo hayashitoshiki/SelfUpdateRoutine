@@ -13,7 +13,6 @@ interface WeatherResultContract {
      * @property learn 教訓
      * @property statement 宣言
      * @property assessment  点数
-     * @property assessmentInputText 点数(天気）
      * @property reason　理由
      * @property improve 目標
      */
@@ -23,7 +22,6 @@ interface WeatherResultContract {
         val learn: String = "",
         val statement: String = "",
         val assessment: Int = 0,
-        val assessmentInputText: String = "",
         val reason: String = "",
         val improve: String = ""
     ) : BaseContract.State

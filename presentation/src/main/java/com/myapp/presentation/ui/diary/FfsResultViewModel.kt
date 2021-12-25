@@ -25,14 +25,17 @@ class FfsResultViewModel @Inject constructor() :
     }
 
     init {
-        DiaryDispatcher.action.onEach {
-            when (it) {
-                is DiaryDispatcherContract.Action.ChangeFact -> setState { copy(fact = it.value) }
-                is DiaryDispatcherContract.Action.ChangeFind -> setState { copy(find = it.value) }
-                is DiaryDispatcherContract.Action.ChangeLearn -> setState { copy(learn = it.value) }
-                is DiaryDispatcherContract.Action.ChangeStatement -> setState { copy(statement = it.value) }
-            }
-        }
+        DiaryDispatcher.factState
+            .onEach { setState { copy(fact = it) } }
+            .launchIn(viewModelScope)
+        DiaryDispatcher.findState
+            .onEach { setState { copy(find = it) } }
+            .launchIn(viewModelScope)
+        DiaryDispatcher.learnState
+            .onEach { setState { copy(learn = it) } }
+            .launchIn(viewModelScope)
+        DiaryDispatcher.statementState
+            .onEach { setState { copy(statement = it) } }
             .launchIn(viewModelScope)
     }
 

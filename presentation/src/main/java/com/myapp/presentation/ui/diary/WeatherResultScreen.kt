@@ -22,9 +22,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.myapp.domain.model.value.HeartScore
 import com.myapp.presentation.R
 import com.myapp.presentation.ui.MainActivity
 import com.myapp.presentation.utils.base.LayoutTag
+import com.myapp.presentation.utils.expansion.text
 import com.myapp.presentation.utils.theme.TextColor
 import es.dmoral.toasty.Toasty
 import kotlinx.coroutines.flow.collect
@@ -99,8 +101,8 @@ fun WeatherResultContent(
     onClickOkButton: () -> Unit
 ) {
     val title = LocalContext.current.getString(R.string.title_answer_check)
-    val factSection = LocalContext.current.getString(R.string.section2_1)
-    val factTitle = LocalContext.current.getString(R.string.question_assessment)
+    val assessmentSection = LocalContext.current.getString(R.string.section2_1)
+    val assessmentTitle = LocalContext.current.getString(R.string.question_assessment)
     val reasonSection = LocalContext.current.getString(R.string.section2_2)
     val reasonTitle = LocalContext.current.getString(R.string.question_reason)
     val improveSection = LocalContext.current.getString(R.string.section2_3)
@@ -121,11 +123,11 @@ fun WeatherResultContent(
         }
 
         WeatherValues(
-            reasonSection, WeatherResultContentTag.TxtAssessmentSection, reasonTitle,
-            WeatherResultContentTag.TxtAssessmentTitle, state.find, WeatherResultContentTag.TxtAssessmentValue
+            assessmentSection, WeatherResultContentTag.TxtAssessmentSection, assessmentTitle,
+            WeatherResultContentTag.TxtAssessmentTitle, LocalContext.current.getString(HeartScore(state.assessment).text), WeatherResultContentTag.TxtAssessmentValue
         )
         WeatherValues(
-            factSection, WeatherResultContentTag.TxtReasonSection, factTitle, WeatherResultContentTag.TxtReasonTitle,
+            reasonSection, WeatherResultContentTag.TxtReasonSection, reasonTitle, WeatherResultContentTag.TxtReasonTitle,
             state.reason, WeatherResultContentTag.TxtReasonValue
         )
         WeatherValues(

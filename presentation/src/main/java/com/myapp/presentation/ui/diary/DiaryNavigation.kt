@@ -7,6 +7,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -67,37 +68,18 @@ enum class Screens(
  * @param navController ナビゲーションAPI
  */
 @Composable
-fun AppNavHost(
-    navController: NavHostController,
-    ffsFactViewModel: FfsFactViewModel,
-    ffsFindViewModel: FfsFindViewModel,
-    ffsLearnViewModel: FfsLearnViewModel,
-    ffsStatementViewModel: FfsStatementViewModel,
-    ffsResultViewModel: FfsResultViewModel,
-    weatherAssessmentViewModel: WeatherAssessmentViewModel,
-    weatherReasonViewModel: WeatherReasonViewModel,
-    weatherImproveViewModel: WeatherImproveViewModel,
-    weatherResultViewModel: WeatherResultViewModel
-) {
+fun AppNavHost(navController: NavHostController) {
     NavHost(
         navController = navController, startDestination = Screens.FFS_FACT_SCREEN.route
     ) {
-        composable(route = Screens.FFS_FACT_SCREEN.route) { FfsFactScreen(navController, ffsFactViewModel) }
-        composable(route = Screens.FFS_FIND_SCREEN.route) { FfsFindScreen(navController, ffsFindViewModel) }
-        composable(route = Screens.FFS_LEARN_SCREEN.route) { FfsLearnScreen(navController, ffsLearnViewModel) }
-        composable(route = Screens.FFS_STATEMENT_SCREEN.route) { FfsStatementScreen(navController, ffsStatementViewModel) }
-        composable(route = Screens.FFS_RESULT_SCREEN.route) { FfsResultScreen(navController, ffsResultViewModel) }
-        composable(route = Screens.WEATHER_ASSESSMENT_SCREEN.route) {
-            WeatherAssessmentScreen(
-                navController, weatherAssessmentViewModel
-            )
-        }
-        composable(route = Screens.WEATHER_REASON_SCREEN.route) { WeatherReasonScreen(navController, weatherReasonViewModel) }
-        composable(route = Screens.WEATHER_IMPROVE_SCREEN.route) {
-            WeatherImproveScreen(
-                navController, weatherImproveViewModel
-            )
-        }
-        composable(route = Screens.WEATHER_RESULT_SCREEN.route) { WeatherResultScreen(weatherResultViewModel) }
+        composable(route = Screens.FFS_FACT_SCREEN.route) { FfsFactScreen(navController, hiltViewModel()) }
+        composable(route = Screens.FFS_FIND_SCREEN.route) { FfsFindScreen(navController, hiltViewModel()) }
+        composable(route = Screens.FFS_LEARN_SCREEN.route) { FfsLearnScreen(navController, hiltViewModel()) }
+        composable(route = Screens.FFS_STATEMENT_SCREEN.route) { FfsStatementScreen(navController, hiltViewModel()) }
+        composable(route = Screens.FFS_RESULT_SCREEN.route) { FfsResultScreen(navController, hiltViewModel()) }
+        composable(route = Screens.WEATHER_ASSESSMENT_SCREEN.route) { WeatherAssessmentScreen(navController, hiltViewModel()) }
+        composable(route = Screens.WEATHER_REASON_SCREEN.route) { WeatherReasonScreen(navController, hiltViewModel()) }
+        composable(route = Screens.WEATHER_IMPROVE_SCREEN.route) { WeatherImproveScreen(navController, hiltViewModel()) }
+        composable(route = Screens.WEATHER_RESULT_SCREEN.route) { WeatherResultScreen(hiltViewModel()) }
     }
 }
