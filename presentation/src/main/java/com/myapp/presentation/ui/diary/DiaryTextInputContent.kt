@@ -1,14 +1,17 @@
 package com.myapp.presentation.ui.diary
 
 import android.content.res.Configuration
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -49,11 +52,13 @@ fun DiaryTextInputContent(
     onChangeText: (String) -> Unit,
     onClickOkButton: () -> Unit
 ) {
-
+    // 背景タップ設定
+    val focusManager = LocalFocusManager.current
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
+            .padding(start = 16.dp, end = 16.dp)
+            .pointerInput(Unit) { detectTapGestures(onTap = { focusManager.clearFocus() }) }
     ) {
         val (txtSection, txtTitle, edtInput, hint, btnOk) = createRefs()
         Text(
@@ -63,10 +68,9 @@ fun DiaryTextInputContent(
             color = TextColor.DarkPrimary,
             modifier = Modifier
                 .constrainAs(txtSection) {
-                    top.linkTo(parent.top)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
-                    bottom.linkTo(txtTitle.top)
+                    bottom.linkTo(txtTitle.top, margin = 16.dp)
                 }
                 .testTag(DiaryTextInputContentTag.TxtSection.value),
         )
@@ -78,10 +82,9 @@ fun DiaryTextInputContent(
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .constrainAs(txtTitle) {
-                    top.linkTo(parent.top)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
-                    bottom.linkTo(parent.bottom)
+                    bottom.linkTo(edtInput.top, margin = 16.dp)
                 }
                 .testTag(DiaryTextInputContentTag.TxtTitle.value),
         )
@@ -89,12 +92,12 @@ fun DiaryTextInputContent(
             value = state.inputText,
             onValueChange = { onChangeText(it) },
             isError = state.hintVisibility,
-            modifier = Modifier
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
                 .constrainAs(edtInput) {
-                    top.linkTo(txtTitle.bottom)
-                    start.linkTo(parent.start, margin = 16.dp)
-                    end.linkTo(parent.end, margin = 16.dp)
-                    bottom.linkTo(parent.bottom)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    bottom.linkTo(btnOk.top, margin = 32.dp)
                 }
                 .testTag(DiaryTextInputContentTag.EdtInput.value))
         if (state.hintVisibility) {
@@ -115,7 +118,7 @@ fun DiaryTextInputContent(
             enabled = state.isButtonEnable,
             modifier = Modifier
                 .constrainAs(btnOk) {
-                    top.linkTo(edtInput.bottom)
+                    top.linkTo(parent.top)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                     bottom.linkTo(parent.bottom)
