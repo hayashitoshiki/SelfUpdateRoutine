@@ -3,7 +3,6 @@ package com.myapp.presentation.ui.diary
 import android.app.Activity
 import android.content.Intent
 import android.content.res.Configuration
-import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
@@ -28,7 +27,6 @@ import com.myapp.presentation.ui.MainActivity
 import com.myapp.presentation.utils.base.LayoutTag
 import com.myapp.presentation.utils.expansion.text
 import com.myapp.presentation.utils.theme.TextColor
-import es.dmoral.toasty.Toasty
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 
@@ -54,8 +52,6 @@ fun WeatherResultScreen(
         viewModel.effect.onEach { effect ->
             when (effect) {
                 is WeatherResultContract.Effect.SaveResult -> {
-                    Toasty.success(context, "日記を保存しました！", Toast.LENGTH_SHORT, true)
-                        .show()
                     context.startActivity(intent)
                     activity?.finish()
                 }

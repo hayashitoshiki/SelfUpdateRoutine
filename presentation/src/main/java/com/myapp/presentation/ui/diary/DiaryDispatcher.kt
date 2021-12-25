@@ -1,17 +1,12 @@
 package com.myapp.presentation.ui.diary
 
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 
 /**
  * 振替入り画面用ディスパッチャー
  */
 object DiaryDispatcher {
-
-//    private val _action: MutableSharedFlow<DiaryDispatcherContract.Action> = MutableSharedFlow()
-//    val action: SharedFlow<DiaryDispatcherContract.Action> = _action
 
     private val _factState: MutableStateFlow<String> = MutableStateFlow("")
     val factState: StateFlow<String> = _factState
@@ -45,6 +40,5 @@ object DiaryDispatcher {
             is DiaryDispatcherContract.Action.ChangeReason -> _reasonState.emit(action.value)
             is DiaryDispatcherContract.Action.ChangeImprove -> _improveState.emit(action.value)
         }
-       // _action.emit(action)
     }
 }
