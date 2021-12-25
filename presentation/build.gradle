@@ -18,9 +18,9 @@ dependencies {
     def navigation_version = "2.4.0-alpha04"
     implementation "androidx.navigation:navigation-fragment-ktx:$navigation_version"
     implementation "androidx.navigation:navigation-ui-ktx:$navigation_version"
-
+    implementation "androidx.navigation:navigation-compose:$navigation_version"
     // compose
-    def compose_version = '1.0.2'
+    def compose_version = '1.0.5'
     implementation "androidx.compose.ui:ui:$compose_version"
     implementation "androidx.compose.material:material:$compose_version"
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
@@ -28,9 +28,7 @@ dependencies {
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
     implementation 'androidx.hilt:hilt-navigation-compose:1.0.0-alpha03'
-    // navigation
-    def compose_navigation_version = "2.4.0-alpha04"
-    implementation "androidx.navigation:navigation-compose:$compose_navigation_version"
+
     // constraintLayout
     def compose_constraint_version = "1.0.0-beta02"
     implementation "androidx.constraintlayout:constraintlayout-compose:$compose_constraint_version"
