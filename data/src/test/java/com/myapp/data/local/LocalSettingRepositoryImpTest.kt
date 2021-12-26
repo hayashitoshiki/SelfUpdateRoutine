@@ -1,8 +1,9 @@
-package com.myapp.data.local.preferences
+package com.myapp.data.local
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.myapp.common.getDateTimeNow
+import com.myapp.data.local.preferences.PreferenceManager
 import com.myapp.domain.model.value.AlarmMode
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -20,9 +21,9 @@ import java.time.LocalTime
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [28])
-class UserSharedPreferencesImpTest {
+class LocalSettingRepositoryImpTest {
 
-    private lateinit var userSharedPreferences: UserSharedPreferencesImp
+    private lateinit var localSettingRepositoryImp: LocalSettingRepositoryImp
     private lateinit var context: Context
     private lateinit var preferenceManager: PreferenceManager
 
@@ -30,7 +31,7 @@ class UserSharedPreferencesImpTest {
     fun setUp() {
         context = ApplicationProvider.getApplicationContext()
         preferenceManager = PreferenceManager(context)
-        userSharedPreferences = UserSharedPreferencesImp(preferenceManager)
+        localSettingRepositoryImp = LocalSettingRepositoryImp(preferenceManager)
     }
 
     @After
@@ -49,8 +50,8 @@ class UserSharedPreferencesImpTest {
     @Test
     fun getAlarmDateByNotNon() {
         val data = LocalDateTime.now()
-        userSharedPreferences.setAlarmDate(data)
-        val result = userSharedPreferences.getAlarmDate()
+        localSettingRepositoryImp.saveAlarmDate(data)
+        val result = localSettingRepositoryImp.getAlarmDate()
         assertEquals(data.year, result.year)
         assertEquals(data.month, result.month)
         assertEquals(data.dayOfMonth, result.dayOfMonth)
@@ -68,7 +69,7 @@ class UserSharedPreferencesImpTest {
     @Test
     fun getAlarmDateByNon() {
         val data = getDateTimeNow().with(LocalTime.of(22, 0))
-        val result = userSharedPreferences.getAlarmDate()
+        val result = localSettingRepositoryImp.getAlarmDate()
         assertEquals(data, result)
     }
 
@@ -84,9 +85,9 @@ class UserSharedPreferencesImpTest {
      */
     @Test
     fun getAlarmModeByNotNon() {
-        val data = AlarmMode.HARD.value
-        userSharedPreferences.setAlarmMode(data)
-        val result = userSharedPreferences.getAlarmMode()
+        val data = AlarmMode.HARD
+        localSettingRepositoryImp.saveAlarmMode(data)
+        val result = localSettingRepositoryImp.getAlarmMode()
         assertEquals(data, result)
     }
 
@@ -98,8 +99,8 @@ class UserSharedPreferencesImpTest {
      */
     @Test
     fun getAlarmModeByNon() {
-        val data = AlarmMode.NORMAL.value
-        val result = userSharedPreferences.getAlarmMode()
+        val data = AlarmMode.NORMAL
+        val result = localSettingRepositoryImp.getAlarmMode()
         assertEquals(data, result)
     }
 
@@ -116,8 +117,8 @@ class UserSharedPreferencesImpTest {
     @Test
     fun getLastReportSaveDateTimeByNotNon() {
         val data = getDateTimeNow().with(LocalTime.of(19, 0))
-        userSharedPreferences.setLastReportSaveDateTime(data)
-        val result = userSharedPreferences.getLastReportSaveDateTime()
+        localSettingRepositoryImp.setLastReportSaveDateTime(data)
+        val result = localSettingRepositoryImp.getLastReportSaveDateTime()
         assertEquals(data, result)
     }
 
@@ -130,7 +131,7 @@ class UserSharedPreferencesImpTest {
     @Test
     fun getLastReportSaveDateTimeByNon() {
         val data = LocalDateTime.of(2000, 1, 1, 0, 0, 0)
-        val result = userSharedPreferences.getLastReportSaveDateTime()
+        val result = localSettingRepositoryImp.getLastReportSaveDateTime()
         assertEquals(data, result)
     }
 

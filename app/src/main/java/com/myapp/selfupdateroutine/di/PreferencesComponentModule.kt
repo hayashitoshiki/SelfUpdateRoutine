@@ -2,9 +2,6 @@ package com.myapp.selfupdateroutine.di
 
 import android.content.Context
 import com.myapp.data.local.preferences.PreferenceManager
-import com.myapp.data.local.preferences.UserSharedPreferences
-import com.myapp.data.local.preferences.UserSharedPreferencesImp
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,15 +11,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class PreferencesComponentModule {
-
-    @Binds
-    abstract fun bindUserSharedPreferencesImp(userSharedPreferencesImp: UserSharedPreferencesImp): UserSharedPreferences
-}
-
-@Module
-@InstallIn(SingletonComponent::class)
-object DataModule {
+object PreferencesComponentModule {
 
     @Provides
     @Singleton
