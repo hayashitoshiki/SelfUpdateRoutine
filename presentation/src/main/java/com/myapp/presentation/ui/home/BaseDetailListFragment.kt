@@ -4,8 +4,22 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.myapp.presentation.databinding.FragmentReportDetailListBaseBinding
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.Card
+import androidx.compose.material.Scaffold
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.unit.dp
+import androidx.navigation.fragment.navArgs
 import com.myapp.presentation.utils.base.BaseFragment
+import com.myapp.presentation.utils.component.ListMainDarkText
+import com.myapp.presentation.utils.component.ListSubDarkText
 import dagger.hilt.android.AndroidEntryPoint
 
 /**
@@ -15,21 +29,54 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 abstract class BaseDetailListFragment : BaseFragment() {
 
-    protected var _binding: FragmentReportDetailListBaseBinding? = null
-    protected val binding get() = _binding!!
-
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
+        inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentReportDetailListBaseBinding.inflate(inflater, container, false)
-        binding.lifecycleOwner = viewLifecycleOwner
-        return binding.root
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+        return ComposeView(requireContext()).apply {
+            setContent {
+                val args: StatementListFragmentArgs by navArgs()
+                ReportDetailListContent(args.statementList.statementList)
+            }
+        }
     }
 }
+
+/**
+ * レポート詳細リスト表示用コンテンツ
+ *
+ * @param ReportDetailList 表示するレポート詳細項目
+ */
+@Composable
+private fun ReportDetailListContent(ReportDetailList: List<ReportDetail>) {
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        backgroundColor = Color.Transparent
+    ) {
+        LazyColumn {
+            ReportDetailList.forEach { reportDetail ->
+                item {
+                    Card(
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .fillMaxWidth(),
+                        elevation = 4.dp,
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .fillMaxWidth()
+                        ) {
+                            ListSubDarkText(text = reportDetail.date.toMdDate())
+                            ListMainDarkText(
+                                text = reportDetail.value,
+                                modifier = Modifier.padding(top = 4.dp)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
