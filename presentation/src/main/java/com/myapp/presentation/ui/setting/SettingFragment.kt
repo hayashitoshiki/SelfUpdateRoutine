@@ -1,6 +1,5 @@
 package com.myapp.presentation.ui.setting
 
-import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
@@ -9,18 +8,46 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.NumberPicker
 import android.widget.Toast
-import androidx.databinding.DataBindingUtil
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.myapp.common.getStrHHmm
 import com.myapp.domain.model.value.AlarmMode
 import com.myapp.presentation.R
-import com.myapp.presentation.databinding.FragmentSettingBinding
 import com.myapp.presentation.ui.diary.AlarmNotificationReceiver
-import com.myapp.presentation.utils.base.BaseAacFragment
+import com.myapp.presentation.utils.component.ButtonPrimaryText
+import com.myapp.presentation.utils.component.ListMainDarkText
+import com.myapp.presentation.utils.component.ListSubDarkText
+import com.myapp.presentation.utils.component.MainLightText
+import com.myapp.presentation.utils.expansion.explanation
 import com.myapp.presentation.utils.expansion.text
+import com.myapp.presentation.utils.theme.*
 import dagger.hilt.android.AndroidEntryPoint
 import es.dmoral.toasty.Toasty
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.collect
 import timber.log.Timber
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
@@ -29,115 +56,21 @@ import java.time.OffsetDateTime
  * 設定画面
  */
 @AndroidEntryPoint
-class SettingFragment : BaseAacFragment<SettingContract.State, SettingContract.Effect, SettingContract.Event>() {
+class SettingFragment : Fragment() {
 
-    private var _binding: FragmentSettingBinding? = null
-    private val binding get() = _binding!!
-    override val viewModel: SettingViewModel by viewModels()
+    private val viewModel: SettingViewModel by viewModels()
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
+        inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = DataBindingUtil.inflate(inflater, R.layout.fragment_setting, container, false)
-        binding.lifecycleOwner = viewLifecycleOwner
-        return binding.root
-    }
-
-    @SuppressLint("SetTextI18n")
-    override fun onViewCreated(
-        view: View,
-        savedInstanceState: Bundle?
-    ) {
-        super.onViewCreated(view, savedInstanceState)
-        viewModel.setEvent(SettingContract.Event.CreatedView)
-        viewModel.state.value?.let { state ->
-            binding.timePicker.hour = state.beforeDate.substring(0, 2).toInt()
-            binding.timePicker.minute = state.beforeDate.substring(3, 5).toInt()
-            binding.alarmValue.text = state.alarmTimeDiff
-            binding.alarmValue.setTextColor(resources.getColor(state.alarmTimeDiffColor, null))
-            binding.alarmTitle.setTextColor(resources.getColor(state.alarmTimeDiffColor, null))
-            binding.nextTitle.setTextColor(resources.getColor(state.alarmTimeDiffColor, null))
-            binding.nextValue.setTextColor(resources.getColor(state.alarmTimeDiffColor, null))
-            binding.nextValue.text = state.nextAlarmTime
-            binding.radioHard.isChecked = state.alarmMode == AlarmMode.HARD
-            binding.radioNormal.isChecked = state.alarmMode == AlarmMode.NORMAL
-            binding.modeDiffValue.text = getString(state.beforeAlarmMode.text) + " -> " + getString(state.alarmMode.text)
-            binding.modeTitle.setTextColor(resources.getColor(state.alarmModeDiffColor, null))
-            binding.modeDiffValue.setTextColor(resources.getColor(state.alarmModeDiffColor, null))
-            binding.txtModeExplanation.text = requireContext().getString(state.alarmModeExplanation)
-            binding.btnOk.isEnabled = state.isEnableConfirmButton
-        }
-    }
-
-    // Viewの各値変更
-    override fun changedState(state: SettingContract.State) {
-        viewModel.cashState.let { cash ->
-            if (cash == null || state.beforeDate != cash.beforeDate) {
-                binding.timePicker.hour = state.beforeDate.substring(0, 2).toInt()
-                binding.timePicker.minute = state.beforeDate.substring(3, 5).toInt()
-            }
-            if (cash == null || state.alarmTimeDiff != cash.alarmTimeDiff) {
-                binding.alarmValue.text = state.alarmTimeDiff
-            }
-            if (cash == null || state.alarmTimeDiffColor != cash.alarmTimeDiffColor) {
-                binding.alarmValue.setTextColor(resources.getColor(state.alarmTimeDiffColor, null))
-                binding.alarmTitle.setTextColor(resources.getColor(state.alarmTimeDiffColor, null))
-                binding.nextTitle.setTextColor(resources.getColor(state.alarmTimeDiffColor, null))
-                binding.nextValue.setTextColor(resources.getColor(state.alarmTimeDiffColor, null))
-            }
-            if (cash == null || state.nextAlarmTime != cash.nextAlarmTime) {
-                binding.nextValue.text = state.nextAlarmTime
-            }
-            if (cash == null || state.alarmMode != cash.alarmMode) {
-                binding.radioHard.isChecked = state.alarmMode == AlarmMode.HARD
-                binding.radioNormal.isChecked = state.alarmMode == AlarmMode.NORMAL
-                binding.modeDiffValue.text = getString(state.beforeAlarmMode.text) + " -> " + getString(state.alarmMode.text)
-            }
-            if (cash == null || state.alarmModeDiffColor != cash.alarmModeDiffColor) {
-                binding.modeTitle.setTextColor(resources.getColor(state.alarmModeDiffColor, null))
-                binding.modeDiffValue.setTextColor(resources.getColor(state.alarmModeDiffColor, null))
-            }
-            if (cash == null || state.alarmModeExplanation != cash.alarmModeExplanation) {
-                binding.txtModeExplanation.text = requireContext().getString(state.alarmModeExplanation)
-            }
-            if (cash == null || state.isEnableConfirmButton != cash.isEnableConfirmButton) {
-                binding.btnOk.isEnabled = state.isEnableConfirmButton
-            }
-        }
-    }
-
-    // イベント発火
-    override fun setEvent() {
-
-        // アラート時間
-        binding.timePicker.also {
-            it.setIs24HourView(true)
-            it.setOnTimeChangedListener { timePicker, hourOfDay, minute ->
-                if (hourOfDay in 0..14) timePicker.hour = 18
-                if (hourOfDay in 15..17) timePicker.hour = 23
-
+        return ComposeView(requireContext()).apply {
+            setContent {
                 val state = viewModel.state.value
-                if (state == null || timePicker.hour != state.hourDate) { viewModel.setEvent(SettingContract.Event.OnChangeAlarmHour(timePicker.hour)) }
-                if (state == null || minute != state.minutesDate) { viewModel.setEvent(SettingContract.Event.OnChangeAlarmMinute(minute)) }
+                SettingScreenContent(viewModel, state) { setAlarmAndBack(it) }
             }
         }
-
-        // アラートモード
-        binding.radioHard.setOnClickListener { viewModel.setEvent(SettingContract.Event.OnChangeAlarmMode(AlarmMode.HARD)) }
-        binding.radioNormal.setOnClickListener { viewModel.setEvent(SettingContract.Event.OnChangeAlarmMode(AlarmMode.NORMAL)) }
-
-        // 確定ボタン
-        binding.btnOk.setOnClickListener { viewModel.setEvent(SettingContract.Event.OnClickNextButton) }
     }
-
-    // イベント発火
-    override fun setEffect(effect: SettingContract.Effect) = when(effect) {
-        is SettingContract.Effect.ShowError -> Toasty.error(requireContext(), effect.throwable.message!!, Toast.LENGTH_SHORT, true).show()
-        is SettingContract.Effect.NextNavigation -> setAlarmAndBack(effect.value)
-    }
-
 
     // 通知バーアラーム表示設定(次の日の設定)
     private fun setAlarmAndBack(date: LocalDateTime) {
@@ -159,9 +92,202 @@ class SettingFragment : BaseAacFragment<SettingContract.State, SettingContract.E
             .show()
         findNavController().popBackStack()
     }
+}
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+/**
+ * 設定画面表示用コンテンツ
+ *
+ */
+@Composable
+private fun SettingScreenContent(
+    viewModel: SettingViewModel,
+    state: SettingContract.State,
+    setAlarmAndBack: (LocalDateTime) -> Unit
+) {
+    LaunchedEffect(true) {
+        viewModel.setEvent(SettingContract.Event.CreatedView)
+        viewModel.effect.onEach { effect ->
+            when (effect) {
+                is SettingContract.Effect.NextNavigation -> {
+                    setAlarmAndBack(effect.value)
+                }
+            }
+        }.collect()
+    }
+
+    // レイアウト
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        backgroundColor = Color.Transparent
+    ) {
+        ConstraintLayout(modifier = Modifier.fillMaxSize()) {
+            val (scroll, button) = createRefs()
+
+            Column(
+                modifier = Modifier
+                    .padding(start = 16.dp, end = 16.dp)
+                    .verticalScroll(rememberScrollState())
+                    .constrainAs(scroll) {
+                        top.linkTo(parent.top)
+                        bottom.linkTo(button.top)
+                    }
+            ) {
+                // アラーム時間設定
+                SettingCard(title = R.string.title_item_alarm_time) {
+                    Row {
+                        CardIcon(resId = R.drawable.ic_schedule_black_48, modifier = Modifier.align(alignment = Alignment.CenterVertically))
+                        val changeHour: (Int) -> Unit = { viewModel.setEvent(SettingContract.Event.OnChangeAlarmHour(it)) }
+                        CardTimePicker(
+                            initTime = state.beforeTime.hour,
+                            min = 18,
+                            max = 23,
+                            changeEvent = changeHour
+                        )
+                        ListMainDarkText(
+                            text = ":",
+                            modifier = Modifier
+                                .padding(start = 8.dp)
+                                .align(alignment = Alignment.CenterVertically),
+                        )
+                        val changeMinute: (Int) -> Unit = { viewModel.setEvent(SettingContract.Event.OnChangeAlarmMinute(it)) }
+                        CardTimePicker(
+                            initTime = state.beforeTime.minute,
+                            min = 0,
+                            max = 59,
+                            changeEvent = changeMinute
+                        )
+                    }
+                }
+                // アラームモード設定
+                SettingCard(title = R.string.title_item_alarm_mode) {
+                    Row {
+                        CardIcon(resId = R.drawable.ic_notifications_black_48)
+                        Column(modifier = Modifier.padding(top = 8.dp, start = 8.dp)) {
+                            Row {
+                                RadioButton(
+                                    selected = state.afterAlarmMode == AlarmMode.NORMAL,
+                                    onClick = { viewModel.setEvent(SettingContract.Event.OnChangeAlarmMode(AlarmMode.NORMAL)) }
+                                )
+                                ListMainDarkText(text = stringResource(id = R.string.radio_btn_alarm_mode_normal))
+                                RadioButton(
+                                    selected = state.afterAlarmMode == AlarmMode.HARD,
+                                    onClick = { viewModel.setEvent(SettingContract.Event.OnChangeAlarmMode(AlarmMode.HARD)) },
+                                    modifier = Modifier.padding(start = 16.dp)
+                                )
+                                ListMainDarkText(text = stringResource(id = R.string.radio_btn_alarm_mode_hard))
+                            }
+                            ListSubDarkText(
+                                text = stringResource(state.afterAlarmMode.explanation),
+                                modifier = Modifier.padding(top = 8.dp)
+                            )
+                        }
+                    }
+                }
+            }
+
+            // 変更結果
+            Column(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp))
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(
+                                PrimaryColor,
+                                PrimaryDarkColor
+                            )
+                        )
+                    )
+                    .padding(16.dp)
+                    .fillMaxWidth()
+                    .constrainAs(button) { bottom.linkTo(parent.bottom) },
+            ) {
+                val alarmTimeDiff = state.beforeTime.getStrHHmm() + "->" + state.afterTime.getStrHHmm()
+                val alarmTimeDiffEnable = state.beforeTime.getStrHHmm() != state.afterTime.getStrHHmm()
+                val alarmModeDiff = stringResource(state.beforeAlarmMode.text) + "->" + stringResource(state.afterAlarmMode.text)
+                val alarmModeDiffEnable = state.beforeAlarmMode != state.afterAlarmMode
+                resultList(title = stringResource(id = R.string.title_item_alarm_time), value = alarmTimeDiff, enable = alarmTimeDiffEnable)
+                resultList(title = stringResource(id = R.string.title_item_alarm_mode), value = alarmModeDiff, enable = alarmModeDiffEnable)
+                resultList(title = stringResource(id = R.string.title_item_next_alarm), value = state.nextAlarmTime, enable = alarmTimeDiffEnable)
+                Button(
+                    onClick = { viewModel.setEvent(SettingContract.Event.OnClickNextButton) },
+                    enabled = state.isEnableConfirmButton,
+                    shape = MaterialTheme.shapes.large,
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color.White,
+                        disabledContentColor = ButtonDisableColor
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp)
+                        .clip(CircleShape)
+                ) {
+                    ButtonPrimaryText(text = stringResource(id = R.string.btn_update), enable = state.isEnableConfirmButton)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun resultList(
+    title: String,
+    value: String,
+    enable: Boolean
+) {
+    Box(modifier = Modifier
+        .padding(top = 8.dp)
+        .fillMaxWidth()){
+        MainLightText(text = title, enable = enable)
+        MainLightText(text = value, enable = enable, modifier = Modifier.align(alignment = Alignment.BottomEnd))
+    }
+}
+@Composable
+private fun CardIcon(resId: Int, modifier: Modifier = Modifier) {
+        Icon(
+            modifier = modifier.size(64.dp),
+            painter = painterResource(id = resId),
+            contentDescription = null
+        )
+}
+
+@Composable
+private fun CardTimePicker(
+    initTime: Int,
+    max: Int,
+    min: Int,
+    changeEvent: (Int) -> Unit
+) {
+    AndroidView(
+        modifier = Modifier
+            .width(64.dp)
+            .height(120.dp)
+            .padding(start = 8.dp),
+        factory = { context ->
+            NumberPicker(context).apply {
+                setOnValueChangedListener { _, _, time -> changeEvent(time) }
+                minValue = min
+                maxValue = max
+                value = initTime
+            }
+        }
+    )
+}
+
+@Composable
+private fun SettingCard(title: Int, content: @Composable () -> Unit){
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        elevation = 8.dp
+    ){
+        Column(
+            modifier = Modifier
+                .padding(8.dp)
+                .fillMaxWidth()
+        ) {
+            ListMainDarkText(text = stringResource(id = title))
+            content()
+        }
     }
 }

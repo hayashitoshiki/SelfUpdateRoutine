@@ -2,6 +2,7 @@ package com.myapp.common
 
 import java.time.Instant
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -36,3 +37,13 @@ fun LocalDateTime.getStrHMMddEHHmm() : String {
     return this.format(formatter)
 }
 
+
+/**
+ * 「HH:mm」文字列へ変換
+ *
+ * @return HH:mm
+ */
+fun LocalTime.getStrHHmm() : String {
+    val formatter = DateTimeFormatter.ofPattern("HH:mm")
+    return this.format(formatter)
+}

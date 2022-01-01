@@ -6,6 +6,10 @@ val Red300 = Color(0xFFE57373)
 val Red500 = Color(0xFFF44336)
 val Red700 = Color(0xFFD32F2F)
 
+val PrimaryColor = Red500
+val PrimaryDarkColor = Red700
+val PrimaryColorDisable = Color(0x99F44336)
+
 /**
  * 文字色定義
  */
@@ -19,4 +23,5 @@ object TextColor {
     val Error = Color(0xFFB00020)
 }
 
+val ButtonDisableColor = Color(0xFFC5C5C5)
 

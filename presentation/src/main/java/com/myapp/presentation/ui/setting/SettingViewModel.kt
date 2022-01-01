@@ -6,11 +6,9 @@ import com.myapp.common.getStrHMMddEHHmm
 import com.myapp.domain.dto.NextAlarmTimeInputDto
 import com.myapp.domain.model.value.AlarmMode
 import com.myapp.domain.usecase.SettingUseCase
-import com.myapp.presentation.R
-import com.myapp.presentation.utils.base.BaseAacViewModel
-import com.myapp.presentation.utils.expansion.explanation
-import com.myapp.presentation.utils.expansion.getLightTextColorByEnable
+import com.myapp.presentation.utils.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.time.LocalTime
 import javax.inject.Inject
 
 /**
@@ -18,7 +16,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class SettingViewModel @Inject constructor(private val settingUseCase: SettingUseCase) :
-    BaseAacViewModel<SettingContract.State, SettingContract.Effect, SettingContract.Event>() {
+    BaseViewModel<SettingContract.State, SettingContract.Effect, SettingContract.Event>() {
 
     override fun initState(): SettingContract.State {
         return SettingContract.State()
@@ -39,19 +37,13 @@ class SettingViewModel @Inject constructor(private val settingUseCase: SettingUs
         runCatching {
             val alarmMode = settingUseCase.getAlarmMode()
             val alarmDate = settingUseCase.getAlarmDate()
-            val beforeData = alarmDate.getStrHHmm()
-            val alarmTimeDiff = "$beforeData -> $beforeData"
            setState {
                 copy(
-                    beforeDate = beforeData,
-                    hourDate = alarmDate.hour,
-                    minutesDate = alarmDate.minute,
-                    secondsDate = alarmDate.second,
+                    beforeTime = alarmDate,
+                    afterTime = LocalTime.of(alarmDate.hour, alarmDate.minute, alarmDate.second),
                     beforeAlarmMode = alarmMode,
-                    alarmMode = alarmMode,
-                    nextAlarmTime = alarmDate.getStrHMMddEHHmm(),
-                    alarmTimeDiff = alarmTimeDiff,
-                    alarmTimeDiffColor = R.color.text_color_light_secondary
+                    afterAlarmMode = alarmMode,
+                    nextAlarmTime = alarmDate.getStrHMMddEHHmm()
                 )
             }
         }.onFailure { setEffect { SettingContract.Effect.ShowError(it) } }
@@ -59,50 +51,43 @@ class SettingViewModel @Inject constructor(private val settingUseCase: SettingUs
     }
 
     // アラーム時間変更
-    private fun changeAlarmHour(value: Int) {
-        setState { copy(hourDate = value) }
-        changeAlarmTime()
+    private fun changeAlarmHour(hour: Int) {
+        val alarmTime = LocalTime.of(hour, state.value.afterTime.minute, state.value.afterTime.second)
+        changeAlarmTime(alarmTime)
         changeEnableButton()
     }
 
     // アラーム分変更
-    private fun changeAlarmMinute(value: Int) {
-        setState { copy(minutesDate = value) }
-        changeAlarmTime()
+    private fun changeAlarmMinute(minute: Int) {
+        val alarmTime = LocalTime.of(state.value.afterTime.hour, minute, state.value.afterTime.second)
+        changeAlarmTime(alarmTime)
         changeEnableButton()
     }
 
     // アラームモード変更
     private fun changeAlarmMode(value: AlarmMode) {
-        val state = state.value ?: return
-        val alarmModeDiffColor = getLightTextColorByEnable(state.beforeAlarmMode == value)
-        setState { copy(alarmMode = value, alarmModeExplanation = value.explanation, alarmModeDiffColor = alarmModeDiffColor) }
+        setState { copy(afterAlarmMode = value) }
         changeEnableButton()
     }
 
     // アラーム設定時間の差分取得
-    private fun changeAlarmTime() {
-        val state = state.value ?: return
-        val alarmTimeDiff = state.beforeDate + " -> " + String.format("%02d", state.hourDate) + ":" + String.format("%02d", state.minutesDate)
-        val alarmTimeDiffColor = getLightTextColorByEnable(alarmTimeDiff.take(5) == alarmTimeDiff.takeLast(5))
-        val nextAlarmTimeInputDto = NextAlarmTimeInputDto(state.hourDate, state.minutesDate, state.secondsDate, state.alarmMode)
+    private fun changeAlarmTime(alarmTime: LocalTime) {
+       val nextAlarmTimeInputDto = NextAlarmTimeInputDto(alarmTime.hour, alarmTime.minute, alarmTime.second, state.value.afterAlarmMode)
 
         runCatching { settingUseCase.getNextAlarmDate(nextAlarmTimeInputDto) }
-            .onSuccess { setState { copy(alarmTimeDiff = alarmTimeDiff, alarmTimeDiffColor = alarmTimeDiffColor, nextAlarmTime = it.getStrHMMddEHHmm()) } }
+            .onSuccess { setState { copy(afterTime = alarmTime, nextAlarmTime = it.getStrHMMddEHHmm()) } }
             .onFailure { SettingContract.Effect.ShowError(it) }
     }
 
     // 確定ボタン活性非活性
     private fun changeEnableButton() {
-        val state = state.value ?: return
-        val isEnableConfirmButton = state.beforeAlarmMode != state.alarmMode || state.alarmTimeDiff.take(5) != state.alarmTimeDiff.takeLast(5)
+        val isEnableConfirmButton = state.value.beforeAlarmMode != state.value.afterAlarmMode || state.value.beforeTime.getStrHHmm() != state.value.afterTime.getStrHHmm()
         setState { copy(isEnableConfirmButton = isEnableConfirmButton) }
     }
 
     // 時間更新
     private fun updateDate() {
-        val state = state.value ?: return
-        val nextAlarmTimeInputDto = NextAlarmTimeInputDto(state.hourDate, state.minutesDate, state.secondsDate, state.alarmMode)
+        val nextAlarmTimeInputDto = NextAlarmTimeInputDto(state.value.afterTime.hour, state.value.afterTime.minute, state.value.afterTime.second, state.value.afterAlarmMode)
         runCatching { settingUseCase.updateAlarmDate(nextAlarmTimeInputDto) }
             .onSuccess { setEffect { SettingContract.Effect.NextNavigation(it) } }
             .onFailure { setEffect { SettingContract.Effect.ShowError(it) } }
