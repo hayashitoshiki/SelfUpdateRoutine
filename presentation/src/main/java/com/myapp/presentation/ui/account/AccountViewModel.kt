@@ -4,7 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.myapp.domain.usecase.AuthUseCase
 import com.myapp.presentation.ui.MainDispatcher
 import com.myapp.presentation.ui.MainDispatcherContract
-import com.myapp.presentation.utils.base.BaseAacViewModel
+import com.myapp.presentation.utils.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -15,7 +15,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class AccountViewModel @Inject constructor(private val authUseCase: AuthUseCase) :
-    BaseAacViewModel<AccountContract.State, AccountContract.Effect, AccountContract.Event>() {
+    BaseViewModel<AccountContract.State, AccountContract.Effect, AccountContract.Event>() {
 
     override fun initState(): AccountContract.State {
        return AccountContract.State()

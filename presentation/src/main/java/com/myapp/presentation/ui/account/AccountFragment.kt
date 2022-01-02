@@ -5,15 +5,24 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isVisible
-import androidx.databinding.DataBindingUtil
+import androidx.compose.foundation.layout.*
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.myapp.presentation.R
-import com.myapp.presentation.databinding.FragmentAccountBinding
-import com.myapp.presentation.utils.base.BaseAacFragment
 import dagger.hilt.android.AndroidEntryPoint
-import android.content.DialogInterface
+import androidx.compose.material.Scaffold
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.fragment.app.Fragment
+import com.myapp.presentation.utils.component.PrimaryColorButton
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 
 
@@ -22,54 +31,38 @@ import timber.log.Timber
  *
  */
 @AndroidEntryPoint
-class AccountFragment : BaseAacFragment<AccountContract.State, AccountContract.Effect, AccountContract.Event>() {
+class AccountFragment : Fragment() {
 
-    override val viewModel: AccountViewModel by viewModels()
-
-    private var _binding: FragmentAccountBinding? = null
-    private val binding get() = _binding!!
+    private val viewModel: AccountViewModel by viewModels()
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
+        inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = DataBindingUtil.inflate(inflater, R.layout.fragment_account, container, false)
-        binding.lifecycleOwner = viewLifecycleOwner
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        viewModel.setEvent(AccountContract.Event.OnViewCreated)
-    }
-
-    override fun setEvent() {
-        binding.btnSignIn.setOnClickListener { viewModel.setEvent(AccountContract.Event.OnClickSignInButton) }
-        binding.btnSignOut.setOnClickListener { viewModel.setEvent(AccountContract.Event.OnClickSignOutButton) }
-        binding.btnSignUp.setOnClickListener { viewModel.setEvent(AccountContract.Event.OnClickSignUpButton) }
-        binding.btnDelete.setOnClickListener { viewModel.setEvent(AccountContract.Event.OnClickDeleteButton) }
-    }
-
-    override fun setEffect(effect: AccountContract.Effect) = when(effect) {
-        is AccountContract.Effect.NavigateSignIn -> {
-            val directions = AccountFragmentDirections.actionNavAccountToNavSignIn()
-            findNavController().navigate(directions)
+        return ComposeView(requireContext()).apply {
+            setContent {
+                val state = viewModel.state.value
+                LaunchedEffect(true) {
+                    viewModel.setEvent(AccountContract.Event.OnViewCreated)
+                    viewModel.effect.onEach { effect ->
+                        when (effect) {
+                            is AccountContract.Effect.NavigateSignIn -> {
+                                val directions = AccountFragmentDirections.actionNavAccountToNavSignIn()
+                                findNavController().navigate(directions)
+                            }
+                            is AccountContract.Effect.NavigateSignUp -> {
+                                val directions = AccountFragmentDirections.actionNavAccountToNavSignUp()
+                                findNavController().navigate(directions)
+                            }
+                            is AccountContract.Effect.ShowError -> { Timber.e(effect.throwable)}
+                            is AccountContract.Effect.ShorDeleteConfirmDialog -> { showDeleteConfirmDialog() }
+                            is AccountContract.Effect.OnDestroyView -> { }
+                        }
+                    }.collect()
+                }
+                AccountScreenContent(viewModel, state)
+            }
         }
-        is AccountContract.Effect.NavigateSignUp -> {
-            val directions = AccountFragmentDirections.actionNavAccountToNavSignUp()
-            findNavController().navigate(directions)
-        }
-        is AccountContract.Effect.ShowError -> { Timber.e(effect.throwable)}
-        is AccountContract.Effect.ShorDeleteConfirmDialog -> { showDeleteConfirmDialog() }
-        is AccountContract.Effect.OnDestroyView -> { }
-    }
-
-    override fun changedState(state: AccountContract.State) {
-        binding.btnSignIn.isVisible = !state.isSignIn
-        binding.btnSignUp.isVisible = !state.isSignIn
-        binding.btnSignOut.isVisible = state.isSignIn
-        binding.btnDelete.isVisible = state.isSignIn
     }
 
     // 削除確認ダイアログ表示
@@ -83,11 +76,48 @@ class AccountFragment : BaseAacFragment<AccountContract.State, AccountContract.E
             .setNegativeButton("いいえ",null)
             .show()
     }
+}
 
-    // 画面破棄（初期化）処理
-    override fun onDestroyView() {
-        super.onDestroyView()
-        viewModel.setEvent(AccountContract.Event.OnDestroyView)
-        _binding = null
+
+/**
+ * 設定画面表示用コンテンツ
+ *
+ */
+@Composable
+private fun AccountScreenContent(
+    viewModel: AccountViewModel,
+    state: AccountContract.State
+) {
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        backgroundColor = Color.Transparent
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            if (state.isSignIn) {
+                PrimaryColorButton(
+                    text = stringResource(id = R.string.btn_sign_out),
+                    onClick = { viewModel.setEvent(AccountContract.Event.OnClickSignOutButton) }
+                )
+                PrimaryColorButton(
+                    text = stringResource(id = R.string.btn_account_delete),
+                    onClick = { viewModel.setEvent(AccountContract.Event.OnClickDeleteConfirmOkButton) },
+                    modifier = Modifier.padding(top = 32.dp)
+                )
+            } else {
+                PrimaryColorButton(
+                    text = stringResource(id = R.string.btn_sign_in),
+                    onClick = { viewModel.setEvent(AccountContract.Event.OnClickSignInButton) }
+                )
+                PrimaryColorButton(
+                    text = stringResource(id = R.string.btn_sign_up),
+                    onClick = { viewModel.setEvent(AccountContract.Event.OnClickSignUpButton) },
+                    modifier = Modifier.padding(top = 32.dp)
+                )
+            }
+        }
     }
 }
