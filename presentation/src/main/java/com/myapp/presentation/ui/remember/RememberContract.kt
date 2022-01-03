@@ -1,5 +1,6 @@
 package com.myapp.presentation.ui.remember
 
+import com.myapp.domain.model.value.HeartScore
 import com.myapp.presentation.R
 import com.myapp.presentation.utils.base.BaseContract
 import com.myapp.presentation.utils.base.StringResource
@@ -23,7 +24,7 @@ interface RememberContract {
         val findComment: String = "",
         val learnComment: String = "",
         val statementComment: String = "",
-        val heartScoreComment: StringResource = StringResource.from(R.string.weather_cloudy),
+        val heartScoreComment: HeartScore = HeartScore(50),
         val reasonComment: String = "",
         val improveComment: String = "",
         val date: String = "",

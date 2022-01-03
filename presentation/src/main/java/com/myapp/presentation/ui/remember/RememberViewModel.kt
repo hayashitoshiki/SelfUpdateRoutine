@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.myapp.domain.model.entity.Report
 import com.myapp.presentation.utils.base.BaseAacViewModel
+import com.myapp.presentation.utils.base.BaseViewModel
 import com.myapp.presentation.utils.base.StringResource
 import com.myapp.presentation.utils.expansion.img
 import com.myapp.presentation.utils.expansion.text
@@ -16,7 +17,7 @@ import dagger.assisted.AssistedInject
  *
  */
 class RememberViewModel @AssistedInject constructor(@Assisted private val report: Report) :
-    BaseAacViewModel<RememberContract.State, RememberContract.Effect, RememberContract.Event>() {
+    BaseViewModel<RememberContract.State, RememberContract.Effect, RememberContract.Event>() {
 
     override fun initState(): RememberContract.State {
         return RememberContract.State()
@@ -29,7 +30,7 @@ class RememberViewModel @AssistedInject constructor(@Assisted private val report
             copy(
                 factComment = report.ffsReport.factComment, findComment = report.ffsReport.findComment,
                 learnComment = report.ffsReport.learnComment, statementComment = report.ffsReport.statementComment,
-                heartScoreComment = StringResource.from(report.weatherReport.heartScore.text),
+                heartScoreComment = report.weatherReport.heartScore,
                 reasonComment = report.weatherReport.reasonComment, improveComment = report.weatherReport.improveComment,
                 heartScoreImg = report.weatherReport.heartScore.img
             )

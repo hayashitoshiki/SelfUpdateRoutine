@@ -5,6 +5,8 @@ import androidx.compose.ui.graphics.Color
 val Red300 = Color(0xFFE57373)
 val Red500 = Color(0xFFF44336)
 val Red700 = Color(0xFFD32F2F)
+val LightBlue50 = Color(0xFFE3F2FD)
+val LightBlue100 = Color(0xFFBBDEFB)
 
 val PrimaryColor = Red500
 val PrimaryDarkColor = Red700

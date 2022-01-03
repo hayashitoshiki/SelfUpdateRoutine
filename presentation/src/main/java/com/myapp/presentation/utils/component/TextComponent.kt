@@ -4,10 +4,27 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.sp
 import androidx.compose.material.Text
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import com.myapp.presentation.utils.theme.PrimaryColor
 import com.myapp.presentation.utils.theme.PrimaryColorDisable
 import com.myapp.presentation.utils.theme.TextColor
 
+/**
+ * リスト表示用のセクションテキスト定義
+ *
+ * @param modifier レイアウト
+ * @param text テキスト
+ */
+@Composable
+fun ListSectionDarkText(modifier: Modifier = Modifier, text: String) {
+    Text(
+        text = text,
+        fontSize = 17.sp,
+        fontWeight = FontWeight.Bold,
+        color = TextColor.DarkPrimary,
+        modifier = modifier
+    )
+}
 /**
  * リスト表示用のメインテキスト定義
  *
