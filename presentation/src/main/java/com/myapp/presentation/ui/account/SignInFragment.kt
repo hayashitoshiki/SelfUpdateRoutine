@@ -4,15 +4,43 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isVisible
-import androidx.core.widget.doAfterTextChanged
-import androidx.databinding.DataBindingUtil
+import android.widget.Toast
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.RelocationRequester
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.unit.dp
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.google.accompanist.insets.LocalWindowInsets
 import com.myapp.presentation.R
-import com.myapp.presentation.databinding.FragmentSignInBinding
-import com.myapp.presentation.utils.base.BaseAacFragment
+import com.myapp.presentation.utils.component.PrimaryColorButton
+import com.myapp.presentation.utils.component.ProgressBar
 import dagger.hilt.android.AndroidEntryPoint
+import es.dmoral.toasty.Toasty
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 
 /**
@@ -20,54 +48,40 @@ import timber.log.Timber
  *
  */
 @AndroidEntryPoint
-class SignInFragment :
-    BaseAacFragment<SignInContract.State, SignInContract.Effect, SignInContract.Event>() {
+class SignInFragment : Fragment() {
 
-    override val viewModel: SignInViewModel by viewModels()
-
-    private var _binding: FragmentSignInBinding? = null
-    private val binding get() = _binding!!
+    private val viewModel: SignInViewModel by viewModels()
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
+        inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = DataBindingUtil.inflate(inflater, R.layout.fragment_sign_in, container, false)
-        binding.lifecycleOwner = viewLifecycleOwner
-        return binding.root
-    }
-
-    override fun setEvent() {
-        binding.edtEmail.doAfterTextChanged { viewModel.setEvent(SignInContract.Event.OnChangeEmail(it.toString())) }
-        binding.edtPassword.doAfterTextChanged { viewModel.setEvent(SignInContract.Event.OnChangePassword(it.toString())) }
-        binding.btnSignIn.setOnClickListener { viewModel.setEvent(SignInContract.Event.OnClickSignInButton) }
-    }
-
-    override fun setEffect(effect: SignInContract.Effect) = when(effect){
-        is SignInContract.Effect.NavigateHome -> backHome()
-        is SignInContract.Effect.OnDestroyView -> { }
-        is SignInContract.Effect.ShowError -> Timber.tag(this.javaClass.simpleName).d(effect.throwable)
-        is SignInContract.Effect.ShorProgressBer -> showProgressBar(effect.value)
-    }
-    override fun changedState(state: SignInContract.State) {
-        viewModel.cashState.let{ cash ->
-            if (cash == null) {
-                binding.edtEmail.setText(state.emailText)
-                binding.edtPassword.setText(state.passwordText)
-            }
-            if (cash == null || state.isSignInEnable != cash.isSignInEnable) {
-                binding.btnSignIn.isEnabled = state.isSignInEnable
+        return ComposeView(requireContext()).apply {
+            setContent {
+                val state = viewModel.state.value
+                val isProgressIndicator = remember{ mutableStateOf(false) }
+                LaunchedEffect(true) {
+                    viewModel.effect.onEach { effect ->
+                        when (effect) {
+                            is SignInContract.Effect.NavigateHome -> backHome()
+                            is SignInContract.Effect.OnDestroyView -> { }
+                            is SignInContract.Effect.ShowError -> shoeErrorToast(effect.throwable)
+                            is SignInContract.Effect.ShorProgressBer -> isProgressIndicator.value = effect.value
+                        }
+                    }.collect()
+                }
+                SignInScreenContent(viewModel, state)
+                if (isProgressIndicator.value) {
+                    ProgressBar()
+                }
             }
         }
     }
 
-    // プログレスバー表示制御
-    private fun showProgressBar(value: Boolean) {
-        binding.progressBar.isVisible = value
-        binding.edtPassword.isEnabled = !value
-        binding.edtEmail.isEnabled = !value
-        binding.btnSignIn.isEnabled = !value
+    // エラートースト表示
+    private fun shoeErrorToast(throwable: Throwable) {
+        Timber.tag(this.javaClass.simpleName).d(throwable)
+        Toasty.error(requireContext(), "ログインに失敗しました。", Toast.LENGTH_SHORT, true).show()
     }
 
     // ホーム画面遷移
@@ -75,9 +89,62 @@ class SignInFragment :
         findNavController().popBackStack()
         findNavController().popBackStack()
     }
+}
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+/**
+ * ログイン画面表示用コンテンツ
+ *
+ */
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+private fun SignInScreenContent(
+    viewModel: SignInViewModel,
+    state: SignInContract.State
+) {
+    val focusManager = LocalFocusManager.current
+    val relocationRequester = remember { RelocationRequester() }
+    val interactionSource = remember { MutableInteractionSource() }
+    val isFocused by interactionSource.collectIsFocusedAsState()
+    val ime = LocalWindowInsets.current.ime
+    if (ime.isVisible && !ime.animationInProgress && isFocused) {
+        LaunchedEffect(Unit) {
+            relocationRequester.bringIntoView()
+        }
+    }
+
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        backgroundColor = Color.Transparent
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .pointerInput(Unit) { detectTapGestures(onTap = { focusManager.clearFocus() }) },
+        ) {
+            OutlinedTextField(
+                value = state.emailText,
+                singleLine = true,
+                onValueChange = { viewModel.setEvent(SignInContract.Event.OnChangeEmail(it)) },
+                label = { Text(stringResource(id = R.string.title_sub_email)) },
+                modifier = Modifier.padding(top = 8.dp)
+            )
+            OutlinedTextField(
+                value = state.passwordText,
+                singleLine = true,
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                onValueChange = { viewModel.setEvent(SignInContract.Event.OnChangePassword(it)) },
+                label = { Text(stringResource(id = R.string.title_sub_password)) },
+                modifier = Modifier.padding(top = 8.dp)
+            )
+            PrimaryColorButton(
+                text = stringResource(id = R.string.btn_sign_in),
+                enable = state.isSignInEnable,
+                onClick = { viewModel.setEvent(SignInContract.Event.OnClickSignInButton) },
+                modifier = Modifier.padding(top = 16.dp)
+            )
+        }
     }
 }

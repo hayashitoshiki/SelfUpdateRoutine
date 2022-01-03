@@ -5,7 +5,7 @@ import com.myapp.domain.dto.SignInDto
 import com.myapp.domain.usecase.AuthUseCase
 import com.myapp.presentation.ui.MainDispatcher
 import com.myapp.presentation.ui.MainDispatcherContract
-import com.myapp.presentation.utils.base.BaseAacViewModel
+import com.myapp.presentation.utils.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -16,7 +16,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class SignInViewModel @Inject constructor(private val authUseCase: AuthUseCase) :
-    BaseAacViewModel<SignInContract.State, SignInContract.Effect, SignInContract.Event>() {
+    BaseViewModel<SignInContract.State, SignInContract.Effect, SignInContract.Event>() {
 
     override fun initState(): SignInContract.State {
         return SignInContract.State()
@@ -26,7 +26,7 @@ class SignInViewModel @Inject constructor(private val authUseCase: AuthUseCase) 
         is SignInContract.Event.OnChangeEmail -> changeEmail(event.email)
         is SignInContract.Event.OnChangePassword -> changePassword(event.password)
         is SignInContract.Event.OnClickSignInButton -> signIn()
-        is SignInContract.Event.OnDestroyView -> onDestroyView()
+        is SignInContract.Event.OnDestroyView -> { }
     }
 
     /**
@@ -54,8 +54,7 @@ class SignInViewModel @Inject constructor(private val authUseCase: AuthUseCase) 
      *
      */
     private fun changeSignInEnable() {
-        val state = state.value ?: return
-        val isSignInEnable = state.emailText.isNotEmpty() && state.passwordText.isNotEmpty()
+        val isSignInEnable = state.value.emailText.isNotEmpty() && state.value.passwordText.isNotEmpty()
         setState { copy(isSignInEnable = isSignInEnable) }
     }
 
@@ -64,8 +63,7 @@ class SignInViewModel @Inject constructor(private val authUseCase: AuthUseCase) 
      *
      */
     private fun signIn() {
-        val state = state.value ?: return
-        val authInputDto = SignInDto(state.emailText, state.passwordText)
+        val authInputDto = SignInDto(state.value.emailText, state.value.passwordText)
         viewModelScope.launch {
             setEffect { SignInContract.Effect.ShorProgressBer(true) }
             runCatching { authUseCase.signIn(authInputDto) }
@@ -79,15 +77,6 @@ class SignInViewModel @Inject constructor(private val authUseCase: AuthUseCase) 
                     setEffect{ SignInContract.Effect.ShowError(it) }
                 }
         }
-    }
-
-    /**
-     * 画面状態初期化
-     *
-     */
-    private fun onDestroyView() {
-        cashState = null
-        setEffect{ SignInContract.Effect.OnDestroyView }
     }
 
 }
