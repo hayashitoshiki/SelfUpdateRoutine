@@ -4,15 +4,39 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isVisible
-import androidx.core.widget.doAfterTextChanged
-import androidx.databinding.DataBindingUtil
+import android.widget.Toast
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.RelocationRequester
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.unit.dp
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.google.accompanist.insets.LocalWindowInsets
 import com.myapp.presentation.R
-import com.myapp.presentation.databinding.FragmentSignUpBinding
-import com.myapp.presentation.utils.base.BaseAacFragment
+import com.myapp.presentation.utils.component.PrimaryColorButton
+import com.myapp.presentation.utils.component.ProgressBar
 import dagger.hilt.android.AndroidEntryPoint
+import es.dmoral.toasty.Toasty
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 
 /**
@@ -20,61 +44,40 @@ import timber.log.Timber
  *
  */
 @AndroidEntryPoint
-class SignUpFragment :
-    BaseAacFragment<SignUpContract.State, SignUpContract.Effect, SignUpContract.Event>() {
+class SignUpFragment : Fragment() {
 
-    override val viewModel: SignUpViewModel by viewModels()
-
-    private var _binding: FragmentSignUpBinding? = null
-    private val binding get() = _binding!!
+    private val viewModel: SignUpViewModel by viewModels()
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
+        inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = DataBindingUtil.inflate(inflater, R.layout.fragment_sign_up, container, false)
-        binding.lifecycleOwner = viewLifecycleOwner
-        return binding.root
-    }
-
-    override fun setEvent() {
-        binding.edtEmail1.doAfterTextChanged { viewModel.setEvent(SignUpContract.Event.OnChangeEmail1(it.toString())) }
-        binding.edtEmail2.doAfterTextChanged { viewModel.setEvent(SignUpContract.Event.OnChangeEmail2(it.toString())) }
-        binding.edtPassword1.doAfterTextChanged { viewModel.setEvent(SignUpContract.Event.OnChangePassword1(it.toString())) }
-        binding.edtPassword2.doAfterTextChanged { viewModel.setEvent(SignUpContract.Event.OnChangePassword2(it.toString())) }
-        binding.btnSignIn.setOnClickListener { viewModel.setEvent(SignUpContract.Event.OnClickSignUpButton) }
-    }
-
-    override fun setEffect(effect: SignUpContract.Effect) = when(effect){
-        is SignUpContract.Effect.NavigateHome -> backHome()
-        is SignUpContract.Effect.OnDestroyView -> { }
-        is SignUpContract.Effect.ShowError -> Timber.tag(this.javaClass.simpleName).d(effect.throwable)
-        is SignUpContract.Effect.ShorProgressBer -> showProgressBar(effect.value)
-    }
-
-    override fun changedState(state: SignUpContract.State) {
-        viewModel.cashState.let{ cash ->
-            if (cash == null) {
-                binding.edtEmail1.setText(state.email1Text)
-                binding.edtEmail2.setText(state.email2Text)
-                binding.edtPassword1.setText(state.password1Text)
-                binding.edtPassword2.setText(state.password2Text)
-            }
-            if (cash == null || state.isSignUpEnable != cash.isSignUpEnable) {
-                binding.btnSignIn.isEnabled = state.isSignUpEnable
+        return ComposeView(requireContext()).apply {
+            setContent {
+                val state = viewModel.state.value
+                val isProgressIndicator = remember{ mutableStateOf(false)}
+                LaunchedEffect(true) {
+                    viewModel.effect.onEach { effect ->
+                        when (effect) {
+                            is SignUpContract.Effect.NavigateHome -> backHome()
+                            is SignUpContract.Effect.OnDestroyView -> { }
+                            is SignUpContract.Effect.ShowError -> shoeErrorToast(effect.throwable)
+                            is SignUpContract.Effect.ShorProgressBer -> isProgressIndicator.value = effect.value
+                        }
+                    }.collect()
+                }
+                SignUpScreenContent(viewModel, state)
+                if (isProgressIndicator.value) {
+                    ProgressBar()
+                }
             }
         }
     }
 
-    // プログレスバー表示制御
-    private fun showProgressBar(value: Boolean) {
-        binding.edtEmail1.isEnabled = !value
-        binding.edtEmail2.isEnabled = !value
-        binding.edtPassword1.isEnabled = !value
-        binding.edtPassword2.isEnabled = !value
-        binding.btnSignIn.isEnabled = !value
-        binding.progressBar.isVisible = value
+    // エラートースト表示
+    private fun shoeErrorToast(throwable: Throwable) {
+        Timber.tag(this.javaClass.simpleName).d(throwable)
+        Toasty.error(requireContext(), "アカウントの作成に失敗しました。", Toast.LENGTH_SHORT, true).show()
     }
 
     // ホーム画面遷移
@@ -82,9 +85,79 @@ class SignUpFragment :
         findNavController().popBackStack()
         findNavController().popBackStack()
     }
+}
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+/**
+ * 設定画面表示用コンテンツ
+ *
+ */
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+private fun SignUpScreenContent(
+    viewModel: SignUpViewModel,
+    state: SignUpContract.State
+) {
+    val focusManager = LocalFocusManager.current
+    val relocationRequester = remember { RelocationRequester() }
+    val interactionSource = remember { MutableInteractionSource() }
+    val isFocused by interactionSource.collectIsFocusedAsState()
+    val ime = LocalWindowInsets.current.ime
+    if (ime.isVisible && !ime.animationInProgress && isFocused) {
+        LaunchedEffect(Unit) {
+            relocationRequester.bringIntoView()
+        }
+    }
+
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        backgroundColor = Color.Transparent
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .pointerInput(Unit) { detectTapGestures(onTap = { focusManager.clearFocus() }) },
+        ) {
+
+            OutlinedTextField(
+                value = state.email1Text,
+                singleLine = true,
+                onValueChange = { viewModel.setEvent(SignUpContract.Event.OnChangeEmail1(it)) },
+                label = { Text(stringResource(id = R.string.title_sub_email)) },
+                modifier = Modifier.padding(top = 8.dp)
+            )
+            OutlinedTextField(
+                value = state.email2Text,
+                singleLine = true,
+                onValueChange = { viewModel.setEvent(SignUpContract.Event.OnChangeEmail2(it)) },
+                label = { Text(stringResource(id = R.string.title_sub_email_confirm)) },
+                modifier = Modifier.padding(top = 8.dp)
+            )
+            OutlinedTextField(
+                value = state.password1Text,
+                singleLine = true,
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                onValueChange = { viewModel.setEvent(SignUpContract.Event.OnChangePassword1(it)) },
+                label = { Text(stringResource(id = R.string.title_sub_password)) },
+                modifier = Modifier.padding(top = 8.dp)
+            )
+            OutlinedTextField(
+                value = state.password2Text,
+                singleLine = true,
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                onValueChange = { viewModel.setEvent(SignUpContract.Event.OnChangePassword2(it)) },
+                label = { Text(stringResource(id = R.string.title_sub_password_confirm)) },
+                modifier = Modifier.padding(top = 8.dp)
+            )
+            PrimaryColorButton(
+                text = stringResource(id = R.string.btn_sign_up),
+                enable = state.isSignUpEnable,
+                onClick = { viewModel.setEvent(SignUpContract.Event.OnClickSignUpButton) },
+                modifier = Modifier.padding(top = 16.dp)
+            )
+        }
     }
 }

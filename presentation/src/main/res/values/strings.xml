@@ -72,7 +72,9 @@
     <string name="title_sub_mission_statement">人生の目的</string>
     <string name="title_sub_constitution">憲法</string>
     <string name="title_sub_email">メールアドレス</string>
+    <string name="title_sub_email_confirm">メールアドレス（確認用）</string>
     <string name="title_sub_password">パスワード</string>
+    <string name="title_sub_password_confirm">パスワード（確認用）</string>
 
     <!-- その他 -->
     <string name="txt_time_punctuation">：</string>
