@@ -2,7 +2,7 @@ package com.myapp.presentation.ui.mission_statement
 
 import androidx.lifecycle.*
 import com.myapp.domain.usecase.MissionStatementUseCase
-import com.myapp.presentation.utils.base.BaseAacViewModel
+import com.myapp.presentation.utils.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -15,7 +15,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class MissionStatementListViewModel @Inject constructor(private val missionStatementUseCase: MissionStatementUseCase) :
-    BaseAacViewModel<MissionStatementListContract.State, MissionStatementListContract.Effect, MissionStatementListContract.Event>() {
+    BaseViewModel<MissionStatementListContract.State, MissionStatementListContract.Effect, MissionStatementListContract.Event>() {
 
     override fun initState(): MissionStatementListContract.State {
         return MissionStatementListContract.State()
@@ -25,7 +25,6 @@ class MissionStatementListViewModel @Inject constructor(private val missionState
         is MissionStatementListContract.Event.OnClickChangeButton -> {
             setEffect { MissionStatementListContract.Effect.NavigateMissionStatementSetting(state.value?.missionStatement) }
         }
-        is MissionStatementListContract.Event.OnDestroyView -> onDestroyView()
     }
 
     init {
@@ -44,11 +43,8 @@ class MissionStatementListViewModel @Inject constructor(private val missionState
                         copy(
                             missionStatement = it,
                             funeralList = it.funeralList,
-                            isEnableFuneralList = it.funeralList.isNotEmpty(),
                             purposeLife = it.purposeLife,
-                            isEnablePurposeLife = it.purposeLife.isNotEmpty(),
                             constitutionList = it.constitutionList,
-                            isEnableConstitutionList = it.constitutionList.isNotEmpty()
                         )
                     }
                 } ?: run { setNullMissionStatement() }
@@ -61,17 +57,9 @@ class MissionStatementListViewModel @Inject constructor(private val missionState
             copy(
                 missionStatement = null,
                 funeralList = listOf(),
-                isEnableFuneralList = false,
                 purposeLife = "",
-                isEnablePurposeLife = false,
-                constitutionList = listOf(),
-                isEnableConstitutionList = false
+                constitutionList = listOf()
             )
         }
-    }
-
-    // 画面破棄（初期化）処理
-    private fun onDestroyView() {
-        setEffect { MissionStatementListContract.Effect.OnDestroyView }
     }
 }

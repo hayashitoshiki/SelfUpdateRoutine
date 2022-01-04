@@ -4,97 +4,129 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Card
+import androidx.compose.material.Scaffold
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.myapp.presentation.databinding.FragmentMissionStatementListBinding
-import com.myapp.presentation.utils.base.BaseAacFragment
-import com.xwray.groupie.GroupAdapter
-import com.xwray.groupie.ViewHolder
+import com.myapp.presentation.R
+import com.myapp.presentation.utils.component.ListMainDarkText
+import com.myapp.presentation.utils.component.ListSubDarkText
+import com.myapp.presentation.utils.component.PrimaryColorButton
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
 
 /**
  * ミッションステートメント一覧画面
  *
  */
 @AndroidEntryPoint
-class MissionStatementListFragment :
-    BaseAacFragment<MissionStatementListContract.State, MissionStatementListContract.Effect, MissionStatementListContract.Event>() {
+class MissionStatementListFragment : Fragment() {
 
-    override val viewModel: MissionStatementListViewModel by viewModels()
-    private var _binding: FragmentMissionStatementListBinding? = null
-    private val binding get() = _binding!!
+    private val viewModel: MissionStatementListViewModel by viewModels()
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
+        inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentMissionStatementListBinding.inflate(inflater, container, false)
-        binding.lifecycleOwner = viewLifecycleOwner
-        return binding.root
+        return ComposeView(requireContext()).apply {
+            setContent {
+                val state = viewModel.state.value
+                LaunchedEffect(true) {
+                    viewModel.effect.onEach { effect ->
+                        when (effect) {
+                            is MissionStatementListContract.Effect.NavigateMissionStatementSetting -> {
+                                val action = MissionStatementListFragmentDirections.actionNavConstitutionToNavConstitutionSetting(effect.value)
+                                findNavController().navigate(action)
+                            }
+                        }
+                    }.collect()
+                }
+                MissionStatementListScreenContent(viewModel, state)
+            }
+        }
     }
+}
 
-    override fun onViewCreated(
-        view: View,
-        savedInstanceState: Bundle?
+
+@Composable
+private fun MissionStatementListScreenContent(
+    viewModel: MissionStatementListViewModel,
+    state: MissionStatementListContract.State
+) {
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        backgroundColor = Color.Transparent
     ) {
-        super.onViewCreated(view, savedInstanceState)
-
-        binding.listConstitution.also {
-            it.adapter = GroupAdapter<ViewHolder>()
-            it.layoutManager = LinearLayoutManager(requireContext())
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+        ) {
+            if (state.missionStatement == null) {
+                ListSubDarkText(
+                    text = stringResource(id = R.string.txt_no_mission_statement),
+                    modifier = Modifier.padding(top = 64.dp)
+                )
+                PrimaryColorButton(
+                    onClick = { viewModel.setEvent(MissionStatementListContract.Event.OnClickChangeButton) },
+                    text = stringResource(id = R.string.btn_edit),
+                    modifier = Modifier.padding(top = 64.dp)
+                )
+            } else {
+                if (state.funeralList.isNotEmpty()) {
+                    MissionStatementCard(title = stringResource(id = R.string.title_sub_dai)) {
+                        state.funeralList.forEach { ListMainDarkText(text = "・$it") }
+                    }
+                }
+                if (state.purposeLife.isNotEmpty()) {
+                    MissionStatementCard(title = stringResource(id = R.string.title_sub_mission_statement)) {
+                        ListMainDarkText(text = state.purposeLife)
+                    }
+                }
+                if (state.constitutionList.isNotEmpty()) {
+                    MissionStatementCard(title = stringResource(id = R.string.title_sub_constitution)) {
+                        state.constitutionList.forEach { ListMainDarkText(text = "・$it") }
+                    }
+                }
+                PrimaryColorButton(
+                    onClick = { viewModel.setEvent(MissionStatementListContract.Event.OnClickChangeButton) },
+                    text = stringResource(id = R.string.btn_edit)
+                )
+            }
         }
-        binding.listFuneral.also {
-            it.adapter = GroupAdapter<ViewHolder>()
-            it.layoutManager = LinearLayoutManager(requireContext())
+    }
+}
+
+@Composable
+private fun MissionStatementCard(title: String, content: @Composable () -> Unit) {
+    Card(
+        modifier = Modifier.padding(16.dp),
+        elevation = 8.dp
+    ) {
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .padding(8.dp)) {
+            ListSubDarkText(
+                text = title, 
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            content()
         }
     }
-
-    override fun changedState(state: MissionStatementListContract.State) {
-
-        // メインコンテンツ
-        binding.layoutMain.visibility = if (state.missionStatement != null) View.VISIBLE else View.INVISIBLE
-        binding.txtNotFoundMessage.visibility = if (state.missionStatement == null) View.VISIBLE else View.INVISIBLE
-
-        // 人生の目的
-        binding.txtValueMissionStatement.text = state.purposeLife
-        binding.cardPurpose.visibility = if (state.isEnablePurposeLife) View.VISIBLE else View.INVISIBLE
-
-        // 理想の葬式
-        binding.cardFuneral.visibility = if (state.isEnableFuneralList) View.VISIBLE else View.INVISIBLE
-        val funeralListAdapter = binding.listFuneral.adapter as GroupAdapter<*>
-        state.funeralList
-            .map { MissionStatementListDiscItem(it, requireContext()) }
-            .also{ funeralListAdapter.update(it) }
-
-        // 憲法
-        binding.cardConstitution.visibility = if (state.isEnableConstitutionList) View.VISIBLE else View.INVISIBLE
-        val constitutionListAdapter = binding.listConstitution.adapter as GroupAdapter<*>
-        state.constitutionList
-            .map { MissionStatementListDiscItem(it, requireContext()) }
-            .also{ constitutionListAdapter.update(it) }
-    }
-
-    // Event設定
-    override fun setEvent() {
-        // 変更ボタン
-        binding.btnChange.setOnClickListener { viewModel.setEvent(MissionStatementListContract.Event.OnClickChangeButton) }
-    }
-
-    // Effect設定
-    override fun setEffect(effect: MissionStatementListContract.Effect) = when(effect) {
-        is MissionStatementListContract.Effect.NavigateMissionStatementSetting -> {
-            val action = MissionStatementListFragmentDirections.actionNavConstitutionToNavConstitutionSetting(effect.value)
-            findNavController().navigate(action)
-        }
-        is MissionStatementListContract.Effect.OnDestroyView -> {}
-    }
-
-    override fun onDestroyView() {
-        viewModel.setEvent(MissionStatementListContract.Event.OnDestroyView)
-        super.onDestroyView()
-        _binding = null
-    }
-
 }

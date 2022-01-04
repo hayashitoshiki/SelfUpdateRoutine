@@ -10,20 +10,14 @@ interface MissionStatementListContract {
      *
      * @property missionStatement ミッションステートメント
      * @property funeralList 理想の葬式リスト
-     * @property isEnableFuneralList 理想の葬式カード表示制御
      * @property purposeLife 人生の目的
-     * @property isEnablePurposeLife 人生の目的カード表示生業
      * @property constitutionList 憲法リスト
-     * @property isEnableConstitutionList 憲法カード表示制御
      */
     data class State(
         var missionStatement: MissionStatement? = null,
         val funeralList: List<String> = listOf(),
-        val isEnableFuneralList: Boolean = false,
         val purposeLife: String = "",
-        val isEnablePurposeLife: Boolean = false,
         val constitutionList: List<String> = listOf(),
-        val isEnableConstitutionList: Boolean = false
     ) : BaseContract.State
 
     /**
@@ -37,11 +31,6 @@ interface MissionStatementListContract {
          * @property value ミッションステートメント
          */
         data class NavigateMissionStatementSetting(val value: MissionStatement?) : Effect()
-
-        /**
-         * ライフサイクル(onDestroyView)
-         */
-        object OnDestroyView : Effect()
     }
 
     /**
@@ -53,10 +42,5 @@ interface MissionStatementListContract {
          * 変更ボタン押下
          */
         object OnClickChangeButton : Event()
-
-        /**
-         * ライフサイクル(onDestroyView)
-         */
-        object OnDestroyView : Event()
     }
 }

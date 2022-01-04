@@ -100,6 +100,7 @@
 
     <!-- ボタン -->
     <string name="btn_ok">確定</string>
+    <string name="btn_edit">編集</string>
     <string name="btn_update">更新</string>
     <string name="btn_next">次へ</string>
     <string name="bth_daly_input">日記入力へ</string>
