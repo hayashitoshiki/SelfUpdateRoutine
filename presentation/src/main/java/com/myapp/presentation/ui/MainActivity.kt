@@ -66,7 +66,6 @@ class MainActivity : AppCompatActivity() {
             setOf(
                 R.id.nav_home,
                 R.id.nav_setting,
-                R.id.nav_constitution,
                 R.id.nav_account
             ), drawerLayout
         )

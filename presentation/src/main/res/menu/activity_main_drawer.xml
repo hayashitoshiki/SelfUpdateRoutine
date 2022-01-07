@@ -9,10 +9,6 @@
             android:icon="@drawable/ic_home_48"
             android:title="@string/menu_home" />
         <item
-            android:id="@+id/nav_constitution"
-            android:icon="@drawable/ic_mission_statement_48"
-            android:title="@string/menu_mission_statement_list" />
-        <item
             android:id="@+id/nav_account"
             android:icon="@drawable/ic_account_48"
             android:title="@string/menu_account" />
