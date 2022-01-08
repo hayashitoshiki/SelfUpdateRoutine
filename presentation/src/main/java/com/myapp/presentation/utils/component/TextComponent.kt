@@ -10,6 +10,38 @@ import com.myapp.presentation.utils.theme.PrimaryColorDisable
 import com.myapp.presentation.utils.theme.TextColor
 
 /**
+ * ホーム画面タイトルテキスト定義
+ *
+ * @param modifier レイアウト
+ * @param text テキスト
+ */
+@Composable
+fun HomeTitleText(modifier: Modifier = Modifier, text: String) {
+    Text(
+        text = text,
+        fontSize = 32.sp,
+        fontWeight = FontWeight.Bold,
+        color = TextColor.DarkPrimary,
+        modifier = modifier
+    )
+}
+/**
+ * ホーム画面サブタイトルテキスト定義
+ *
+ * @param modifier レイアウト
+ * @param text テキスト
+ */
+@Composable
+fun HomeSubTitleText(modifier: Modifier = Modifier, text: String) {
+    Text(
+        text = text,
+        fontSize = 24.sp,
+        fontWeight = FontWeight.Bold,
+        color = TextColor.DarkSecondary,
+        modifier = modifier
+    )
+}
+/**
  * リスト表示用のセクションテキスト定義
  *
  * @param modifier レイアウト
@@ -54,6 +86,22 @@ fun ListSubDarkText(modifier: Modifier = Modifier, text: String) {
         text = text,
         fontSize = 12.sp,
         color = TextColor.DarkSecondary,
+        modifier = modifier
+    )
+}
+
+/**
+ * セクションテキスト定義
+ *
+ * @param modifier レイアウト
+ * @param text テキスト
+ */
+@Composable
+fun SectionDarkText(modifier: Modifier = Modifier, text: String) {
+    Text(
+        text = text,
+        fontSize = 17.sp,
+        color = TextColor.DarkPrimary,
         modifier = modifier
     )
 }

@@ -5,7 +5,7 @@ import com.myapp.domain.usecase.MissionStatementUseCase
 import com.myapp.domain.usecase.ReportUseCase
 import com.myapp.presentation.ui.MainDispatcher
 import com.myapp.presentation.ui.MainDispatcherContract
-import com.myapp.presentation.utils.base.BaseAacViewModel
+import com.myapp.presentation.utils.base.BaseViewModel
 import com.myapp.presentation.utils.expansion.img
 import com.myapp.presentation.utils.expansion.isToday
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,8 +22,7 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val reportUseCase: ReportUseCase,
     private val missionStatementUseCase: MissionStatementUseCase
-) :
-    BaseAacViewModel<HomeContract.State, HomeContract.Effect, HomeContract.Event>() {
+) : BaseViewModel<HomeContract.State, HomeContract.Effect, HomeContract.Event>() {
 
     override fun initState(): HomeContract.State {
         return HomeContract.State()
@@ -104,42 +103,31 @@ class HomeViewModel @Inject constructor(
 
     // Fab表示切り替え
     private fun changeFab() {
-        val enable = state.value?.isFabCheck ?: false
-        setState { copy(isFabCheck = !enable) }
-        setEffect { HomeContract.Effect.ChangeFabEnable(!enable) }
+        setState { copy(isFabCheck = !state.value.isFabCheck) }
     }
 
     // 格言一覧画面へ遷移
     private fun navigateLearnList() {
-        val reportList = state.value?.reportList ?:run {
+        if (state.value.reportList.isEmpty()) {
             setEffect { HomeContract.Effect.ShowError(NullPointerException("レポートリストがありません")) }
-            return
+        } else {
+            setEffect { HomeContract.Effect.LearnListNavigation(state.value.reportList) }
         }
-        if (reportList.isEmpty()) {
-            setEffect { HomeContract.Effect.ShowError(NullPointerException("レポートリストがありません")) }
-            return
-        }
-        setEffect { HomeContract.Effect.LearnListNavigation(reportList) }
     }
 
     // 宣言詳細画面へ遷移
     private fun navigateStatementList() {
-        val reportList = state.value?.reportList ?:run {
+        if (state.value.reportList.isEmpty()) {
             setEffect { HomeContract.Effect.ShowError(NullPointerException("レポートリストがありません")) }
-            return
+        } else {
+            setEffect { HomeContract.Effect.StatementListNavigation(state.value.reportList) }
         }
-        if (reportList.isEmpty()) {
-            setEffect { HomeContract.Effect.ShowError(NullPointerException("レポートリストがありません")) }
-            return
-        }
-        setEffect { HomeContract.Effect.StatementListNavigation(reportList) }
     }
 
     // 画面破棄（初期化）処理
     private fun onDestroyView() {
         setState { copy(isFabCheck = false) }
         setEffect { HomeContract.Effect.OnDestroyView }
-        cashState = null
     }
 }
 
