@@ -6,8 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import com.myapp.presentation.R
 import dagger.hilt.android.AndroidEntryPoint
 import androidx.compose.material.Scaffold
@@ -20,6 +20,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavHostController
 import com.myapp.presentation.utils.component.PrimaryColorButton
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
@@ -47,12 +48,12 @@ class AccountFragment : Fragment() {
                     viewModel.effect.onEach { effect ->
                         when (effect) {
                             is AccountContract.Effect.NavigateSignIn -> {
-                                val directions = AccountFragmentDirections.actionNavAccountToNavSignIn()
-                                findNavController().navigate(directions)
+//                                val directions = AccountFragmentDirections.actionNavAccountToNavSignIn()
+//                                findNavController().navigate(directions)
                             }
                             is AccountContract.Effect.NavigateSignUp -> {
-                                val directions = AccountFragmentDirections.actionNavAccountToNavSignUp()
-                                findNavController().navigate(directions)
+//                                val directions = AccountFragmentDirections.actionNavAccountToNavSignUp()
+//                                findNavController().navigate(directions)
                             }
                             is AccountContract.Effect.ShowError -> { Timber.e(effect.throwable)}
                             is AccountContract.Effect.ShorDeleteConfirmDialog -> { showDeleteConfirmDialog() }
@@ -78,6 +79,19 @@ class AccountFragment : Fragment() {
     }
 }
 
+/**
+ * 振り返り_事実画面
+ *
+ */
+@ExperimentalMaterialApi
+@Composable
+fun AccountScreen(
+    navController: NavHostController,
+    viewModel: AccountViewModel
+) {
+    val state = viewModel.state.value
+    AccountScreenContent(viewModel, state)
+}
 
 /**
  * 設定画面表示用コンテンツ

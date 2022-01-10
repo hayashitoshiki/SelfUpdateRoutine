@@ -34,6 +34,7 @@ import com.myapp.presentation.R
 import com.myapp.presentation.utils.base.LayoutTag
 import com.myapp.presentation.utils.expansion.img
 import com.myapp.presentation.utils.theme.TextColor
+import com.myapp.presentation.utils.theme.buttonRoundedCornerShape
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 
@@ -178,7 +179,7 @@ fun DiarySliderInputContent(
 
         Button(
             onClick = { onClickOkButton() },
-            shape = MaterialTheme.shapes.large,
+            shape = buttonRoundedCornerShape,
             modifier = Modifier
                 .constrainAs(btnOk) {
                     start.linkTo(parent.start)

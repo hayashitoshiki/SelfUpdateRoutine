@@ -3,6 +3,7 @@ package com.myapp.presentation.ui.diary
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
@@ -17,6 +18,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class DiaryActivity : AppCompatActivity() {
 
+    @ExperimentalMaterialApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -32,6 +34,7 @@ class DiaryActivity : AppCompatActivity() {
  * ベース画面
  *
  */
+@ExperimentalMaterialApi
 @Composable
 fun ComposeBaseApp() {
     ComposeSampleTheme {

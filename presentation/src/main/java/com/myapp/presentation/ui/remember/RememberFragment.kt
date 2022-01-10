@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Card
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -19,7 +20,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.NavHostController
 import androidx.navigation.fragment.navArgs
+import com.myapp.common.getDateTimeNow
+import com.myapp.domain.model.entity.FfsReport
+import com.myapp.domain.model.entity.Report
+import com.myapp.domain.model.entity.WeatherReport
+import com.myapp.domain.model.value.HeartScore
+import com.myapp.domain.model.value.ReportDateTime
 import com.myapp.presentation.R
 import com.myapp.presentation.utils.component.ListMainDarkText
 import com.myapp.presentation.utils.component.ListSectionDarkText
@@ -36,13 +44,17 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class RememberFragment : Fragment() {
+//
+//    private val args: RememberFragmentArgs by navArgs()
+    private val lastYearFfsReport = FfsReport(ReportDateTime(getDateTimeNow()), "fact", "find", "learn", "statement")
+    private val lastYearWeatherReport = WeatherReport(ReportDateTime(getDateTimeNow()), HeartScore(50),"reason", "improve")
+    private val report = Report(lastYearFfsReport, lastYearWeatherReport)
 
-    private val args: RememberFragmentArgs by navArgs()
 
     @Inject
     lateinit var viewModelFactory: RememberViewModel.Factory
     private val viewModel: RememberViewModel by viewModels {
-        RememberViewModel.provideFactory(viewModelFactory, args.report)
+        RememberViewModel.provideFactory(viewModelFactory, report)
     }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -55,6 +67,20 @@ class RememberFragment : Fragment() {
             }
         }
     }
+}
+
+/**
+ * 振り返り_事実画面
+ *
+ */
+@ExperimentalMaterialApi
+@Composable
+fun RememberScreen(
+    navController: NavHostController,
+    viewModel: RememberViewModel
+) {
+    val state = viewModel.state.value
+    RememberScreenContent(state)
 }
 
 /**

@@ -23,6 +23,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import com.myapp.presentation.R
 import com.myapp.presentation.utils.base.LayoutTag
 import com.myapp.presentation.utils.theme.TextColor
+import com.myapp.presentation.utils.theme.buttonRoundedCornerShape
 
 /**
  * 画面要素定義
@@ -114,7 +115,7 @@ fun DiaryTextInputContent(
         }
         Button(
             onClick = { onClickOkButton() },
-            shape = MaterialTheme.shapes.large,
+            shape = buttonRoundedCornerShape,
             enabled = state.isButtonEnable,
             modifier = Modifier
                 .constrainAs(btnOk) {

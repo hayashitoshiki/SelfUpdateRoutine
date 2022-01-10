@@ -1,64 +1,60 @@
 package com.myapp.presentation.ui.diary
 
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.myapp.presentation.R
+import com.myapp.presentation.ui.account.AccountScreen
+import com.myapp.presentation.ui.account.SignInScreen
+import com.myapp.presentation.ui.account.SignUpScreen
+import com.myapp.presentation.ui.home.HomeScreen
+import com.myapp.presentation.ui.home.LearnListScreen
+import com.myapp.presentation.ui.home.StatementListScreen
+import com.myapp.presentation.ui.setting.SettingScreen
 
 /**
  * 画面定義
  *
- * @property group Bottomタブ
  * @property route 遷移パス
  * @property resourceId ナビゲーションタイトル
- * @property imgRes ナビゲーションアイコン
  */
-enum class Screens(
-    val group: Group,
+sealed class Screens(
     val route: String,
-    @StringRes val resourceId: Int,
-    val imgRes: ImageVector
+    @StringRes val resourceId: Int
 ) {
 
-    FFS_FIND_SCREEN(
-        Group.Diary, "find_screen_navigate", R.string.title_item_short_find, Icons.Filled.Home
-    ),
-    FFS_FACT_SCREEN(
-        Group.Diary, "ffs_fact_screen_navigate", R.string.title_item_short_fact, Icons.Filled.Info
-    ),
-    FFS_LEARN_SCREEN(
-        Group.Diary, "ffs_learn_screen_navigate", R.string.title_item_short_learn, Icons.Filled.Email
-    ),
-    FFS_STATEMENT_SCREEN(
-        Group.Diary, "ffs_statement_screen_navigate", R.string.title_item_short_statement, Icons.Filled.Email
-    ),
-    FFS_RESULT_SCREEN(
-        Group.Diary, "ffs_result_screen_navigate", R.string.title_item_short_ffs_result, Icons.Filled.Email
-    ),
-    WEATHER_ASSESSMENT_SCREEN(
-        Group.Diary, "weather_assessment_screen_navigate", R.string.title_item_short_fact, Icons.Filled.Info
-    ),
-    WEATHER_REASON_SCREEN(
-        Group.Diary, "weather_reason_screen_navigate", R.string.title_item_short_learn, Icons.Filled.Email
-    ),
-    WEATHER_IMPROVE_SCREEN(
-        Group.Diary, "weather_improve_screen_navigate", R.string.title_item_short_statement, Icons.Filled.Email
-    ),
-    WEATHER_RESULT_SCREEN(
-        Group.Diary, "weather_result_screen_navigate", R.string.title_item_short_wather_result, Icons.Filled.Email
-    ), ;
+    object FFS_FIND_SCREEN : Screens("find_screen_navigate", R.string.title_item_short_find)
+    object FFS_FACT_SCREEN : Screens("ffs_fact_screen_navigate", R.string.title_item_short_fact)
+    object FFS_LEARN_SCREEN : Screens( "ffs_learn_screen_navigate", R.string.title_item_short_learn)
+    object FFS_STATEMENT_SCREEN : Screens("ffs_statement_screen_navigate", R.string.title_item_short_statement)
+    object FFS_RESULT_SCREEN : Screens("ffs_result_screen_navigate", R.string.title_item_short_ffs_result)
+    object WEATHER_ASSESSMENT_SCREEN : Screens("weather_assessment_screen_navigate", R.string.title_item_short_fact)
+    object WEATHER_REASON_SCREEN : Screens("weather_reason_screen_navigate", R.string.title_item_short_learn)
+    object WEATHER_IMPROVE_SCREEN : Screens("weather_improve_screen_navigate", R.string.title_item_short_statement)
+    object WEATHER_RESULT_SCREEN : Screens("weather_result_screen_navigate", R.string.title_item_short_wather_result)
 
-    enum class Group {
-        Diary;
+    // MainActivity
+
+    sealed class DrawerScreens(
+        route: String,
+        @StringRes resourceId: Int,
+        @DrawableRes val icon: Int
+    ) : Screens(route, resourceId) {
+        object HOME_SCREEN : DrawerScreens("home_screen_navigate", R.string.menu_home, R.drawable.ic_home_48)
+        object SETTING_SCREEN : DrawerScreens("setting_navigate", R.string.menu_setting, R.drawable.ic_menu_settings_48)
+        object ACCOUNT_SCREEN : DrawerScreens("account_navigate", R.string.menu_account, R.drawable.ic_account_48)
     }
+
+    object STATEMENT_LIST_SCREEN : Screens("statement_list_screen_navigate", R.string.menu_constitution_statement_list)
+    object LEARN_LIST_SCREEN : Screens("learn_screen_navigate", R.string.menu_constitution_learn_list)
+    object REPORT_DETAIL_SCREEN : Screens("report_detail_navigate", R.string.menu_remember)
+    object SIGN_IN_SCREEN : Screens("sign_in_navigate", R.string.menu_account)
+    object SIGN_UP_SCREEN : Screens("sign_up_navigate", R.string.menu_account)
 
 }
 
@@ -67,6 +63,7 @@ enum class Screens(
  *
  * @param navController ナビゲーションAPI
  */
+@ExperimentalMaterialApi
 @Composable
 fun AppNavHost(navController: NavHostController) {
     NavHost(
@@ -83,3 +80,47 @@ fun AppNavHost(navController: NavHostController) {
         composable(route = Screens.WEATHER_RESULT_SCREEN.route) { WeatherResultScreen(hiltViewModel()) }
     }
 }
+
+/**
+ * NavigationHost
+ *
+ * @param navController ナビゲーションAPI
+ */
+@ExperimentalMaterialApi
+@Composable
+fun MainAppNavHost(navController: NavHostController, setScreen: (Screens) ->Unit) {
+    NavHost(
+        navController = navController, startDestination = Screens.DrawerScreens.HOME_SCREEN.route
+    ) {
+        composable(route = Screens.DrawerScreens.HOME_SCREEN.route) {
+            setScreen(Screens.DrawerScreens.HOME_SCREEN)
+            HomeScreen(navController, hiltViewModel())
+        }
+        composable(route = Screens.STATEMENT_LIST_SCREEN.route) {
+            setScreen(Screens.STATEMENT_LIST_SCREEN)
+            StatementListScreen(navController)
+        }
+        composable(route = Screens.LEARN_LIST_SCREEN.route) {
+            setScreen(Screens.STATEMENT_LIST_SCREEN)
+            LearnListScreen(navController)
+        }
+       // composable(route = Screens.REPORT_DETAIL_SCREEN.route) { RememberScreen(navController, hiltViewModel()) }
+        composable(route = Screens.DrawerScreens.SETTING_SCREEN.route) {
+            setScreen(Screens.DrawerScreens.SETTING_SCREEN)
+            SettingScreen(navController, hiltViewModel())
+        }
+        composable(route = Screens.DrawerScreens.ACCOUNT_SCREEN.route) {
+            setScreen(Screens.DrawerScreens.ACCOUNT_SCREEN)
+            AccountScreen(navController, hiltViewModel())
+        }
+        composable(route = Screens.SIGN_IN_SCREEN.route) {
+            setScreen(Screens.SIGN_IN_SCREEN)
+            SignInScreen(navController, hiltViewModel())
+        }
+        composable(route = Screens.SIGN_UP_SCREEN.route) {
+            setScreen(Screens.SIGN_UP_SCREEN)
+            SignUpScreen(navController, hiltViewModel())
+        }
+    }
+}
+

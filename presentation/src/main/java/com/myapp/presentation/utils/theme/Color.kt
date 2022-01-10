@@ -3,6 +3,7 @@ package com.myapp.presentation.utils.theme
 import androidx.compose.ui.graphics.Color
 
 val Red300 = Color(0xFFE57373)
+val Red400 = Color(0xFFEF5350)
 val Red500 = Color(0xFFF44336)
 val Red700 = Color(0xFFD32F2F)
 val LightBlue50 = Color(0xFFE3F2FD)
@@ -26,4 +27,6 @@ object TextColor {
 }
 
 val ButtonDisableColor = Color(0xFFC5C5C5)
+
+val backgroundColor = Color(0xfff5f5f5)
 

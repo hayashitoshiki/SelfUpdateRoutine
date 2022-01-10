@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -32,6 +33,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.NavHostController
 import androidx.navigation.fragment.findNavController
 import com.google.accompanist.insets.LocalWindowInsets
 import com.myapp.presentation.R
@@ -89,6 +91,21 @@ class SignInFragment : Fragment() {
         findNavController().popBackStack()
         findNavController().popBackStack()
     }
+}
+
+
+/**
+ * 振り返り_事実画面
+ *
+ */
+@ExperimentalMaterialApi
+@Composable
+fun SignInScreen(
+    navController: NavHostController,
+    viewModel: SignInViewModel
+) {
+    val state = viewModel.state.value
+    SignInScreenContent(viewModel, state)
 }
 
 /**

@@ -1,5 +1,6 @@
 package com.myapp.presentation.ui
 
+import com.myapp.presentation.ui.diary.Screens
 import com.myapp.presentation.utils.base.BaseContract
 
 interface MainContract {
@@ -9,10 +10,12 @@ interface MainContract {
      *
      * @property accountName アカウント名
      * @property accountEmail アカウントのメールアドレス
+     * @property currentScreen 遷移した画面
      */
     data class State(
         var accountName: String = "",
-        val accountEmail: String = ""
+        val accountEmail: String = "",
+        val currentScreen: Screens = Screens.DrawerScreens.HOME_SCREEN
     ) : BaseContract.State
 
     /**
@@ -25,5 +28,12 @@ interface MainContract {
      * アクション
      *
      */
-    sealed class Event : BaseContract.Event
+    sealed class Event : BaseContract.Event {
+        /**
+         * 画面遷移
+         *
+         * @property screen 遷移先画面
+         */
+        data class OnMoveScreen(val screen: Screens): Event()
+    }
 }

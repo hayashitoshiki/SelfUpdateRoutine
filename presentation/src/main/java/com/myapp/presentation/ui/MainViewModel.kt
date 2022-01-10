@@ -2,7 +2,7 @@ package com.myapp.presentation.ui
 
 import androidx.lifecycle.viewModelScope
 import com.myapp.domain.usecase.AuthUseCase
-import com.myapp.presentation.utils.base.BaseAacViewModel
+import com.myapp.presentation.utils.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -10,7 +10,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(private val authUseCase: AuthUseCase) :
-    BaseAacViewModel<MainContract.State, MainContract.Effect, MainContract.Event>() {
+    BaseViewModel<MainContract.State, MainContract.Effect, MainContract.Event>() {
 
     override fun initState(): MainContract.State {
         return MainContract.State()

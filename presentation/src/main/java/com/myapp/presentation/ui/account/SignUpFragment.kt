@@ -28,6 +28,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.NavHostController
 import androidx.navigation.fragment.findNavController
 import com.google.accompanist.insets.LocalWindowInsets
 import com.myapp.presentation.R
@@ -85,6 +86,20 @@ class SignUpFragment : Fragment() {
         findNavController().popBackStack()
         findNavController().popBackStack()
     }
+}
+
+/**
+ * 振り返り_事実画面
+ *
+ */
+@ExperimentalMaterialApi
+@Composable
+fun SignUpScreen(
+    navController: NavHostController,
+    viewModel: SignUpViewModel
+) {
+    val state = viewModel.state.value
+    SignUpScreenContent(viewModel, state)
 }
 
 /**

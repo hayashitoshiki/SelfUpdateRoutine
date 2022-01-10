@@ -32,6 +32,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.NavHostController
 import androidx.navigation.fragment.findNavController
 import com.myapp.common.getStrHHmm
 import com.myapp.domain.model.value.AlarmMode
@@ -93,6 +94,22 @@ class SettingFragment : Fragment() {
         findNavController().popBackStack()
     }
 }
+
+
+/**
+ * 振り返り_事実画面
+ *
+ */
+@ExperimentalMaterialApi
+@Composable
+fun SettingScreen(
+    navController: NavHostController,
+    viewModel: SettingViewModel
+) {
+    val state = viewModel.state.value
+    SettingScreenContent(viewModel, state) { }
+}
+
 
 /**
  * 設定画面表示用コンテンツ
@@ -211,7 +228,7 @@ private fun SettingScreenContent(
                 Button(
                     onClick = { viewModel.setEvent(SettingContract.Event.OnClickNextButton) },
                     enabled = state.isEnableConfirmButton,
-                    shape = MaterialTheme.shapes.large,
+                    shape = buttonRoundedCornerShape,
                     colors = ButtonDefaults.buttonColors(
                         backgroundColor = Color.White,
                         disabledContentColor = ButtonDisableColor

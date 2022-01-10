@@ -3,7 +3,6 @@ package com.myapp.presentation.ui.diary
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -24,6 +23,7 @@ import androidx.navigation.compose.rememberNavController
 import com.myapp.presentation.R
 import com.myapp.presentation.utils.base.LayoutTag
 import com.myapp.presentation.utils.theme.TextColor
+import com.myapp.presentation.utils.theme.buttonRoundedCornerShape
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 
@@ -141,7 +141,7 @@ fun FfsResultContent(
         Box(Modifier.fillMaxWidth()) {
             Button(
                 onClick = { onClickOkButton() },
-                shape = MaterialTheme.shapes.large,
+                shape = buttonRoundedCornerShape,
                 modifier = Modifier
                     .padding(top = 32.dp)
                     .align(Alignment.Center)

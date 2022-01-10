@@ -16,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
-import androidx.navigation.fragment.navArgs
 import com.myapp.presentation.utils.base.BaseFragment
 import com.myapp.presentation.utils.component.ListMainDarkText
 import com.myapp.presentation.utils.component.ListSubDarkText
@@ -35,8 +34,9 @@ abstract class BaseDetailListFragment : BaseFragment() {
     ): View {
         return ComposeView(requireContext()).apply {
             setContent {
-                val args: StatementListFragmentArgs by navArgs()
-                ReportDetailListContent(args.statementList.statementList)
+//                val args: StatementListFragmentArgs by navArgs()
+                val statementList = listOf<ReportDetail>()
+                ReportDetailListContent(statementList)
             }
         }
     }
@@ -48,7 +48,7 @@ abstract class BaseDetailListFragment : BaseFragment() {
  * @param ReportDetailList 表示するレポート詳細項目
  */
 @Composable
-private fun ReportDetailListContent(ReportDetailList: List<ReportDetail>) {
+fun ReportDetailListContent(ReportDetailList: List<ReportDetail>) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         backgroundColor = Color.Transparent
