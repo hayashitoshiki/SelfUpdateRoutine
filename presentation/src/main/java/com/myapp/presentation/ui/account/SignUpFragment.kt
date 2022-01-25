@@ -1,9 +1,5 @@
 package com.myapp.presentation.ui.account
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -20,22 +16,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.RelocationRequester
-import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.navigation.NavHostController
-import androidx.navigation.fragment.findNavController
 import com.google.accompanist.insets.LocalWindowInsets
 import com.myapp.presentation.R
 import com.myapp.presentation.utils.component.PrimaryColorButton
 import com.myapp.presentation.utils.component.ProgressBar
-import dagger.hilt.android.AndroidEntryPoint
-import es.dmoral.toasty.Toasty
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
@@ -44,62 +35,35 @@ import timber.log.Timber
  * アカウント作成画面
  *
  */
-@AndroidEntryPoint
-class SignUpFragment : Fragment() {
-
-    private val viewModel: SignUpViewModel by viewModels()
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        return ComposeView(requireContext()).apply {
-            setContent {
-                val state = viewModel.state.value
-                val isProgressIndicator = remember{ mutableStateOf(false)}
-                LaunchedEffect(true) {
-                    viewModel.effect.onEach { effect ->
-                        when (effect) {
-                            is SignUpContract.Effect.NavigateHome -> backHome()
-                            is SignUpContract.Effect.OnDestroyView -> { }
-                            is SignUpContract.Effect.ShowError -> shoeErrorToast(effect.throwable)
-                            is SignUpContract.Effect.ShorProgressBer -> isProgressIndicator.value = effect.value
-                        }
-                    }.collect()
-                }
-                SignUpScreenContent(viewModel, state)
-                if (isProgressIndicator.value) {
-                    ProgressBar()
-                }
-            }
-        }
-    }
-
-    // エラートースト表示
-    private fun shoeErrorToast(throwable: Throwable) {
-        Timber.tag(this.javaClass.simpleName).d(throwable)
-        Toasty.error(requireContext(), "アカウントの作成に失敗しました。", Toast.LENGTH_SHORT, true).show()
-    }
-
-    // ホーム画面遷移
-    private fun backHome() {
-        findNavController().popBackStack()
-        findNavController().popBackStack()
-    }
-}
-
-/**
- * 振り返り_事実画面
- *
- */
 @ExperimentalMaterialApi
 @Composable
 fun SignUpScreen(
     navController: NavHostController,
     viewModel: SignUpViewModel
 ) {
+    val context = LocalContext.current
     val state = viewModel.state.value
+    val isProgressIndicator = remember{ mutableStateOf(false)}
+    LaunchedEffect(true) {
+        viewModel.effect.onEach { effect ->
+            when (effect) {
+                is SignUpContract.Effect.NavigateHome -> {
+                    navController.popBackStack()
+                    navController.popBackStack()
+                }
+                is SignUpContract.Effect.OnDestroyView -> { }
+                is SignUpContract.Effect.ShowError -> {
+                    Timber.tag(this.javaClass.simpleName).d(effect.throwable)
+                    Toast.makeText(context, "アカウントの作成に失敗しました。", Toast.LENGTH_SHORT).show()
+                }
+                is SignUpContract.Effect.ShorProgressBer -> isProgressIndicator.value = effect.value
+            }
+        }.collect()
+    }
     SignUpScreenContent(viewModel, state)
+    if (isProgressIndicator.value) {
+        ProgressBar()
+    }
 }
 
 /**

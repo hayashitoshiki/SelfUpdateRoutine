@@ -1,86 +1,29 @@
 package com.myapp.presentation.ui.account
 
-import android.app.AlertDialog
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.fragment.app.viewModels
+import androidx.compose.material.*
 import com.myapp.presentation.R
-import dagger.hilt.android.AndroidEntryPoint
-import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.fragment.app.Fragment
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
+import com.myapp.presentation.ui.diary.Screens
 import com.myapp.presentation.utils.component.PrimaryColorButton
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 
-
 /**
  * アカウント管理画面
- *
- */
-@AndroidEntryPoint
-class AccountFragment : Fragment() {
-
-    private val viewModel: AccountViewModel by viewModels()
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        return ComposeView(requireContext()).apply {
-            setContent {
-                val state = viewModel.state.value
-                LaunchedEffect(true) {
-                    viewModel.setEvent(AccountContract.Event.OnViewCreated)
-                    viewModel.effect.onEach { effect ->
-                        when (effect) {
-                            is AccountContract.Effect.NavigateSignIn -> {
-//                                val directions = AccountFragmentDirections.actionNavAccountToNavSignIn()
-//                                findNavController().navigate(directions)
-                            }
-                            is AccountContract.Effect.NavigateSignUp -> {
-//                                val directions = AccountFragmentDirections.actionNavAccountToNavSignUp()
-//                                findNavController().navigate(directions)
-                            }
-                            is AccountContract.Effect.ShowError -> { Timber.e(effect.throwable)}
-                            is AccountContract.Effect.ShorDeleteConfirmDialog -> { showDeleteConfirmDialog() }
-                            is AccountContract.Effect.OnDestroyView -> { }
-                        }
-                    }.collect()
-                }
-                AccountScreenContent(viewModel, state)
-            }
-        }
-    }
-
-    // 削除確認ダイアログ表示
-    private fun showDeleteConfirmDialog() {
-        AlertDialog.Builder(activity)
-            .setTitle("！！注意！！")
-            .setMessage("アカウントを削除してもよろしいですか？")
-            .setPositiveButton("はい") { _, _ ->
-                viewModel.setEvent(AccountContract.Event.OnClickDeleteConfirmOkButton)
-            }
-            .setNegativeButton("いいえ",null)
-            .show()
-    }
-}
-
-/**
- * 振り返り_事実画面
  *
  */
 @ExperimentalMaterialApi
@@ -90,7 +33,34 @@ fun AccountScreen(
     viewModel: AccountViewModel
 ) {
     val state = viewModel.state.value
+    val isDialog = remember{ mutableStateOf(false) }
+    LaunchedEffect(true) {
+        viewModel.setEvent(AccountContract.Event.OnViewCreated)
+        viewModel.effect.onEach { effect ->
+            when (effect) {
+                is AccountContract.Effect.NavigateSignIn -> {
+                    navController.navigate(Screens.SIGN_IN_SCREEN.route)
+                }
+                is AccountContract.Effect.NavigateSignUp -> {
+                    navController.navigate(Screens.SIGN_UP_SCREEN.route)
+                }
+                is AccountContract.Effect.ShowError -> { Timber.e(effect.throwable)}
+                is AccountContract.Effect.ShorDeleteConfirmDialog -> { isDialog.value = true }
+                is AccountContract.Effect.OnDestroyView -> { }
+            }
+        }.collect()
+    }
     AccountScreenContent(viewModel, state)
+
+    if (isDialog.value) {
+        ShowDeleteConfirmDialog(
+            onClickPositiveAction = {
+                viewModel.setEvent(AccountContract.Event.OnClickDeleteConfirmOkButton)
+                isDialog.value = false
+            },
+            onClickNegativeAction = { isDialog.value = false }
+        )
+    }
 }
 
 /**
@@ -131,6 +101,37 @@ private fun AccountScreenContent(
                     onClick = { viewModel.setEvent(AccountContract.Event.OnClickSignUpButton) },
                     modifier = Modifier.padding(top = 32.dp)
                 )
+            }
+        }
+    }
+}
+
+@Composable
+fun ShowDeleteConfirmDialog(
+    onClickPositiveAction: () -> Unit,
+    onClickNegativeAction: () -> Unit
+) {
+    Dialog(onDismissRequest = {}) {
+        Surface(
+            modifier = Modifier.background(Color.White)
+        ) {
+            Column(modifier= Modifier.padding(16.dp)) {
+                Text(
+                    text = "！！注意！！",
+                    fontSize = 20.sp
+                )
+                Text(
+                    text = "アカウントを削除してもよろしいですか？",
+                    modifier = Modifier.padding(top = 16.dp)
+                )
+                Row(modifier = Modifier.padding(top = 16.dp)) {
+                    Button(onClick = { onClickNegativeAction() }) {
+                        Text(text = "いいえ")
+                    }
+                    Button(onClick = { onClickPositiveAction() }) {
+                        Text(text = "はい")
+                    }
+                }
             }
         }
     }
