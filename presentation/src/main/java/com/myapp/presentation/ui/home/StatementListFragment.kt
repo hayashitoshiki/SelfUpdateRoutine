@@ -2,8 +2,6 @@ package com.myapp.presentation.ui.home
 
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavHostController
-import com.myapp.presentation.ui.remember.RememberViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 /**
@@ -19,9 +17,6 @@ class StatementListFragment : BaseDetailListFragment()
  */
 @ExperimentalMaterialApi
 @Composable
-fun StatementListScreen(
-    navController: NavHostController
-) {
-    val statementList = listOf<ReportDetail>()
+fun StatementListScreen(statementList: List<ReportDetail>) {
     ReportDetailListContent(statementList)
 }

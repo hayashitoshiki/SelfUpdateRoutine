@@ -31,6 +31,8 @@ import com.myapp.presentation.utils.component.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
+import kotlinx.serialization.*
+import kotlinx.serialization.json.Json
 import timber.log.Timber
 
 /**
@@ -59,15 +61,15 @@ class HomeFragment : Fragment() {
                             }
                             is HomeContract.Effect.LearnListNavigation -> {
                                 effect.value
-                                    .map{ ReportDetail(it.ffsReport.learnComment, it.ffsReport.dataTime) }
-                                    .let{ ReportDetailList(it)}
+//                                    .map{ ReportDetail(it.ffsReport.learnComment, it.ffsReport.dataTime) }
+//                                    .let{ ReportDetailList(it)}
 //                                    .let{ HomeFragmentDirections.actionNavHomeToNavLearnList(it) }
 //                                    .let{ findNavController().navigate(it) }
                             }
                             is HomeContract.Effect.StatementListNavigation -> {
                                 effect.value
-                                    .map{ ReportDetail(it.ffsReport.statementComment, it.ffsReport.dataTime) }
-                                    .let{ ReportDetailList(it) }
+//                                    .map{ ReportDetail(it.ffsReport.statementComment, it.ffsReport.dataTime) }
+//                                    .let{ ReportDetailList(it) }
 //                                    .let{ HomeFragmentDirections.actionNavHomeToNavStatementList(it) }
 //                                    .let{ findNavController().navigate(it) }
                             }
@@ -111,25 +113,28 @@ fun HomeScreen(
             when (effect) {
                 is HomeContract.Effect.ChangeFabEnable -> { }
                 is HomeContract.Effect.DiaryReportNavigation -> {
-                 //   val intent = Intent(context, DiaryActivity::class.java)
-                 //   startActivity(intent)
+                    val intent = Intent(context, DiaryActivity::class.java)
+                    context.startActivity(intent)
                 }
                 is HomeContract.Effect.LearnListNavigation -> {
                     effect.value
-                        .map{ ReportDetail(it.ffsReport.learnComment, it.ffsReport.dataTime) }
-                        .let{ ReportDetailList(it)}
-//                        .let{ HomeFragmentDirections.actionNavHomeToNavLearnList(it) }
-//                        .let{ navController.navigate(Screens.REPORT_DETAIL_SCREEN.route) }
+                        .map{ ReportDetail(it.ffsReport.learnComment, it.ffsReport.dataTime.toMdDate()) }
+                        .also {
+                            val jsonList = Json.encodeToString(it)
+                            navController.navigate(Screens.LEARN_LIST_SCREEN.route +"/$jsonList")
+                        }
                 }
                 is HomeContract.Effect.StatementListNavigation -> {
                     effect.value
-                        .map{ ReportDetail(it.ffsReport.statementComment, it.ffsReport.dataTime) }
-                        .let{ ReportDetailList(it) }
-//                        .let{ HomeFragmentDirections.actionNavHomeToNavStatementList(it) }
-//                        .let{ navController.navigate(Screens.STATEMENT_LIST_SCREEN.route) }
+                        .map{ ReportDetail(it.ffsReport.statementComment, it.ffsReport.dataTime.toMdDate()) }
+                        .also{
+                            val jsonList = Json.encodeToString(it)
+                            navController.navigate(Screens.STATEMENT_LIST_SCREEN.route +"/$jsonList")
+                        }
                 }
                 is HomeContract.Effect.ReportDetailListNavigation -> {
-                    effect.value
+//                    val jsonReport = Json.encodeToString(effect.value)
+//                    navController.navigate(Screens.REPORT_DETAIL_SCREEN.route +"/$jsonReport")
 //                        .let{ HomeFragmentDirections.actionNavHomeToNavRememner(it) }
 //                        .let{ navController.navigate(Screens.LEARN_LIST_SCREEN.route) }
                 }

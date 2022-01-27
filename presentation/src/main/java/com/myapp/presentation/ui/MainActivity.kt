@@ -1,55 +1,42 @@
 package com.myapp.presentation.ui
 
-import android.app.AlarmManager
-import android.app.PendingIntent
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
 import com.myapp.domain.usecase.AlarmNotificationUseCase
-import com.myapp.presentation.R
-import com.myapp.presentation.ui.account.SignInScreen
-import com.myapp.presentation.ui.diary.AlarmNotificationReceiver
-import com.myapp.presentation.ui.diary.AppNavHost
 import com.myapp.presentation.ui.diary.MainAppNavHost
 import com.myapp.presentation.ui.diary.Screens
+import com.myapp.presentation.ui.remember.RememberViewModel
 import com.myapp.presentation.utils.component.BackButtonAppBar
 import com.myapp.presentation.utils.component.Drawer
 import com.myapp.presentation.utils.component.MenuButtonAppBar
 import com.myapp.presentation.utils.theme.ComposeSampleTheme
 import com.myapp.presentation.utils.theme.backgroundColor
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.components.ActivityComponent
 import kotlinx.coroutines.launch
-import java.time.OffsetDateTime
 import javax.inject.Inject
-import timber.log.Timber
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @EntryPoint
+    @InstallIn(ActivityComponent::class)
+    interface ViewModelFactoryProvider {
+        fun noteDetailViewModelFactory(): RememberViewModel.Factory
+    }
 
     private lateinit var appBarConfiguration: AppBarConfiguration
 //    private var _binding: ActivityMainBinding? = null
@@ -70,7 +57,7 @@ class MainActivity : ComponentActivity() {
         }
 
 
-//        WindowCompat.setDecorFitsSystemWindows(window, false)
+        //        WindowCompat.setDecorFitsSystemWindows(window, false)
 //        _binding = ActivityMainBinding.inflate(layoutInflater)
 //        setContentView(binding.root)
 //        val navViewHeaderBinding : NavHeaderMainBinding = DataBindingUtil.inflate(layoutInflater, R.layout.nav_header_main, binding.navView, false)

@@ -76,7 +76,6 @@ class RememberFragment : Fragment() {
 @ExperimentalMaterialApi
 @Composable
 fun RememberScreen(
-    navController: NavHostController,
     viewModel: RememberViewModel
 ) {
     val state = viewModel.state.value

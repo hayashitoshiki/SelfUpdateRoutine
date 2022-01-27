@@ -3,11 +3,8 @@ package com.myapp.presentation.ui.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.myapp.domain.model.entity.Report
-import com.myapp.presentation.utils.base.BaseAacViewModel
 import com.myapp.presentation.utils.base.BaseViewModel
-import com.myapp.presentation.utils.base.StringResource
 import com.myapp.presentation.utils.expansion.img
-import com.myapp.presentation.utils.expansion.text
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject

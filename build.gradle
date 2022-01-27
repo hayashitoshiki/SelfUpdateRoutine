@@ -135,6 +135,8 @@ subprojects {
         // Hilt
         implementation "com.google.dagger:hilt-android:$rootProject.hilt_version"
         kapt "com.google.dagger:hilt-android-compiler:$rootProject.hilt_version"
+        // kotlinx-serialization
+        implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2'
 
         // test
         testImplementation 'junit:junit:4.13.1'

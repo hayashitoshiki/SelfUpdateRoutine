@@ -1,21 +1,31 @@
 package com.myapp.presentation.ui.diary
 
+import android.app.Activity
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navArgument
+import com.myapp.domain.model.entity.Report
 import com.myapp.presentation.R
+import com.myapp.presentation.ui.MainActivity
 import com.myapp.presentation.ui.account.AccountScreen
 import com.myapp.presentation.ui.account.SignInScreen
 import com.myapp.presentation.ui.account.SignUpScreen
-import com.myapp.presentation.ui.home.HomeScreen
-import com.myapp.presentation.ui.home.LearnListScreen
-import com.myapp.presentation.ui.home.StatementListScreen
+import com.myapp.presentation.ui.home.*
+import com.myapp.presentation.ui.remember.RememberScreen
+import com.myapp.presentation.ui.remember.RememberViewModel
 import com.myapp.presentation.ui.setting.SettingScreen
+import dagger.hilt.android.EntryPointAccessors
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 
 /**
  * 画面定義
@@ -96,15 +106,36 @@ fun MainAppNavHost(navController: NavHostController, setScreen: (Screens) ->Unit
             setScreen(Screens.DrawerScreens.HOME_SCREEN)
             HomeScreen(navController, hiltViewModel())
         }
-        composable(route = Screens.STATEMENT_LIST_SCREEN.route) {
-            setScreen(Screens.STATEMENT_LIST_SCREEN)
-            StatementListScreen(navController)
+        composable(
+            route = Screens.STATEMENT_LIST_SCREEN.route + "/{reportDetailList}",
+            arguments = listOf(navArgument("reportDetailList") { type = NavType.StringType })
+        ) { backStackEntry ->
+            backStackEntry.arguments?.getString("reportDetailList")?.let{
+                val reportList = Json.decodeFromString<List<ReportDetail>>(it)
+                setScreen(Screens.STATEMENT_LIST_SCREEN)
+                StatementListScreen(reportList)
+            }
         }
-        composable(route = Screens.LEARN_LIST_SCREEN.route) {
-            setScreen(Screens.STATEMENT_LIST_SCREEN)
-            LearnListScreen(navController)
+        composable(
+            route = Screens.LEARN_LIST_SCREEN.route + "/{reportDetailList}",
+            arguments = listOf(navArgument("reportDetailList") { type = NavType.StringType })
+        ) { backStackEntry ->
+            backStackEntry.arguments?.getString("reportDetailList")?.let{
+                val reportList = Json.decodeFromString<List<ReportDetail>>(it)
+                setScreen(Screens.LEARN_LIST_SCREEN)
+                LearnListScreen(reportList)
+            }
         }
-       // composable(route = Screens.REPORT_DETAIL_SCREEN.route) { RememberScreen(navController, hiltViewModel()) }
+        composable(
+            route = Screens.REPORT_DETAIL_SCREEN.route + "/{report}",
+            arguments = listOf(navArgument("report") { type = NavType.StringType })
+        ) { backStackEntry ->
+            backStackEntry.arguments?.getString("report")?.let{
+                val report = Json.decodeFromString<Report>(it)
+                setScreen(Screens.REPORT_DETAIL_SCREEN)
+                RememberScreen(rememberViewModel(report))
+            }
+        }
         composable(route = Screens.DrawerScreens.SETTING_SCREEN.route) {
             setScreen(Screens.DrawerScreens.SETTING_SCREEN)
             SettingScreen(navController, hiltViewModel())
@@ -124,3 +155,13 @@ fun MainAppNavHost(navController: NavHostController, setScreen: (Screens) ->Unit
     }
 }
 
+
+@Composable
+fun rememberViewModel(report: Report): RememberViewModel {
+    val factory = EntryPointAccessors.fromActivity(
+        LocalContext.current as Activity,
+        MainActivity.ViewModelFactoryProvider::class.java
+    ).noteDetailViewModelFactory()
+
+    return viewModel(factory = RememberViewModel.provideFactory(factory, report))
+}

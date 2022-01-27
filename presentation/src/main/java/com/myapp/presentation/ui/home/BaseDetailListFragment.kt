@@ -67,7 +67,7 @@ fun ReportDetailListContent(ReportDetailList: List<ReportDetail>) {
                                 .padding(8.dp)
                                 .fillMaxWidth()
                         ) {
-                            ListSubDarkText(text = reportDetail.date.toMdDate())
+                            ListSubDarkText(text = reportDetail.date)
                             ListMainDarkText(
                                 text = reportDetail.value,
                                 modifier = Modifier.padding(top = 4.dp)

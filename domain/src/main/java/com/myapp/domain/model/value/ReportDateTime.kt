@@ -1,6 +1,7 @@
 package com.myapp.domain.model.value
 
 import android.annotation.SuppressLint
+import kotlinx.serialization.Serializable
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
@@ -12,6 +13,7 @@ import java.util.*
 /**
  * 記録をつけた日時
  */
+@Serializable
 data class ReportDateTime(val date: LocalDateTime) {
     /**
      * セクション用の日時文字列を返す
