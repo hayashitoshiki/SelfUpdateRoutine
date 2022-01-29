@@ -16,7 +16,9 @@ class MainViewModel @Inject constructor(private val authUseCase: AuthUseCase) :
         return MainContract.State()
     }
 
-    override fun handleEvents(event: MainContract.Event) {}
+    override fun handleEvents(event: MainContract.Event) = when(event) {
+        is MainContract.Event.OnMoveScreen -> { setState { copy(currentScreen = event.screen) } }
+    }
 
     init {
         updateAccountDetail()

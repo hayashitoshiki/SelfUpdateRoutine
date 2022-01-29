@@ -1,9 +1,7 @@
 package com.myapp.presentation.ui.setting
 
 import com.myapp.domain.model.value.AlarmMode
-import com.myapp.presentation.R
 import com.myapp.presentation.utils.base.BaseContract
-import com.myapp.presentation.utils.expansion.explanation
 import java.time.LocalDateTime
 import java.time.LocalTime
 
@@ -24,7 +22,8 @@ interface SettingContract {
         val beforeAlarmMode: AlarmMode = AlarmMode.NORMAL,
         val afterAlarmMode: AlarmMode = AlarmMode.NORMAL,
         val nextAlarmTime: String = "1月1日(日) 22:00",
-        val isEnableConfirmButton: Boolean = false
+        val isEnableConfirmButton: Boolean = false,
+        val init: Boolean = false
     ) : BaseContract.State
 
     /**

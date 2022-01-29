@@ -43,7 +43,8 @@ class SettingViewModel @Inject constructor(private val settingUseCase: SettingUs
                     afterTime = LocalTime.of(alarmDate.hour, alarmDate.minute, alarmDate.second),
                     beforeAlarmMode = alarmMode,
                     afterAlarmMode = alarmMode,
-                    nextAlarmTime = alarmDate.getStrHMMddEHHmm()
+                    nextAlarmTime = alarmDate.getStrHMMddEHHmm(),
+                    init = true
                 )
             }
         }.onFailure { setEffect { SettingContract.Effect.ShowError(it) } }
