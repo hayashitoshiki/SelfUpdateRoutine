@@ -37,65 +37,6 @@ import timber.log.Timber
 
 /**
  * ホーム画面
- */
-@AndroidEntryPoint
-class HomeFragment : Fragment() {
-
-    private val viewModel: HomeViewModel by viewModels()
-
-    @ExperimentalMaterialApi
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        return ComposeView(requireContext()).apply {
-            setContent {
-                val state = viewModel.state.value
-                LaunchedEffect(true) {
-                    viewModel.effect.onEach { effect ->
-                        when (effect) {
-                            is HomeContract.Effect.ChangeFabEnable -> { }
-                            is HomeContract.Effect.DiaryReportNavigation -> {
-                                val intent = Intent(context, DiaryActivity::class.java)
-                                startActivity(intent)
-                            }
-                            is HomeContract.Effect.LearnListNavigation -> {
-                                effect.value
-//                                    .map{ ReportDetail(it.ffsReport.learnComment, it.ffsReport.dataTime) }
-//                                    .let{ ReportDetailList(it)}
-//                                    .let{ HomeFragmentDirections.actionNavHomeToNavLearnList(it) }
-//                                    .let{ findNavController().navigate(it) }
-                            }
-                            is HomeContract.Effect.StatementListNavigation -> {
-                                effect.value
-//                                    .map{ ReportDetail(it.ffsReport.statementComment, it.ffsReport.dataTime) }
-//                                    .let{ ReportDetailList(it) }
-//                                    .let{ HomeFragmentDirections.actionNavHomeToNavStatementList(it) }
-//                                    .let{ findNavController().navigate(it) }
-                            }
-                            is HomeContract.Effect.ReportDetailListNavigation -> {
-                                effect.value
-//                                    .let{ HomeFragmentDirections.actionNavHomeToNavRememner(it) }
-//                                    .let{ findNavController().navigate(it) }
-                            }
-                            is HomeContract.Effect.OnDestroyView -> {}
-                            is HomeContract.Effect.ShowError -> Timber.tag(this.javaClass.simpleName).d(effect.throwable.message)
-                        }
-                    }.collect()
-                }
-                HomeContent(viewModel, state)
-            }
-        }
-    }
-
-    override fun onDestroyView() {
-        viewModel.setEvent(HomeContract.Event.OnDestroyView)
-        super.onDestroyView()
-    }
-}
-
-/**
- * 振り返り_事実画面
  *
  */
 @ExperimentalMaterialApi

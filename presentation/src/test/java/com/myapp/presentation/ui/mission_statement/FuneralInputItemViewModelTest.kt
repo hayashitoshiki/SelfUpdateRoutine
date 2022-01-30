@@ -1,11 +1,8 @@
 package com.myapp.presentation.ui.mission_statement
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.myapp.presentation.utils.base.BaseInputTextItemContract
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.test.*
 import org.junit.After
 import org.junit.Assert.assertEquals

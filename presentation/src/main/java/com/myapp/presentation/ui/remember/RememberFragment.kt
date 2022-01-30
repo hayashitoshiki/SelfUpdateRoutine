@@ -1,9 +1,5 @@
 package com.myapp.presentation.ui.remember
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,19 +11,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import androidx.navigation.NavHostController
-import androidx.navigation.fragment.navArgs
-import com.myapp.common.getDateTimeNow
-import com.myapp.domain.model.entity.FfsReport
-import com.myapp.domain.model.entity.Report
-import com.myapp.domain.model.entity.WeatherReport
-import com.myapp.domain.model.value.HeartScore
-import com.myapp.domain.model.value.ReportDateTime
 import com.myapp.presentation.R
 import com.myapp.presentation.utils.component.ListMainDarkText
 import com.myapp.presentation.utils.component.ListSectionDarkText
@@ -35,39 +20,6 @@ import com.myapp.presentation.utils.component.ListSubDarkText
 import com.myapp.presentation.utils.expansion.text
 import com.myapp.presentation.utils.theme.LightBlue50
 import com.myapp.presentation.utils.theme.LightBlue100
-import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
-
-/**
- * 過去の振り返り詳細画面
- *
- */
-@AndroidEntryPoint
-class RememberFragment : Fragment() {
-//
-//    private val args: RememberFragmentArgs by navArgs()
-    private val lastYearFfsReport = FfsReport(ReportDateTime(getDateTimeNow()), "fact", "find", "learn", "statement")
-    private val lastYearWeatherReport = WeatherReport(ReportDateTime(getDateTimeNow()), HeartScore(50),"reason", "improve")
-    private val report = Report(lastYearFfsReport, lastYearWeatherReport)
-
-
-    @Inject
-    lateinit var viewModelFactory: RememberViewModel.Factory
-    private val viewModel: RememberViewModel by viewModels {
-        RememberViewModel.provideFactory(viewModelFactory, report)
-    }
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        return ComposeView(requireContext()).apply {
-            setContent {
-                val state = viewModel.state.value
-                RememberScreenContent(state)
-            }
-        }
-    }
-}
 
 /**
  * 振り返り_事実画面
