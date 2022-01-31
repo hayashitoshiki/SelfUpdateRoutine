@@ -1,6 +1,5 @@
 package com.myapp.presentation.ui.account
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import com.myapp.presentation.R
@@ -13,11 +12,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
 import com.myapp.presentation.ui.diary.Screens
 import com.myapp.presentation.utils.component.PrimaryColorButton
+import com.myapp.presentation.utils.component.ShowDeleteConfirmDialog
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
@@ -54,6 +52,8 @@ fun AccountScreen(
 
     if (isDialog.value) {
         ShowDeleteConfirmDialog(
+            title = "！！注意！！",
+            message = "アカウントを削除してもよろしいですか？",
             onClickPositiveAction = {
                 viewModel.setEvent(AccountContract.Event.OnClickDeleteConfirmOkButton)
                 isDialog.value = false
@@ -101,37 +101,6 @@ private fun AccountScreenContent(
                     onClick = { viewModel.setEvent(AccountContract.Event.OnClickSignUpButton) },
                     modifier = Modifier.padding(top = 32.dp)
                 )
-            }
-        }
-    }
-}
-
-@Composable
-fun ShowDeleteConfirmDialog(
-    onClickPositiveAction: () -> Unit,
-    onClickNegativeAction: () -> Unit
-) {
-    Dialog(onDismissRequest = {}) {
-        Surface(
-            modifier = Modifier.background(Color.White)
-        ) {
-            Column(modifier= Modifier.padding(16.dp)) {
-                Text(
-                    text = "！！注意！！",
-                    fontSize = 20.sp
-                )
-                Text(
-                    text = "アカウントを削除してもよろしいですか？",
-                    modifier = Modifier.padding(top = 16.dp)
-                )
-                Row(modifier = Modifier.padding(top = 16.dp)) {
-                    Button(onClick = { onClickNegativeAction() }) {
-                        Text(text = "いいえ")
-                    }
-                    Button(onClick = { onClickPositiveAction() }) {
-                        Text(text = "はい")
-                    }
-                }
             }
         }
     }
