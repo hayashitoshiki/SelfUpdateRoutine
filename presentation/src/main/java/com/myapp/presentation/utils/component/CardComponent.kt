@@ -1,12 +1,10 @@
 package com.myapp.presentation.utils.component
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -15,6 +13,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.Dimension
 import com.myapp.presentation.utils.theme.PrimaryColor
 import com.myapp.presentation.utils.theme.PrimaryDarkColor
 
@@ -82,4 +81,24 @@ fun CardIcon(resId: Int, modifier: Modifier = Modifier) {
         painter = painterResource(id = resId),
         contentDescription = null
     )
+}
+
+@ExperimentalMaterialApi
+@Composable
+fun CommonCard(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit= {},
+    content: @Composable () -> Unit) {
+    Card(
+        modifier = modifier,
+        elevation = 8.dp,
+        onClick = {onClick()},
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(8.dp)
+        ) {
+            content()
+        }
+    }
 }
