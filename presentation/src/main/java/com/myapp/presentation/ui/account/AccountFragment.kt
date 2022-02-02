@@ -13,7 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.myapp.presentation.ui.diary.Screens
+import com.myapp.presentation.ui.Screens
 import com.myapp.presentation.utils.component.PrimaryColorButton
 import com.myapp.presentation.utils.component.ShowDeleteConfirmDialog
 import kotlinx.coroutines.flow.collect
@@ -37,10 +37,10 @@ fun AccountScreen(
         viewModel.effect.onEach { effect ->
             when (effect) {
                 is AccountContract.Effect.NavigateSignIn -> {
-                    navController.navigate(Screens.SIGN_IN_SCREEN.route)
+                    navController.navigate(Screens.SignInScreen.route)
                 }
                 is AccountContract.Effect.NavigateSignUp -> {
-                    navController.navigate(Screens.SIGN_UP_SCREEN.route)
+                    navController.navigate(Screens.SignUpScreen.route)
                 }
                 is AccountContract.Effect.ShowError -> { Timber.e(effect.throwable)}
                 is AccountContract.Effect.ShorDeleteConfirmDialog -> { isDialog.value = true }

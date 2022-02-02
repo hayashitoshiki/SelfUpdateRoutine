@@ -21,6 +21,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.myapp.presentation.R
+import com.myapp.presentation.ui.Screens
 import com.myapp.presentation.utils.base.LayoutTag
 import com.myapp.presentation.utils.theme.TextColor
 import com.myapp.presentation.utils.theme.buttonRoundedCornerShape
@@ -47,8 +48,8 @@ fun FfsResultScreen(
         viewModel.effect.onEach { effect ->
             when (effect) {
                 is FfsResultContract.Effect.NextNavigation -> {
-                    navController.navigate(Screens.WEATHER_ASSESSMENT_SCREEN.route) {
-                        popUpTo(Screens.FFS_RESULT_SCREEN.route) {
+                    navController.navigate(Screens.FfsAssessmentScreen.route) {
+                        popUpTo(Screens.FfsResultScreen.route) {
                             saveState = true
                         }
                         launchSingleTop = true

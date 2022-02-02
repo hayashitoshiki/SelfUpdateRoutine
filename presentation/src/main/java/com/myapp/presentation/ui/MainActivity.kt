@@ -14,8 +14,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.ui.AppBarConfiguration
 import com.myapp.domain.usecase.AlarmNotificationUseCase
-import com.myapp.presentation.ui.diary.MainAppNavHost
-import com.myapp.presentation.ui.diary.Screens
 import com.myapp.presentation.ui.remember.RememberViewModel
 import com.myapp.presentation.utils.component.BackButtonAppBar
 import com.myapp.presentation.utils.component.Drawer
@@ -135,7 +133,7 @@ fun ComposeMainBaseApp(viewModel: MainViewModel) {
         // ヘッダー定義
         val topBar: @Composable () -> Unit = {
             when (currentScreen) {
-                Screens.DrawerScreens.HOME_SCREEN -> {
+                Screens.DrawerScreens.HomeScreen -> {
                     MenuButtonAppBar(
                         title = "",
                         onButtonClicked = {
@@ -145,7 +143,7 @@ fun ComposeMainBaseApp(viewModel: MainViewModel) {
                         }
                     )
                 }
-                Screens.DrawerScreens.ACCOUNT_SCREEN, Screens.DrawerScreens.SETTING_SCREEN -> {
+                Screens.DrawerScreens.AccountScreen, Screens.DrawerScreens.SettingScreen -> {
                     MenuButtonAppBar(
                         title = stringResource(id = currentScreen.resourceId),
                         onButtonClicked = {

@@ -17,6 +17,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.navigation.NavHostController
 import com.myapp.presentation.R
+import com.myapp.presentation.ui.Screens
 import com.myapp.presentation.ui.diary.*
 import com.myapp.presentation.utils.component.*
 import kotlinx.coroutines.flow.collect
@@ -52,7 +53,7 @@ fun HomeScreen(
                         .map{ ReportDetail(it.ffsReport.learnComment, it.ffsReport.dataTime.toMdDate()) }
                         .also {
                             val jsonList = Json.encodeToString(it)
-                            navController.navigate(Screens.LEARN_LIST_SCREEN.route +"/$jsonList")
+                            navController.navigate(Screens.LearnListScreen.route +"/$jsonList")
                         }
                 }
                 is HomeContract.Effect.StatementListNavigation -> {
@@ -60,7 +61,7 @@ fun HomeScreen(
                         .map{ ReportDetail(it.ffsReport.statementComment, it.ffsReport.dataTime.toMdDate()) }
                         .also{
                             val jsonList = Json.encodeToString(it)
-                            navController.navigate(Screens.STATEMENT_LIST_SCREEN.route +"/$jsonList")
+                            navController.navigate(Screens.StatementListScreen.route +"/$jsonList")
                         }
                 }
                 is HomeContract.Effect.OnDestroyView -> {}

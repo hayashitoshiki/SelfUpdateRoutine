@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
+import com.myapp.presentation.ui.DiaryAppNavHost
 import com.myapp.presentation.utils.theme.ComposeSampleTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -40,7 +41,7 @@ fun ComposeBaseApp() {
     ComposeSampleTheme {
         val navController = rememberNavController()
         Scaffold(backgroundColor = Color(0xfff5f5f5)) {
-            AppNavHost(navController)
+            DiaryAppNavHost(navController)
         }
     }
 }

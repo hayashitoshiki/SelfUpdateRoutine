@@ -31,6 +31,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.myapp.domain.model.value.HeartScore
 import com.myapp.presentation.R
+import com.myapp.presentation.ui.Screens
 import com.myapp.presentation.utils.base.LayoutTag
 import com.myapp.presentation.utils.expansion.img
 import com.myapp.presentation.utils.theme.TextColor
@@ -63,8 +64,8 @@ fun WeatherAssessmentScreen(
         viewModel.effect.onEach { effect ->
             when (effect) {
                 is DiaryBaseContract.Effect.NextNavigation -> {
-                    navController.navigate(Screens.WEATHER_REASON_SCREEN.route) {
-                        popUpTo(Screens.WEATHER_ASSESSMENT_SCREEN.route) {
+                    navController.navigate(Screens.WeatherReasonScreen.route) {
+                        popUpTo(Screens.FfsAssessmentScreen.route) {
                             saveState = true
                         }
                         launchSingleTop = true

@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -20,16 +19,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.myapp.presentation.R
-import com.myapp.presentation.ui.diary.Screens
+import com.myapp.presentation.ui.Screens
 import com.myapp.presentation.utils.theme.*
 
 /**
  * Drawableメニューリスト定義
  */
 private val drawableScreens = listOf(
-    Screens.DrawerScreens.HOME_SCREEN,
-    Screens.DrawerScreens.ACCOUNT_SCREEN,
-    Screens.DrawerScreens.SETTING_SCREEN
+    Screens.DrawerScreens.HomeScreen,
+    Screens.DrawerScreens.AccountScreen,
+    Screens.DrawerScreens.SettingScreen
 )
 
 /**

@@ -14,6 +14,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.myapp.presentation.R
+import com.myapp.presentation.ui.Screens
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 
@@ -42,8 +43,8 @@ fun WeatherReasonScreen(
         viewModel.effect.onEach { effect ->
             when (effect) {
                 is DiaryBaseContract.Effect.NextNavigation -> {
-                    navController.navigate(Screens.WEATHER_IMPROVE_SCREEN.route) {
-                        popUpTo(Screens.WEATHER_REASON_SCREEN.route) {
+                    navController.navigate(Screens.WeatherImproveScreen.route) {
+                        popUpTo(Screens.WeatherReasonScreen.route) {
                             saveState = true
                         }
                         launchSingleTop = true

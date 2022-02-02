@@ -1,6 +1,5 @@
 package com.myapp.presentation.ui
 
-import com.myapp.presentation.ui.diary.Screens
 import com.myapp.presentation.utils.base.BaseContract
 
 interface MainContract {
@@ -15,7 +14,7 @@ interface MainContract {
     data class State(
         var accountName: String = "",
         val accountEmail: String = "",
-        val currentScreen: Screens = Screens.DrawerScreens.HOME_SCREEN
+        val currentScreen: Screens = Screens.DrawerScreens.HomeScreen
     ) : BaseContract.State
 
     /**

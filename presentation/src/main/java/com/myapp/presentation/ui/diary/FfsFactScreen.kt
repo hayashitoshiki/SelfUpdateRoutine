@@ -14,6 +14,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.myapp.presentation.R
+import com.myapp.presentation.ui.Screens
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 
@@ -43,8 +44,8 @@ fun FfsFactScreen(
         viewModel.effect.onEach { effect ->
             when (effect) {
                 is DiaryBaseContract.Effect.NextNavigation -> {
-                    navController.navigate(Screens.FFS_FIND_SCREEN.route) {
-                        popUpTo(Screens.FFS_FACT_SCREEN.route) {
+                    navController.navigate(Screens.FfsFindScreen.route) {
+                        popUpTo(Screens.FfsFactScreen.route) {
                             saveState = true
                         }
                         launchSingleTop = true
