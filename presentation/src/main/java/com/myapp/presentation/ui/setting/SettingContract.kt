@@ -5,7 +5,12 @@ import com.myapp.presentation.utils.base.BaseContract
 import java.time.LocalDateTime
 import java.time.LocalTime
 
+/**
+ * 設定画面用Contract
+ *
+ */
 interface SettingContract {
+
     /**
      * 　設定画面　状態保持
      *
@@ -15,6 +20,7 @@ interface SettingContract {
      * @property afterAlarmMode 変更後のアラームモード
      * @property nextAlarmTime 次回のアラーム時間
      * @property isEnableConfirmButton 変更ボタンの活性・非活性制御
+     * @property init 初期化フラグ
      */
     data class State(
         val beforeTime: LocalDateTime = LocalDateTime.now(),

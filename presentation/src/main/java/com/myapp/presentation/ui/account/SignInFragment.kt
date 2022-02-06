@@ -121,7 +121,7 @@ private fun SignInScreenContent(
             )
             PrimaryColorButton(
                 text = stringResource(id = R.string.btn_sign_in),
-                enable = state.isSignInEnable,
+                enabled = state.isSignInEnable,
                 onClick = { viewModel.setEvent(SignInContract.Event.OnClickSignInButton) },
                 modifier = Modifier.padding(top = 16.dp)
             )

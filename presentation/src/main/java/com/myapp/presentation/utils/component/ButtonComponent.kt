@@ -6,20 +6,30 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import com.myapp.presentation.utils.theme.ButtonDisableColor
 import com.myapp.presentation.utils.theme.PrimaryColor
 import com.myapp.presentation.utils.theme.PrimaryColorDisable
+import com.myapp.presentation.utils.theme.buttonRoundedCornerShape
 
 /**
- * リスト表示用のメインテキスト定義
+ * メイン配色ボタン
  *
  * @param modifier レイアウト
- * @param text テキスト
+ * @param onClick クリックアクション
+ * @param enabled 活性非活性
+ * @param text ボタン文言
  */
 @Composable
-fun PrimaryColorButton(onClick:() -> Unit, modifier: Modifier = Modifier, text: String, enable: Boolean = true) {
+fun PrimaryColorButton(
+    onClick:() -> Unit,
+    modifier: Modifier = Modifier,
+    text: String,
+    enabled: Boolean = true
+) {
     Button(
         onClick = { onClick() },
-        enabled = enable,
+        enabled = enabled,
         colors = ButtonDefaults.buttonColors(
             backgroundColor = PrimaryColor,
             disabledContentColor = PrimaryColorDisable
@@ -28,7 +38,40 @@ fun PrimaryColorButton(onClick:() -> Unit, modifier: Modifier = Modifier, text: 
     ) {
         MainLightText(
             text = text,
-            enable = enable
+            enable = enabled
         )
     }
 }
+
+/**
+ * 白色ボタン
+ *
+ * @param modifier レイアウト
+ * @param onClick クリックアクション
+ * @param enabled 活性非活性
+ * @param text ボタン文言
+ */
+@Composable
+fun WhiteColorButton(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+    enabled: Boolean = true,
+    text: String
+) {
+    Button(
+        onClick = { onClick() },
+        enabled = enabled,
+        shape = buttonRoundedCornerShape,
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = Color.White,
+            disabledContentColor = ButtonDisableColor
+        ),
+        modifier = modifier.clip(CircleShape)
+    ) {
+        ButtonPrimaryText(
+            text = text,
+            enable = enabled
+        )
+    }
+}
+

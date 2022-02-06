@@ -133,7 +133,7 @@ private fun SignUpScreenContent(
             )
             PrimaryColorButton(
                 text = stringResource(id = R.string.btn_sign_up),
-                enable = state.isSignUpEnable,
+                enabled = state.isSignUpEnable,
                 onClick = { viewModel.setEvent(SignUpContract.Event.OnClickSignUpButton) },
                 modifier = Modifier.padding(top = 16.dp)
             )
