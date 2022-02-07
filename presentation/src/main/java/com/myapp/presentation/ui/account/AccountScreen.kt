@@ -31,6 +31,7 @@ fun AccountScreen(
     viewModel: AccountViewModel
 ) {
     val state = viewModel.state.value
+    val event: (AccountContract.Event) -> Unit = { viewModel.setEvent(it) }
     val isDialog = remember{ mutableStateOf(false) }
     LaunchedEffect(true) {
         viewModel.setEvent(AccountContract.Event.OnViewCreated)
@@ -48,7 +49,7 @@ fun AccountScreen(
             }
         }.collect()
     }
-    AccountScreenContent(viewModel, state)
+    AccountScreenContent(event, state)
 
     if (isDialog.value) {
         ShowDeleteConfirmDialog(
@@ -69,7 +70,7 @@ fun AccountScreen(
  */
 @Composable
 private fun AccountScreenContent(
-    viewModel: AccountViewModel,
+    event: (AccountContract.Event) -> Unit,
     state: AccountContract.State
 ) {
     Scaffold(
@@ -84,21 +85,21 @@ private fun AccountScreenContent(
             if (state.isSignIn) {
                 PrimaryColorButton(
                     text = stringResource(id = R.string.btn_sign_out),
-                    onClick = { viewModel.setEvent(AccountContract.Event.OnClickSignOutButton) }
+                    onClick = { event(AccountContract.Event.OnClickSignOutButton) }
                 )
                 PrimaryColorButton(
                     text = stringResource(id = R.string.btn_account_delete),
-                    onClick = { viewModel.setEvent(AccountContract.Event.OnClickDeleteConfirmOkButton) },
+                    onClick = { event(AccountContract.Event.OnClickDeleteConfirmOkButton) },
                     modifier = Modifier.padding(top = 32.dp)
                 )
             } else {
                 PrimaryColorButton(
                     text = stringResource(id = R.string.btn_sign_in),
-                    onClick = { viewModel.setEvent(AccountContract.Event.OnClickSignInButton) }
+                    onClick = { event(AccountContract.Event.OnClickSignInButton) }
                 )
                 PrimaryColorButton(
                     text = stringResource(id = R.string.btn_sign_up),
-                    onClick = { viewModel.setEvent(AccountContract.Event.OnClickSignUpButton) },
+                    onClick = { event(AccountContract.Event.OnClickSignUpButton) },
                     modifier = Modifier.padding(top = 32.dp)
                 )
             }

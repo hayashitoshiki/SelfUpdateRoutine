@@ -4,16 +4,11 @@ import android.widget.Toast
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -37,49 +32,50 @@ import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 
 /**
- * ログイン画面
+ * アカウント作成画面
  *
  */
 @ExperimentalMaterialApi
 @Composable
-fun SignInScreen(
+fun SignUpScreen(
     navController: NavHostController,
-    viewModel: SignInViewModel
+    viewModel: SignUpViewModel
 ) {
-    val state = viewModel.state.value
     val context = LocalContext.current
-    val isProgressIndicator = remember{ mutableStateOf(false) }
+    val state = viewModel.state.value
+    val event: (SignUpContract.Event) -> Unit = { viewModel.setEvent(it) }
+    val isProgressIndicator = remember{ mutableStateOf(false)}
     LaunchedEffect(true) {
         viewModel.effect.onEach { effect ->
             when (effect) {
-                is SignInContract.Effect.NavigateHome -> {
+                is SignUpContract.Effect.NavigateHome -> {
                     navController.popBackStack()
                     navController.popBackStack()
                 }
-                is SignInContract.Effect.OnDestroyView -> { }
-                is SignInContract.Effect.ShowError -> {
+                is SignUpContract.Effect.OnDestroyView -> { }
+                is SignUpContract.Effect.ShowError -> {
                     Timber.tag(this.javaClass.simpleName).d(effect.throwable)
-                    Toast.makeText(context, "ログインに失敗しました", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "アカウントの作成に失敗しました。", Toast.LENGTH_SHORT).show()
                 }
-                is SignInContract.Effect.ShorProgressBer -> isProgressIndicator.value = effect.value
+                is SignUpContract.Effect.ShorProgressBer -> isProgressIndicator.value = effect.value
             }
         }.collect()
     }
-    SignInScreenContent(viewModel, state)
+    SignUpScreenContent(event, state)
     if (isProgressIndicator.value) {
         ProgressBar()
     }
 }
 
 /**
- * ログイン画面表示用コンテンツ
+ * 設定画面表示用コンテンツ
  *
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-private fun SignInScreenContent(
-    viewModel: SignInViewModel,
-    state: SignInContract.State
+private fun SignUpScreenContent(
+    event: (SignUpContract.Event) -> Unit,
+    state: SignUpContract.State
 ) {
     val focusManager = LocalFocusManager.current
     val relocationRequester = remember { RelocationRequester() }
@@ -99,30 +95,48 @@ private fun SignInScreenContent(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
+                .padding(start = 32.dp, end = 32.dp)
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .pointerInput(Unit) { detectTapGestures(onTap = { focusManager.clearFocus() }) },
         ) {
+
             OutlinedTextField(
-                value = state.emailText,
+                value = state.email1Text,
                 singleLine = true,
-                onValueChange = { viewModel.setEvent(SignInContract.Event.OnChangeEmail(it)) },
+                onValueChange = { event(SignUpContract.Event.OnChangeEmail1(it)) },
                 label = { Text(stringResource(id = R.string.title_sub_email)) },
                 modifier = Modifier.padding(top = 8.dp)
             )
             OutlinedTextField(
-                value = state.passwordText,
+                value = state.email2Text,
+                singleLine = true,
+                onValueChange = { event(SignUpContract.Event.OnChangeEmail2(it)) },
+                label = { Text(stringResource(id = R.string.title_sub_email_confirm)) },
+                modifier = Modifier.padding(top = 8.dp)
+            )
+            OutlinedTextField(
+                value = state.password1Text,
                 singleLine = true,
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                onValueChange = { viewModel.setEvent(SignInContract.Event.OnChangePassword(it)) },
+                onValueChange = { event(SignUpContract.Event.OnChangePassword1(it)) },
                 label = { Text(stringResource(id = R.string.title_sub_password)) },
                 modifier = Modifier.padding(top = 8.dp)
             )
+            OutlinedTextField(
+                value = state.password2Text,
+                singleLine = true,
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                onValueChange = { event(SignUpContract.Event.OnChangePassword2(it)) },
+                label = { Text(stringResource(id = R.string.title_sub_password_confirm)) },
+                modifier = Modifier.padding(top = 8.dp)
+            )
             PrimaryColorButton(
-                text = stringResource(id = R.string.btn_sign_in),
-                enabled = state.isSignInEnable,
-                onClick = { viewModel.setEvent(SignInContract.Event.OnClickSignInButton) },
+                text = stringResource(id = R.string.btn_sign_up),
+                enabled = state.isSignUpEnable,
+                onClick = { event(SignUpContract.Event.OnClickSignUpButton) },
                 modifier = Modifier.padding(top = 16.dp)
             )
         }

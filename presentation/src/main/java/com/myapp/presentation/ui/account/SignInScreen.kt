@@ -4,11 +4,17 @@ import android.widget.Toast
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -32,49 +38,50 @@ import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 
 /**
- * アカウント作成画面
+ * ログイン画面
  *
  */
 @ExperimentalMaterialApi
 @Composable
-fun SignUpScreen(
+fun SignInScreen(
     navController: NavHostController,
-    viewModel: SignUpViewModel
+    viewModel: SignInViewModel
 ) {
-    val context = LocalContext.current
     val state = viewModel.state.value
-    val isProgressIndicator = remember{ mutableStateOf(false)}
+    val event: (SignInContract.Event) -> Unit = { viewModel.setEvent(it) }
+    val context = LocalContext.current
+    val isProgressIndicator = remember{ mutableStateOf(false) }
     LaunchedEffect(true) {
         viewModel.effect.onEach { effect ->
             when (effect) {
-                is SignUpContract.Effect.NavigateHome -> {
+                is SignInContract.Effect.NavigateHome -> {
                     navController.popBackStack()
                     navController.popBackStack()
                 }
-                is SignUpContract.Effect.OnDestroyView -> { }
-                is SignUpContract.Effect.ShowError -> {
+                is SignInContract.Effect.OnDestroyView -> { }
+                is SignInContract.Effect.ShowError -> {
                     Timber.tag(this.javaClass.simpleName).d(effect.throwable)
-                    Toast.makeText(context, "アカウントの作成に失敗しました。", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "ログインに失敗しました", Toast.LENGTH_SHORT).show()
                 }
-                is SignUpContract.Effect.ShorProgressBer -> isProgressIndicator.value = effect.value
+                is SignInContract.Effect.ShorProgressBer -> isProgressIndicator.value = effect.value
             }
         }.collect()
     }
-    SignUpScreenContent(viewModel, state)
+    SignInScreenContent(event, state)
     if (isProgressIndicator.value) {
         ProgressBar()
     }
 }
 
 /**
- * 設定画面表示用コンテンツ
+ * ログイン画面表示用コンテンツ
  *
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-private fun SignUpScreenContent(
-    viewModel: SignUpViewModel,
-    state: SignUpContract.State
+private fun SignInScreenContent(
+    event: (SignInContract.Event) -> Unit,
+    state: SignInContract.State
 ) {
     val focusManager = LocalFocusManager.current
     val relocationRequester = remember { RelocationRequester() }
@@ -94,47 +101,31 @@ private fun SignUpScreenContent(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
+                .padding(start = 32.dp, end = 32.dp)
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .pointerInput(Unit) { detectTapGestures(onTap = { focusManager.clearFocus() }) },
         ) {
-
             OutlinedTextField(
-                value = state.email1Text,
+                value = state.emailText,
                 singleLine = true,
-                onValueChange = { viewModel.setEvent(SignUpContract.Event.OnChangeEmail1(it)) },
+                onValueChange = { event(SignInContract.Event.OnChangeEmail(it)) },
                 label = { Text(stringResource(id = R.string.title_sub_email)) },
-                modifier = Modifier.padding(top = 8.dp)
+                modifier = Modifier.padding(top = 8.dp).fillMaxWidth()
             )
             OutlinedTextField(
-                value = state.email2Text,
-                singleLine = true,
-                onValueChange = { viewModel.setEvent(SignUpContract.Event.OnChangeEmail2(it)) },
-                label = { Text(stringResource(id = R.string.title_sub_email_confirm)) },
-                modifier = Modifier.padding(top = 8.dp)
-            )
-            OutlinedTextField(
-                value = state.password1Text,
+                value = state.passwordText,
                 singleLine = true,
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                onValueChange = { viewModel.setEvent(SignUpContract.Event.OnChangePassword1(it)) },
+                onValueChange = { event(SignInContract.Event.OnChangePassword(it)) },
                 label = { Text(stringResource(id = R.string.title_sub_password)) },
-                modifier = Modifier.padding(top = 8.dp)
-            )
-            OutlinedTextField(
-                value = state.password2Text,
-                singleLine = true,
-                visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                onValueChange = { viewModel.setEvent(SignUpContract.Event.OnChangePassword2(it)) },
-                label = { Text(stringResource(id = R.string.title_sub_password_confirm)) },
-                modifier = Modifier.padding(top = 8.dp)
+                modifier = Modifier.padding(top = 8.dp).fillMaxWidth()
             )
             PrimaryColorButton(
-                text = stringResource(id = R.string.btn_sign_up),
-                enabled = state.isSignUpEnable,
-                onClick = { viewModel.setEvent(SignUpContract.Event.OnClickSignUpButton) },
+                text = stringResource(id = R.string.btn_sign_in),
+                enabled = state.isSignInEnable,
+                onClick = { event(SignInContract.Event.OnClickSignInButton) },
                 modifier = Modifier.padding(top = 16.dp)
             )
         }
