@@ -1,18 +1,19 @@
 package com.myapp.presentation.ui.setting
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.myapp.common.getStrHHmm
 import com.myapp.common.getStrHMMddEHHmm
 import com.myapp.domain.dto.NextAlarmTimeInputDto
 import com.myapp.domain.model.value.AlarmMode
 import com.myapp.domain.usecase.SettingUseCase
-import com.myapp.presentation.R
-import com.myapp.presentation.utils.expansion.explanation
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
+import junit.framework.Assert.assertEquals
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.test.*
 import org.junit.*
 import org.junit.rules.TestRule
@@ -25,11 +26,16 @@ import java.time.LocalTime
  */
 class SettingViewModelTest {
 
+    // mock
     private lateinit var settingViewModel: SettingViewModel
     private lateinit var settingUseCase: SettingUseCase
+    private var state = SettingContract.State()
+
+    // data
     private val initLocalDataTime = LocalDateTime.now().with(LocalTime.of(22, 20, 0))
-    private val updateLocalDataTime = LocalDateTime.now().with(LocalTime.of(22, 25, 0))
-    private val nextAlarmDataTime = LocalDateTime.now().with(LocalTime.of(23, 22, 22))
+    private val initUpdateLocalDataTime = LocalDateTime.now().with(LocalTime.of(22, 25, 0))
+    private var initAlertMode = AlarmMode.NORMAL
+
 
     @ExperimentalCoroutinesApi
     private val coroutineDispatcher = TestCoroutineDispatcher()
@@ -46,28 +52,43 @@ class SettingViewModelTest {
     @Before
     fun setUp() {
         Dispatchers.setMain(coroutineDispatcher)
-        settingUseCase = mockk<SettingUseCase>().also {
-            coEvery { it.getAlarmDate() } returns initLocalDataTime
-            coEvery { it.getAlarmMode() } returns AlarmMode.NORMAL
-            coEvery { it.updateAlarmDate(any()) } returns updateLocalDataTime
-            coEvery { it.getNextAlarmDate(any()) } returns nextAlarmDataTime
-        }
+        setSettingUseCase()
         initViewModel()
     }
 
     // アラームタイムが初期値を返すようにモック化
-    private fun setGetNextAlarmByInit() {
+    private fun setSettingUseCase() {
         settingUseCase = mockk<SettingUseCase>().also {
             coEvery { it.getAlarmDate() } returns initLocalDataTime
-            coEvery { it.getAlarmMode() } returns AlarmMode.NORMAL
-            coEvery { it.updateAlarmDate(any()) } returns updateLocalDataTime
+            coEvery { it.getAlarmMode() } returns initAlertMode
+            coEvery { it.updateAlarmDate(any()) } returns initUpdateLocalDataTime
             coEvery { it.getNextAlarmDate(any()) } returns initLocalDataTime
         }
+    }
+
+    private fun setSettingUseCaseByAlertModeHard() {
+        setSettingUseCase()
+        initAlertMode = AlarmMode.HARD
+        coEvery { settingUseCase.getAlarmMode() } returns initAlertMode
+    }
+
+    private fun  setSettingUseCaseByUpdateAlarmDateException() {
+        setSettingUseCase()
+        coEvery { settingUseCase.updateAlarmDate(any()) } throws IllegalArgumentException("test")
     }
 
     // ViewMode　初期化
     private fun initViewModel() {
         settingViewModel = SettingViewModel(settingUseCase)
+        settingViewModel.setEvent(SettingContract.Event.CreatedView)
+        state = state.copy(
+            beforeTime = initLocalDataTime,
+            afterTime = initLocalDataTime.toLocalTime(),
+            beforeAlarmMode = initAlertMode,
+            afterAlarmMode = initAlertMode,
+            nextAlarmTime = initLocalDataTime.getStrHMMddEHHmm(),
+            init = true
+        )
     }
 
     @ExperimentalCoroutinesApi
@@ -83,22 +104,15 @@ class SettingViewModelTest {
      * @param effect Effectの期待値
      */
     @ExperimentalCoroutinesApi
-    private fun result(
-        state: SettingContract.State,
-        effect: SettingContract.Effect?
-    ) = testScope.runBlockingTest {
-        val resultState = settingViewModel.state.value
-        val resultEffect = settingViewModel.effect.value
-
-        // 比較
-        Assert.assertEquals(state, resultState)
-        if (resultEffect is SettingContract.Effect.ShowError) {
-            val resultMessage = resultEffect.throwable.message
-            val message = (effect as SettingContract.Effect.ShowError).throwable.message
-            Assert.assertEquals(message, resultMessage)
-        } else {
-            Assert.assertEquals(effect, resultEffect)
-        }
+    private fun result(state: SettingContract.State, effect: SettingContract.Effect? = null) = testScope.runBlockingTest {
+        settingViewModel.effect
+            .stateIn(
+                scope = testScope,
+                started = SharingStarted.Eagerly,
+                initialValue = null
+            )
+            .onEach { assertEquals(effect, it) }
+        assertEquals(state, settingViewModel.state.value)
     }
 
     // region アラーム分変更
@@ -110,7 +124,6 @@ class SettingViewModelTest {
      * 期待結果；
      * ・画面の値
      * 　　・アラームモードがノーマルへ変更されること
-     * 　　・アラームモード差分の文字色が非活性濁であること
      * 　　・変更ボタンが非活性状態であること
      * ・画面イベント
      * 　　・何もイベントが発生しないこと
@@ -120,29 +133,18 @@ class SettingViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun changeAlarmMinuteByNotEqual() = testScope.runBlockingTest {
-
         // 期待結果
-        settingViewModel.setEvent(SettingContract.Event.CreatedView)
-        val value = initLocalDataTime.minute + 3
-        val nextAlarmTimeInputDto = NextAlarmTimeInputDto(initLocalDataTime.hour, value, initLocalDataTime.second, AlarmMode.NORMAL)
-        val alarmTimeDiff = settingViewModel.state.value!!.beforeDate + " -> " + String.format(
-            "%02d", settingViewModel.state.value!!.hourDate
-        ) + ":" + String.format("%02d", value)
-        val expectationsEffect = null
-        val expectationsState = settingViewModel.state.value!!.copy(
-            minutesDate = value,
-            alarmTimeDiff = alarmTimeDiff,
-            alarmTimeDiffColor = R.color.text_color_light_primary,
-            isEnableConfirmButton = true,
-            nextAlarmTime = nextAlarmDataTime.getStrHMMddEHHmm()
+        val value = initLocalDataTime.plusMinutes(3).toLocalTime()
+        val expectationsState = state.copy(
+            afterTime = value,
+            isEnableConfirmButton = true
         )
 
         // 実施
-        settingViewModel.setEvent(SettingContract.Event.OnChangeAlarmMinute(value))
+        settingViewModel.setEvent(SettingContract.Event.OnChangeAlarmMinute(value.minute))
 
         // 比較
-        result(expectationsState, expectationsEffect)
-        coVerify(exactly = 1) { (settingUseCase).getNextAlarmDate(nextAlarmTimeInputDto) }
+        result(expectationsState)
     }
 
     /**
@@ -162,21 +164,11 @@ class SettingViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun changeAlarmMinuteByEqual() = testScope.runBlockingTest {
-
         // 期待結果
-        setGetNextAlarmByInit()
-        initViewModel()
-        settingViewModel.setEvent(SettingContract.Event.CreatedView)
         val value = initLocalDataTime.minute + 3
-        val nextAlarmTimeInputDto = NextAlarmTimeInputDto(initLocalDataTime.hour, initLocalDataTime.minute, initLocalDataTime.second, AlarmMode.NORMAL)
-        val alarmTimeDiff = initLocalDataTime.getStrHHmm() + " -> " + initLocalDataTime.getStrHHmm()
-        val expectationsEffect = null
-        val expectationsState = settingViewModel.state.value!!.copy(
-            minutesDate = initLocalDataTime.minute,
-            alarmTimeDiff = alarmTimeDiff,
-            alarmTimeDiffColor = R.color.text_color_light_secondary,
-            isEnableConfirmButton = false,
-            nextAlarmTime = initLocalDataTime.getStrHMMddEHHmm()
+        val expectationsState = state.copy(
+            afterTime = initLocalDataTime.toLocalTime(),
+            isEnableConfirmButton = false
         )
 
         // 実施
@@ -184,8 +176,7 @@ class SettingViewModelTest {
         settingViewModel.setEvent(SettingContract.Event.OnChangeAlarmMinute(initLocalDataTime.minute))
 
         // 比較
-        result(expectationsState, expectationsEffect)
-        coVerify(exactly = 1) { (settingUseCase).getNextAlarmDate(nextAlarmTimeInputDto) }
+        result(expectationsState)
     }
 
     // endregion
@@ -199,7 +190,6 @@ class SettingViewModelTest {
      * 期待結果；
      * ・画面の値
      * 　　・アラームモードがノーマルへ変更されること
-     * 　　・アラームモード差分の文字色が非活性濁であること
      * 　　・変更ボタンが非活性状態であること
      * ・画面イベント
      * 　　・何もイベントが発生しないこと
@@ -209,39 +199,27 @@ class SettingViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun changeAlarmHourByNotEqual() = testScope.runBlockingTest {
-
         // 期待結果
-        settingViewModel.setEvent(SettingContract.Event.CreatedView)
-        val value = initLocalDataTime.hour + 1
-        val nextAlarmTimeInputDto = NextAlarmTimeInputDto(value, initLocalDataTime.minute, initLocalDataTime.second, AlarmMode.NORMAL)
-        val alarmTimeDiff = settingViewModel.state.value!!.beforeDate + " -> " + String.format(
-            "%02d", value
-        ) + ":" + String.format("%02d", settingViewModel.state.value!!.minutesDate)
-        val expectationsEffect = null
-        val expectationsState = settingViewModel.state.value!!.copy(
-            hourDate = value,
-            alarmTimeDiff = alarmTimeDiff,
-            alarmTimeDiffColor = R.color.text_color_light_primary,
-            isEnableConfirmButton = true,
-            nextAlarmTime = nextAlarmDataTime.getStrHMMddEHHmm()
+        val value = initLocalDataTime.plusHours(1).toLocalTime()
+        val expectationsState = state.copy(
+            afterTime = value,
+            isEnableConfirmButton = true
         )
 
         // 実施
-        settingViewModel.setEvent(SettingContract.Event.OnChangeAlarmHour(value))
+        settingViewModel.setEvent(SettingContract.Event.OnChangeAlarmHour(value.hour))
 
         // 比較
-        result(expectationsState, expectationsEffect)
-        coVerify(exactly = 1) { (settingUseCase).getNextAlarmDate(nextAlarmTimeInputDto) }
+        result(expectationsState)
     }
 
     /**
      * アラーム時間変更
      *
-     * 条件：変更後のアラーム時間が元々のアラーム時間と同じ
+     * 条件：変更後のアラーム時間が元々のアラーム時間と同じになるよう変奥
      * 期待結果；
      * ・画面の値
      * 　　・アラームモードがノーマルへ変更されること
-     * 　　・アラームモード差分の文字色が非活性濁であること
      * 　　・変更ボタンが非活性状態であること
      * ・画面イベント
      * 　　・何もイベントが発生しないこと
@@ -251,21 +229,11 @@ class SettingViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun changeAlarmHourByEqual() = testScope.runBlockingTest {
-
         // 期待結果
-        setGetNextAlarmByInit()
-        initViewModel()
-        settingViewModel.setEvent(SettingContract.Event.CreatedView)
         val value = initLocalDataTime.hour + 1
-        val nextAlarmTimeInputDto = NextAlarmTimeInputDto(initLocalDataTime.hour, initLocalDataTime.minute, initLocalDataTime.second, AlarmMode.NORMAL)
-        val alarmTimeDiff = initLocalDataTime.getStrHHmm() + " -> " + initLocalDataTime.getStrHHmm()
-        val expectationsEffect = null
-        val expectationsState = settingViewModel.state.value!!.copy(
-            hourDate = initLocalDataTime.hour,
-            alarmTimeDiff = alarmTimeDiff,
-            alarmTimeDiffColor = R.color.text_color_light_secondary,
+        val expectationsState = state.copy(
+            afterTime = initLocalDataTime.toLocalTime(),
             isEnableConfirmButton = false,
-            nextAlarmTime = initLocalDataTime.getStrHMMddEHHmm()
         )
 
         // 実施
@@ -273,8 +241,7 @@ class SettingViewModelTest {
         settingViewModel.setEvent(SettingContract.Event.OnChangeAlarmHour(initLocalDataTime.hour))
 
         // 比較
-        result(expectationsState, expectationsEffect)
-        coVerify(exactly = 1) { (settingUseCase).getNextAlarmDate(nextAlarmTimeInputDto) }
+        result(expectationsState)
     }
 
     // endregion
@@ -284,11 +251,10 @@ class SettingViewModelTest {
     /**
      * アラームモード変更
      *
-     * 条件：変更時のアラームモード：ノーマル、アラームモードの初期値：ノーマル
+     * 条件：変更時のアラームモード：ノーマル、アラームモードの初期値：ハード
      * 期待結果；
      * ・画面の値
      * 　　・アラームモードがノーマルへ変更されること
-     * 　　・アラームモード差分の文字色が非活性濁であること
      * 　　・変更ボタンが非活性状態であること
      * ・画面イベント
      * 　　・何もイベントが発生しないこと
@@ -298,25 +264,22 @@ class SettingViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun changeAlarmModeBySetNormalInitNormal() = testScope.runBlockingTest {
+        // 初期化
+        setSettingUseCaseByAlertModeHard()
+        initViewModel()
 
         // 期待結果
-        settingUseCase = mockk<SettingUseCase>().also {
-            coEvery { it.getAlarmDate() } returns LocalDateTime.now()
-            coEvery { it.getAlarmMode() } returns AlarmMode.NORMAL
-            coEvery { it.updateAlarmDate(any()) } returns updateLocalDataTime
-        }
-        settingViewModel = SettingViewModel(settingUseCase)
-        settingViewModel.setEvent(SettingContract.Event.CreatedView)
         val alarmMode = AlarmMode.NORMAL
-        val expectationsEffect = null
-        val expectationsState =
-            settingViewModel.state.value!!.copy(alarmMode = alarmMode, alarmModeExplanation = alarmMode.explanation)
+        val expectationsState = state.copy(
+            afterAlarmMode = alarmMode,
+            isEnableConfirmButton = true
+        )
 
         // 実施
         settingViewModel.setEvent(SettingContract.Event.OnChangeAlarmMode(alarmMode))
 
         // 比較
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     /**
@@ -326,7 +289,6 @@ class SettingViewModelTest {
      * 期待結果；
      * ・画面の値
      * 　　・アラームモードがノーマルへ変更されること
-     * 　　・アラームモード差分の文字色が活性濁であること
      * 　　・変更ボタンが活性状態であること
      * ・画面イベント
      * 　　・何もイベントが発生しないこと
@@ -336,29 +298,18 @@ class SettingViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun changeAlarmModeBySetNormalInitHard() = testScope.runBlockingTest {
-
         // 期待結果
-        settingUseCase = mockk<SettingUseCase>().also {
-            coEvery { it.getAlarmDate() } returns LocalDateTime.now()
-            coEvery { it.getAlarmMode() } returns AlarmMode.HARD
-            coEvery { it.updateAlarmDate(any()) } returns updateLocalDataTime
-        }
-        settingViewModel = SettingViewModel(settingUseCase)
-        settingViewModel.setEvent(SettingContract.Event.CreatedView)
         val alarmMode = AlarmMode.NORMAL
-        val expectationsEffect = null
-        val expectationsState = settingViewModel.state.value!!.copy(
-            alarmMode = alarmMode,
-            alarmModeExplanation = alarmMode.explanation,
-            alarmModeDiffColor = R.color.text_color_light_primary,
-            isEnableConfirmButton = true
+        val expectationsState = state.copy(
+            afterAlarmMode = alarmMode,
+            isEnableConfirmButton = false
         )
 
         // 実施
         settingViewModel.setEvent(SettingContract.Event.OnChangeAlarmMode(alarmMode))
 
         // 比較
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     /**
@@ -368,7 +319,6 @@ class SettingViewModelTest {
      * 期待結果；
      * ・画面の値
      * 　　・アラームモードがハードへ変更されること
-     * 　　・アラームモード差分の文字色が非活性濁であること
      * 　　・変更ボタンが非活性状態であること
      * ・画面イベント
      * 　　・何もイベントが発生しないこと
@@ -378,31 +328,28 @@ class SettingViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun changeAlarmModeBySetHardInitHard() = testScope.runBlockingTest {
+        // 初期化
+        setSettingUseCaseByAlertModeHard()
+        initViewModel()
 
         // 期待結果
-        settingUseCase = mockk<SettingUseCase>().also {
-            coEvery { it.getAlarmDate() } returns LocalDateTime.now()
-            coEvery { it.getAlarmMode() } returns AlarmMode.HARD
-            coEvery { it.updateAlarmDate(any()) } returns updateLocalDataTime
-        }
-        settingViewModel = SettingViewModel(settingUseCase)
-        settingViewModel.setEvent(SettingContract.Event.CreatedView)
         val alarmMode = AlarmMode.HARD
-        val expectationsEffect = null
-        val expectationsState =
-            settingViewModel.state.value!!.copy(beforeAlarmMode = alarmMode, alarmMode = alarmMode, alarmModeExplanation = alarmMode.explanation)
+        val expectationsState = state.copy(
+            afterAlarmMode = alarmMode,
+            isEnableConfirmButton = false
+        )
 
         // 実施
         settingViewModel.setEvent(SettingContract.Event.OnChangeAlarmMode(alarmMode))
 
         // 比較
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     /**
      * アラームモード変更
      *
-     * 条件：変更時のアラームモード：ハード、アラームモードの初期値：ハード
+     * 条件：変更時のアラームモード：ハード、アラームモードの初期値：ノーマル
      * 期待結果；
      * ・画面の値
      * 　　・アラームモードがハードへ変更されること
@@ -416,21 +363,10 @@ class SettingViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun changeAlarmModeBySetHardInitNormal() = testScope.runBlockingTest {
-
         // 期待結果
-        settingUseCase = mockk<SettingUseCase>().also {
-            coEvery { it.getAlarmDate() } returns LocalDateTime.now()
-            coEvery { it.getAlarmMode() } returns AlarmMode.NORMAL
-            coEvery { it.updateAlarmDate(any()) } returns updateLocalDataTime
-        }
-        settingViewModel = SettingViewModel(settingUseCase)
-        settingViewModel.setEvent(SettingContract.Event.CreatedView)
         val alarmMode = AlarmMode.HARD
-        val expectationsEffect = null
-        val expectationsState = settingViewModel.state.value!!.copy(
-            alarmMode = alarmMode,
-            alarmModeExplanation = alarmMode.explanation,
-            alarmModeDiffColor = R.color.text_color_light_primary,
+        val expectationsState = state.copy(
+            afterAlarmMode = alarmMode,
             isEnableConfirmButton = true
         )
 
@@ -438,7 +374,7 @@ class SettingViewModelTest {
         settingViewModel.setEvent(SettingContract.Event.OnChangeAlarmMode(alarmMode))
 
         // 比較
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     // endregion
@@ -459,23 +395,18 @@ class SettingViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun onClickNextButton() = testScope.runBlockingTest {
-
         // 期待結果
-        settingUseCase = mockk<SettingUseCase>().also {
-            coEvery { it.getAlarmDate() } returns LocalDateTime.now()
-            coEvery { it.getAlarmMode() } returns AlarmMode.NORMAL
-            coEvery { it.updateAlarmDate(any()) } returns updateLocalDataTime
-        }
-        settingViewModel = SettingViewModel(settingUseCase)
-        settingViewModel.setEvent(SettingContract.Event.CreatedView)
-        val expectationsEffect = SettingContract.Effect.NextNavigation(updateLocalDataTime)
-        val expectationsState = settingViewModel.state.value!!.copy()
+        val expectationsEffect = SettingContract.Effect.NextNavigation(initUpdateLocalDataTime)
+        val expectationsState = state.copy()
         val nextAlarmTimeInputDto = NextAlarmTimeInputDto(
-            expectationsState.hourDate, expectationsState.minutesDate, expectationsState.secondsDate,
-            expectationsState.alarmMode
+            state.afterTime.hour,
+            state.afterTime.minute,
+            state.afterTime.second,
+            state.afterAlarmMode
         )
 
         // 実施
+        initViewModel()
         settingViewModel.setEvent(SettingContract.Event.OnClickNextButton)
 
         // 比較
@@ -497,23 +428,20 @@ class SettingViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun onClickNextButtonByException() = testScope.runBlockingTest {
-
         // 期待結果
-        settingUseCase = mockk<SettingUseCase>().also {
-            coEvery { it.getAlarmDate() } returns LocalDateTime.now()
-            coEvery { it.getAlarmMode() } returns AlarmMode.NORMAL
-            coEvery { it.updateAlarmDate(any()) } throws IllegalArgumentException("test")
-        }
-        settingViewModel = SettingViewModel(settingUseCase)
-        settingViewModel.setEvent(SettingContract.Event.CreatedView)
         val expectationsEffect = SettingContract.Effect.ShowError(IllegalArgumentException("test"))
-        val expectationsState = settingViewModel.state.value!!.copy()
+        val expectationsState = state.copy()
         val nextAlarmTimeInputDto = NextAlarmTimeInputDto(
-            expectationsState.hourDate, expectationsState.minutesDate, expectationsState.secondsDate,
-            expectationsState.alarmMode
+            state.afterTime.hour,
+            state.afterTime.minute,
+            state.afterTime.second,
+            state.afterAlarmMode
         )
 
         // 実施
+        setSettingUseCaseByUpdateAlarmDateException()
+        initViewModel()
+        settingViewModel.setEvent(SettingContract.Event.CreatedView)
         settingViewModel.setEvent(SettingContract.Event.OnClickNextButton)
 
         // 比較

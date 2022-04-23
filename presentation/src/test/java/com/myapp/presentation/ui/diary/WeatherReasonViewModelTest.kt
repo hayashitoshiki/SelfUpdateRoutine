@@ -2,8 +2,9 @@ package com.myapp.presentation.ui.diary
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.test.*
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -17,7 +18,6 @@ class WeatherReasonViewModelTest {
 
     private val state = DiaryBaseContract.State()
     private lateinit var ffsFactViewModel: WeatherReasonViewModel
-    private var resultAction: DiaryDispatcherContract.Action? = null
 
     @ExperimentalCoroutinesApi
     private val coroutineDispatcher = TestCoroutineDispatcher()
@@ -30,9 +30,6 @@ class WeatherReasonViewModelTest {
     fun setUp() {
         Dispatchers.setMain(coroutineDispatcher)
         ffsFactViewModel = WeatherReasonViewModel()
-
-        DiaryDispatcher.action.onEach { resultAction = it }
-            .launchIn(testScope)
     }
 
     @ExperimentalCoroutinesApi
@@ -46,23 +43,17 @@ class WeatherReasonViewModelTest {
      *
      * @param state Stateの期待値
      * @param effect Effectの期待値
-     * @param action actionの期待値
      */
     @ExperimentalCoroutinesApi
-    private fun result(
-        state: DiaryBaseContract.State,
-        effect: DiaryBaseContract.Effect?,
-        action: DiaryDispatcherContract.Action?
-    ) = testScope.runBlockingTest {
-        val resultState = ffsFactViewModel.state.value
-        var resultEffect: DiaryBaseContract.Effect? = null
-        ffsFactViewModel.effect.onEach { resultEffect = it }
-            .launchIn(testScope)
-
-        // 比較
-        assertEquals(resultState, state)
-        assertEquals(resultEffect, effect)
-        assertEquals(resultAction, action)
+    private fun result(state: DiaryBaseContract.State, effect: DiaryBaseContract.Effect? = null) = testScope.runBlockingTest {
+        ffsFactViewModel.effect
+            .stateIn(
+                scope = testScope,
+                started = SharingStarted.Eagerly,
+                initialValue = null
+            )
+            .onEach { assertEquals(effect, it) }
+        assertEquals(state, ffsFactViewModel.state.value)
     }
 
     // region テキスト入力
@@ -83,18 +74,15 @@ class WeatherReasonViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun changeReasonByInput() = testScope.runBlockingTest {
-
         // 期待結果
         val value = "reason"
         val expectationsState = state.copy(inputText = value, isButtonEnable = true)
-        val expectationsEffect = null
-        val expectationsAction = DiaryDispatcherContract.Action.ChangeReason(value)
 
         // 実施
         ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(value))
 
         // 比較
-        result(expectationsState, expectationsEffect, expectationsAction)
+        result(expectationsState)
     }
 
     /**
@@ -113,20 +101,17 @@ class WeatherReasonViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun changeReasonByAllDelete() = testScope.runBlockingTest {
-
         // 期待結果
         val initValue = "reason"
         val value = ""
         val expectationsState = state.copy(inputText = value, isButtonEnable = false)
-        val expectationsEffect = null
-        val expectationsAction = DiaryDispatcherContract.Action.ChangeReason(value)
 
         // 実施
         ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(initValue))
         ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(value))
 
         // 比較
-        result(expectationsState, expectationsEffect, expectationsAction)
+        result(expectationsState)
     }
 
     // endregion
@@ -148,17 +133,15 @@ class WeatherReasonViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun onClickNextButton() = testScope.runBlockingTest {
-
         // 期待結果
         val expectationsState = state.copy()
         val expectationsEffect = DiaryBaseContract.Effect.NextNavigation
-        val expectationsAction = null
 
         // 実施
         ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnClickNextButton)
 
         // 比較
-        result(expectationsState, expectationsEffect, expectationsAction)
+        result(expectationsState, expectationsEffect)
     }
 
     // endregion
@@ -180,17 +163,15 @@ class WeatherReasonViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun actionByChangeFact() = testScope.runBlockingTest {
-
         // 期待結果
         val action = DiaryDispatcherContract.Action.ChangeFact("fact")
         val expectationsState = state.copy()
-        val expectationsEffect = null
 
         // 実施
         DiaryDispatcher.setActions(action)
 
         // 比較
-        result(expectationsState, expectationsEffect, action)
+        result(expectationsState)
     }
 
     /**
@@ -208,17 +189,15 @@ class WeatherReasonViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun actionByChangeFind() = testScope.runBlockingTest {
-
         // 期待結果
         val action = DiaryDispatcherContract.Action.ChangeFind("find")
         val expectationsState = state.copy()
-        val expectationsEffect = null
 
         // 実施
         DiaryDispatcher.setActions(action)
 
         // 比較
-        result(expectationsState, expectationsEffect, action)
+        result(expectationsState)
     }
 
     /**
@@ -236,17 +215,15 @@ class WeatherReasonViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun actionByChangeLearn() = testScope.runBlockingTest {
-
         // 期待結果
         val action = DiaryDispatcherContract.Action.ChangeLearn("learn")
         val expectationsState = state.copy()
-        val expectationsEffect = null
 
         // 実施
         DiaryDispatcher.setActions(action)
 
         // 比較
-        result(expectationsState, expectationsEffect, action)
+        result(expectationsState)
     }
 
     /**
@@ -264,17 +241,15 @@ class WeatherReasonViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun actionByChangeStatement() = testScope.runBlockingTest {
-
         // 期待結果
         val action = DiaryDispatcherContract.Action.ChangeStatement("statement")
         val expectationsState = state.copy()
-        val expectationsEffect = null
 
         // 実施
         DiaryDispatcher.setActions(action)
 
         // 比較
-        result(expectationsState, expectationsEffect, action)
+        result(expectationsState)
     }
 
 
@@ -293,17 +268,15 @@ class WeatherReasonViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun actionByChangeAssessment() = testScope.runBlockingTest {
-
         // 期待結果
         val action = DiaryDispatcherContract.Action.ChangeAssessment(1f)
         val expectationsState = state.copy()
-        val expectationsEffect = null
 
         // 実施
         DiaryDispatcher.setActions(action)
 
         // 比較
-        result(expectationsState, expectationsEffect, action)
+        result(expectationsState)
     }
 
     /**
@@ -321,17 +294,15 @@ class WeatherReasonViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun actionByChangeReason() = testScope.runBlockingTest {
-
         // 期待結果
         val action = DiaryDispatcherContract.Action.ChangeReason("reason")
         val expectationsState = state.copy()
-        val expectationsEffect = null
 
         // 実施
         DiaryDispatcher.setActions(action)
 
         // 比較
-        result(expectationsState, expectationsEffect, action)
+        result(expectationsState)
     }
 
     /**
@@ -349,17 +320,15 @@ class WeatherReasonViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun actionByChangeImprove() = testScope.runBlockingTest {
-
         // 期待結果
         val action = DiaryDispatcherContract.Action.ChangeImprove("improve")
         val expectationsState = state.copy()
-        val expectationsEffect = null
 
         // 実施
         DiaryDispatcher.setActions(action)
 
         // 比較
-        result(expectationsState, expectationsEffect, action)
+        result(expectationsState)
     }
 
     // endregion

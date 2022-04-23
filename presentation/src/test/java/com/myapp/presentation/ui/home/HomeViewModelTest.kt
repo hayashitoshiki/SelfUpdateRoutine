@@ -16,8 +16,12 @@ import io.mockk.mockkStatic
 import java.time.LocalDateTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.test.*
 import org.junit.*
+import org.junit.Assert.assertEquals
 import org.junit.rules.TestRule
 
 /**
@@ -44,6 +48,7 @@ class HomeViewModelTest {
     private lateinit var viewModel: HomeViewModel
     private lateinit var reportUseCase: ReportUseCase
     private lateinit var missionStatementUseCase: MissionStatementUseCase
+    private var state = viewModel.state.value
 
     private val funeralList = listOf("弔辞：感謝されること", "人：優しい人間")
     private val purposeLife = "世界一楽しく生きること"
@@ -70,6 +75,10 @@ class HomeViewModelTest {
     @Before
     fun setUp() {
         Dispatchers.setMain(coroutineDispatcher)
+    }
+
+    private fun initViewModel() {
+        viewModel = HomeViewModel(reportUseCase, missionStatementUseCase)
     }
 
     private fun setMissionStatement() {
@@ -128,19 +137,15 @@ class HomeViewModelTest {
      * @param effect Effectの期待値
      */
     @ExperimentalCoroutinesApi
-    private fun result(state: HomeContract.State, effect: HomeContract.Effect?) = testScope.runBlockingTest {
-        val resultState = viewModel.state.value
-        val resultEffect = viewModel.effect.value
-
-        // 比較
-        Assert.assertEquals(resultState, state)
-        if (resultEffect is HomeContract.Effect.ShowError) {
-            val resultMessage = resultEffect.throwable.message
-            val message = (effect as HomeContract.Effect.ShowError).throwable.message
-            Assert.assertEquals(resultMessage, message)
-        } else {
-            Assert.assertEquals(resultEffect, effect)
-        }
+    private fun result(state: HomeContract.State, effect: HomeContract.Effect? = null) = testScope.runBlockingTest {
+        viewModel.effect
+            .stateIn(
+                scope = testScope,
+                started = SharingStarted.Eagerly,
+                initialValue = null
+            )
+            .onEach { assertEquals(effect, it) }
+       assertEquals(state, viewModel.state.value)
     }
 
     // endregion
@@ -165,21 +170,21 @@ class HomeViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun initByNotReport() = testScope.runBlockingTest {
-
         // 期待結果
-        setReportListByEmpty()
-        setMissionStatementByNull()
-        viewModel = HomeViewModel(reportUseCase, missionStatementUseCase)
-        val expectationsEffect = null
-        val expectationsState = viewModel.state.value!!.copy(
+        val expectationsState = state.copy(
             isFabVisibility = false,
             isReportListVisibility = false,
             isNotReportListVisibility = true,
             mainContainerType = HomeFragmentMainContainerType.NotReport,
         )
 
+        // 実施
+        setReportListByEmpty()
+        setMissionStatementByNull()
+        initViewModel()
+
         // 比較
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     /**
@@ -200,23 +205,21 @@ class HomeViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun initByYesterdayReportAndMissionReport() = testScope.runBlockingTest {
-
         // 期待結果
-        setReportListByNotToday()
-        setNowTimeByBefore18()
-        setMissionStatement()
-        viewModel = HomeViewModel(reportUseCase, missionStatementUseCase)
-
-        val expectationsEffect = null
-        val expectationsState = viewModel.state.value!!.copy(
+        val expectationsState = state.copy(
             isFabVisibility = true,
             isReportListVisibility = true,
             isNotReportListVisibility = false,
             mainContainerType = HomeFragmentMainContainerType.Vision
         )
 
+        // 実施
+        setReportListByNotToday()
+        setNowTimeByBefore18()
+        setMissionStatement()
+
         // 比較
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     /**
@@ -237,22 +240,22 @@ class HomeViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun initByYesterdayReportAndTimeAfter18() = testScope.runBlockingTest {
-
         // 期待結果
-        setNowTimeByAfter18()
-        setReportListByNotToday()
-        setMissionStatementByNull()
-        viewModel = HomeViewModel(reportUseCase, missionStatementUseCase)
-        val expectationsEffect = null
-        val expectationsState = viewModel.state.value!!.copy(
+        val expectationsState = state.copy(
             isFabVisibility = true,
             isReportListVisibility = true,
             isNotReportListVisibility = false,
             mainContainerType = HomeFragmentMainContainerType.NotReport
         )
 
+        // 実施
+        setNowTimeByAfter18()
+        setReportListByNotToday()
+        setMissionStatementByNull()
+        initViewModel()
+
         // 比較
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     /**
@@ -273,22 +276,22 @@ class HomeViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun initByReportAndBefore18() = testScope.runBlockingTest {
-
         // 期待結果
-        setNowTimeByBefore18()
-        setReportListByToday()
-        setMissionStatementByNull()
-        viewModel = HomeViewModel(reportUseCase, missionStatementUseCase)
-        val expectationsEffect = null
-        val expectationsState = viewModel.state.value!!.copy(
+        val expectationsState = state.copy(
             isFabVisibility = true,
             isReportListVisibility = true,
             isNotReportListVisibility = false,
             mainContainerType = HomeFragmentMainContainerType.Vision
         )
 
+        // 実施
+        setNowTimeByBefore18()
+        setReportListByToday()
+        setMissionStatementByNull()
+        initViewModel()
+
         // 比較
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     /**
@@ -309,22 +312,22 @@ class HomeViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun initByReportAndAfter18() = testScope.runBlockingTest {
-
         // 期待結果
-        setNowTimeByAfter18()
-        setReportListByToday()
-        setMissionStatementByNull()
-        viewModel = HomeViewModel(reportUseCase, missionStatementUseCase)
-        val expectationsEffect = null
-        val expectationsState = viewModel.state.value!!.copy(
+        val expectationsState = state.copy(
             isFabVisibility = true,
             isReportListVisibility = true,
             isNotReportListVisibility = false,
             mainContainerType = HomeFragmentMainContainerType.Report
         )
 
+        // 実施
+        setNowTimeByAfter18()
+        setReportListByToday()
+        setMissionStatementByNull()
+        initViewModel()
+
         // 比較
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     // endregion
@@ -346,16 +349,15 @@ class HomeViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun onClickReportButton() = testScope.runBlockingTest {
-
         // 期待結果
+        val expectationsEffect = HomeContract.Effect.DiaryReportNavigation
+        val expectationsState = state.copy()
+
+        // 実施
         setReportListByNotToday()
         setNowTimeByBefore18()
         setMissionStatement()
-        viewModel = HomeViewModel(reportUseCase, missionStatementUseCase)
-        val expectationsEffect = HomeContract.Effect.DiaryReportNavigation
-        val expectationsState = viewModel.state.value!!.copy()
-
-        // 実施
+        initViewModel()
         viewModel.setEvent(HomeContract.Event.OnClickReportButton)
 
         // 比較
@@ -381,17 +383,16 @@ class HomeViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun onClickFabByFalse() = testScope.runBlockingTest {
-
         // 期待結果
+        val value = false
+        val expectationsEffect = HomeContract.Effect.ChangeFabEnable(value)
+        val expectationsState = state.copy(isFabCheck = value)
+
+        // 実施
         setReportListByNotToday()
         setNowTimeByBefore18()
         setMissionStatement()
-        viewModel = HomeViewModel(reportUseCase, missionStatementUseCase)
-        val value = false
-        val expectationsEffect = HomeContract.Effect.ChangeFabEnable(value)
-        val expectationsState = viewModel.state.value!!.copy(isFabCheck = value)
-
-        // 実施
+        initViewModel()
         viewModel.setEvent(HomeContract.Event.OnClickFabButton)
         viewModel.setEvent(HomeContract.Event.OnClickFabButton)
 
@@ -414,17 +415,16 @@ class HomeViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun onClickFabByTrue() = testScope.runBlockingTest {
-
         // 期待結果
+        val value = true
+        val expectationsEffect = HomeContract.Effect.ChangeFabEnable(value)
+        val expectationsState = state.copy(isFabCheck = value)
+
+        // 実施
         setReportListByNotToday()
         setNowTimeByBefore18()
         setMissionStatement()
-        viewModel = HomeViewModel(reportUseCase, missionStatementUseCase)
-        val value = true
-        val expectationsEffect = HomeContract.Effect.ChangeFabEnable(value)
-        val expectationsState = viewModel.state.value!!.copy(isFabCheck = value)
-
-        // 実施
+        initViewModel()
         viewModel.setEvent(HomeContract.Event.OnClickFabButton)
 
         // 比較
@@ -450,17 +450,16 @@ class HomeViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun onClickFabLearnButton() = testScope.runBlockingTest {
-
         // 期待結果
+        val value = state.reportList
+        val expectationsEffect = HomeContract.Effect.LearnListNavigation(value)
+        val expectationsState = state.copy()
+
+        // 実施
         setReportListByNotToday()
         setNowTimeByBefore18()
         setMissionStatement()
-        viewModel = HomeViewModel(reportUseCase, missionStatementUseCase)
-        val value = viewModel.state.value!!.reportList
-        val expectationsEffect = HomeContract.Effect.LearnListNavigation(value)
-        val expectationsState = viewModel.state.value!!.copy()
-
-        // 実施
+        initViewModel()
         viewModel.setEvent(HomeContract.Event.OnClickFabLearnButton)
 
         // 比較
@@ -482,17 +481,16 @@ class HomeViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun onClickFabLearnButtonByEmptyReport() = testScope.runBlockingTest {
-
         // 期待結果
+        val value = NullPointerException("レポートリストがありません")
+        val expectationsEffect = HomeContract.Effect.ShowError(value)
+        val expectationsState = state.copy()
+
+        // 実施
         setReportListByEmpty()
         setNowTimeByBefore18()
         setMissionStatement()
-        viewModel = HomeViewModel(reportUseCase, missionStatementUseCase)
-        val value = NullPointerException("レポートリストがありません")
-        val expectationsEffect = HomeContract.Effect.ShowError(value)
-        val expectationsState = viewModel.state.value!!.copy()
-
-        // 実施
+        initViewModel()
         viewModel.setEvent(HomeContract.Event.OnClickFabLearnButton)
 
         // 比較
@@ -518,17 +516,16 @@ class HomeViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun onClickFabStatementButton() = testScope.runBlockingTest {
-
         // 期待結果
+        val value = state.reportList
+        val expectationsEffect = HomeContract.Effect.StatementListNavigation(value)
+        val expectationsState = state.copy()
+
+        // 実施
         setReportListByNotToday()
         setNowTimeByBefore18()
         setMissionStatement()
-        viewModel = HomeViewModel(reportUseCase, missionStatementUseCase)
-        val value = viewModel.state.value!!.reportList
-        val expectationsEffect = HomeContract.Effect.StatementListNavigation(value)
-        val expectationsState = viewModel.state.value!!.copy()
-
-        // 実施
+        initViewModel()
         viewModel.setEvent(HomeContract.Event.OnClickFabStatementButton)
 
         // 比較
@@ -550,17 +547,16 @@ class HomeViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun onClickFabStatementButtonByEmptyReport() = testScope.runBlockingTest {
-
         // 期待結果
+        val value = NullPointerException("レポートリストがありません")
+        val expectationsEffect = HomeContract.Effect.ShowError(value)
+        val expectationsState = state.copy()
+
+        // 実施
         setReportListByEmpty()
         setNowTimeByBefore18()
         setMissionStatement()
-        viewModel = HomeViewModel(reportUseCase, missionStatementUseCase)
-        val value = NullPointerException("レポートリストがありません")
-        val expectationsEffect = HomeContract.Effect.ShowError(value)
-        val expectationsState = viewModel.state.value!!.copy()
-
-        // 実施
+        initViewModel()
         viewModel.setEvent(HomeContract.Event.OnClickFabStatementButton)
 
         // 比較
@@ -587,17 +583,16 @@ class HomeViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun onClickReportCard() = testScope.runBlockingTest {
-
         // 期待結果
+        val value = reportByToday
+        val expectationsEffect = HomeContract.Effect.ReportDetailListNavigation(value)
+        val expectationsState = state.copy()
+
+        // 実施
         setReportListByNotToday()
         setNowTimeByBefore18()
         setMissionStatement()
-        viewModel = HomeViewModel(reportUseCase, missionStatementUseCase)
-        val value = reportByToday
-        val expectationsEffect = HomeContract.Effect.ReportDetailListNavigation(value)
-        val expectationsState = viewModel.state.value!!.copy()
-
-        // 実施
+        initViewModel()
         viewModel.setEvent(HomeContract.Event.OnClickReportCard(value))
 
         // 比較
@@ -623,17 +618,16 @@ class HomeViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun onDestroyView() = testScope.runBlockingTest {
-
         // 期待結果
+        val value = false
+        val expectationsEffect = HomeContract.Effect.OnDestroyView
+        val expectationsState = state.copy(isFabCheck = value)
+
+        // 実施
         setReportListByNotToday()
         setNowTimeByBefore18()
         setMissionStatement()
-        viewModel = HomeViewModel(reportUseCase, missionStatementUseCase)
-        val value = false
-        val expectationsEffect = HomeContract.Effect.OnDestroyView
-        val expectationsState = viewModel.state.value!!.copy(isFabCheck = value)
-
-        // 実施
+        initViewModel()
         viewModel.setEvent(HomeContract.Event.OnDestroyView)
 
         // 比較

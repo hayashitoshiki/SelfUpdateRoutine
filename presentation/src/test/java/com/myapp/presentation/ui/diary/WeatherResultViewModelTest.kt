@@ -8,8 +8,9 @@ import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.test.*
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -24,7 +25,6 @@ class WeatherResultViewModelTest {
     private val state = WeatherResultContract.State()
     private lateinit var ffsFactViewModel: WeatherResultViewModel
     private lateinit var reportUseCase: ReportUseCase
-    private var resultAction: DiaryDispatcherContract.Action? = null
 
     @ExperimentalCoroutinesApi
     private val coroutineDispatcher = TestCoroutineDispatcher()
@@ -40,9 +40,6 @@ class WeatherResultViewModelTest {
             coEvery { it.saveReport(any()) } returns Unit
         }
         ffsFactViewModel = WeatherResultViewModel(reportUseCase)
-
-        DiaryDispatcher.action.onEach { resultAction = it }
-            .launchIn(testScope)
     }
 
     @ExperimentalCoroutinesApi
@@ -56,83 +53,66 @@ class WeatherResultViewModelTest {
      *
      * @param state Stateの期待値
      * @param effect Effectの期待値
-     * @param action actionの期待値
      */
     @ExperimentalCoroutinesApi
-    private fun result(
-        state: WeatherResultContract.State,
-        effect: WeatherResultContract.Effect?,
-        action: DiaryDispatcherContract.Action?
-    ) = testScope.runBlockingTest {
-        val resultState = ffsFactViewModel.state.value
-        var resultEffect: WeatherResultContract.Effect? = null
-        ffsFactViewModel.effect.onEach { resultEffect = it }
-            .launchIn(testScope)
-
-        // 比較
-        assertEquals(resultState, state)
-        assertEquals(resultAction, action)
-
-        if (resultEffect is WeatherResultContract.Effect.SaveResult) {
-            val resultStatus = (resultEffect as WeatherResultContract.Effect.SaveResult).status
-            if (resultStatus is Status.Failure) {
-                val status = ((effect as WeatherResultContract.Effect.SaveResult).status as Status.Failure)
-                assertEquals(resultStatus.throwable.message, status.throwable.message)
-            } else {
-                assertEquals(resultEffect, effect)
-            }
-        } else {
-            assertEquals(resultEffect, effect)
-        }
+    private fun result(state: WeatherResultContract.State, effect: WeatherResultContract.Effect? = null) = testScope.runBlockingTest {
+        ffsFactViewModel.effect
+            .stateIn(
+                scope = testScope,
+                started = SharingStarted.Eagerly,
+                initialValue = null
+            )
+            .onEach { assertEquals(effect, it) }
+        assertEquals(state, ffsFactViewModel.state.value)
     }
 
-    private suspend fun diaryDispatcherFactAction(expectationsState: WeatherResultContract.State): Pair<WeatherResultContract.State, DiaryDispatcherContract.Action> {
+    private suspend fun diaryDispatcherFactAction(expectationsState: WeatherResultContract.State): WeatherResultContract.State {
         val value = "fact"
         val action = DiaryDispatcherContract.Action.ChangeFact(value)
         DiaryDispatcher.setActions(action)
-        return Pair(expectationsState.copy(fact = value), action)
+        return expectationsState.copy(fact = value)
     }
 
-    private suspend fun diaryDispatcherFindAction(expectationsState: WeatherResultContract.State): Pair<WeatherResultContract.State, DiaryDispatcherContract.Action> {
+    private suspend fun diaryDispatcherFindAction(expectationsState: WeatherResultContract.State): WeatherResultContract.State {
         val value = "find"
         val action = DiaryDispatcherContract.Action.ChangeFind(value)
         DiaryDispatcher.setActions(action)
-        return Pair(expectationsState.copy(find = value), action)
+        return expectationsState.copy(find = value)
     }
 
-    private suspend fun diaryDispatcherLearnAction(expectationsState: WeatherResultContract.State): Pair<WeatherResultContract.State, DiaryDispatcherContract.Action> {
+    private suspend fun diaryDispatcherLearnAction(expectationsState: WeatherResultContract.State): WeatherResultContract.State {
         val value = "learn"
         val action = DiaryDispatcherContract.Action.ChangeLearn(value)
         DiaryDispatcher.setActions(action)
-        return Pair(expectationsState.copy(learn = value), action)
+        return expectationsState.copy(learn = value)
     }
 
-    private suspend fun diaryDispatcherStatementAction(expectationsState: WeatherResultContract.State): Pair<WeatherResultContract.State, DiaryDispatcherContract.Action> {
+    private suspend fun diaryDispatcherStatementAction(expectationsState: WeatherResultContract.State): WeatherResultContract.State {
         val value = "statement"
         val action = DiaryDispatcherContract.Action.ChangeStatement(value)
         DiaryDispatcher.setActions(action)
-        return Pair(expectationsState.copy(statement = value), action)
+        return expectationsState.copy(statement = value)
     }
 
-    private suspend fun diaryDispatcherAssessmentAction(expectationsState: WeatherResultContract.State): Pair<WeatherResultContract.State, DiaryDispatcherContract.Action> {
+    private suspend fun diaryDispatcherAssessmentAction(expectationsState: WeatherResultContract.State): WeatherResultContract.State {
         val value = 50f
         val action = DiaryDispatcherContract.Action.ChangeAssessment(value)
         DiaryDispatcher.setActions(action)
-        return Pair(expectationsState.copy(assessment = (value * 100).toInt()), action)
+        return expectationsState.copy(assessment = (value * 100).toInt())
     }
 
-    private suspend fun diaryDispatcherReasonAction(expectationsState: WeatherResultContract.State): Pair<WeatherResultContract.State, DiaryDispatcherContract.Action> {
+    private suspend fun diaryDispatcherReasonAction(expectationsState: WeatherResultContract.State): WeatherResultContract.State {
         val value = "reason"
         val action = DiaryDispatcherContract.Action.ChangeReason(value)
         DiaryDispatcher.setActions(action)
-        return Pair(expectationsState.copy(reason = value), action)
+        return expectationsState.copy(reason = value)
     }
 
-    private suspend fun diaryDispatcherImproveAction(expectationsState: WeatherResultContract.State): Pair<WeatherResultContract.State, DiaryDispatcherContract.Action> {
+    private suspend fun diaryDispatcherImproveAction(expectationsState: WeatherResultContract.State): WeatherResultContract.State {
         val value = "improve"
         val action = DiaryDispatcherContract.Action.ChangeImprove(value)
         DiaryDispatcher.setActions(action)
-        return Pair(expectationsState.copy(improve = value), action)
+        return expectationsState.copy(improve = value)
     }
 
 
@@ -155,18 +135,16 @@ class WeatherResultViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun onClickNextButtonByAllNull() = testScope.runBlockingTest {
-
         // 期待結果
         val expectationsState = state.copy()
         val status = Status.Failure(IllegalAccessError("事実データが入っていません"))
         val expectationsEffect = WeatherResultContract.Effect.SaveResult(status)
-        val expectationsAction = null
 
         // 実施
         ffsFactViewModel.setEvent(WeatherResultContract.Event.OnClickSaveButton)
 
         // 比較
-        result(expectationsState, expectationsEffect, expectationsAction)
+        result(expectationsState, expectationsEffect)
         coVerify(exactly = 0) { (reportUseCase).saveReport(any()) }
     }
 
@@ -187,22 +165,21 @@ class WeatherResultViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun onClickNextButtonByFactNull() = testScope.runBlockingTest {
-
         // 期待結果
         val status = Status.Failure(IllegalAccessError("事実データが入っていません"))
-        var stateCopy = diaryDispatcherFindAction(state).first
-        stateCopy = diaryDispatcherLearnAction(stateCopy).first
-        stateCopy = diaryDispatcherStatementAction(stateCopy).first
-        stateCopy = diaryDispatcherAssessmentAction(stateCopy).first
-        stateCopy = diaryDispatcherReasonAction(stateCopy).first
+        var stateCopy = diaryDispatcherFindAction(state)
+        stateCopy = diaryDispatcherLearnAction(stateCopy)
+        stateCopy = diaryDispatcherStatementAction(stateCopy)
+        stateCopy = diaryDispatcherAssessmentAction(stateCopy)
+        stateCopy = diaryDispatcherReasonAction(stateCopy)
         val expectationsEffect = WeatherResultContract.Effect.SaveResult(status)
-        val (expectationsState, expectationsAction) = diaryDispatcherImproveAction(stateCopy)
+        val expectationsState = diaryDispatcherImproveAction(stateCopy)
 
         // 実施
         ffsFactViewModel.setEvent(WeatherResultContract.Event.OnClickSaveButton)
 
         // 比較
-        result(expectationsState, expectationsEffect, expectationsAction)
+        result(expectationsState, expectationsEffect)
         coVerify(exactly = 0) { (reportUseCase).saveReport(any()) }
     }
 
@@ -223,22 +200,21 @@ class WeatherResultViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun onClickNextButtonByFindNull() = testScope.runBlockingTest {
-
         // 期待結果
         val status = Status.Failure(IllegalAccessError("発見データが入っていません"))
-        var stateCopy = diaryDispatcherFactAction(state).first
-        stateCopy = diaryDispatcherLearnAction(stateCopy).first
-        stateCopy = diaryDispatcherStatementAction(stateCopy).first
-        stateCopy = diaryDispatcherAssessmentAction(stateCopy).first
-        stateCopy = diaryDispatcherReasonAction(stateCopy).first
+        var stateCopy = diaryDispatcherFactAction(state)
+        stateCopy = diaryDispatcherLearnAction(stateCopy)
+        stateCopy = diaryDispatcherStatementAction(stateCopy)
+        stateCopy = diaryDispatcherAssessmentAction(stateCopy)
+        stateCopy = diaryDispatcherReasonAction(stateCopy)
         val expectationsEffect = WeatherResultContract.Effect.SaveResult(status)
-        val (expectationsState, expectationsAction) = diaryDispatcherImproveAction(stateCopy)
+        val expectationsState = diaryDispatcherImproveAction(stateCopy)
 
         // 実施
         ffsFactViewModel.setEvent(WeatherResultContract.Event.OnClickSaveButton)
 
         // 比較
-        result(expectationsState, expectationsEffect, expectationsAction)
+        result(expectationsState, expectationsEffect)
         coVerify(exactly = 0) { (reportUseCase).saveReport(any()) }
     }
 
@@ -259,22 +235,21 @@ class WeatherResultViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun onClickNextButtonByLearnNull() = testScope.runBlockingTest {
-
         // 期待結果
         val status = Status.Failure(IllegalAccessError("学びデータが入っていません"))
-        var stateCopy = diaryDispatcherFactAction(state).first
-        stateCopy = diaryDispatcherFindAction(stateCopy).first
-        stateCopy = diaryDispatcherStatementAction(stateCopy).first
-        stateCopy = diaryDispatcherAssessmentAction(stateCopy).first
-        stateCopy = diaryDispatcherReasonAction(stateCopy).first
-        val (expectationsState, expectationsAction) = diaryDispatcherImproveAction(stateCopy)
+        var stateCopy = diaryDispatcherFactAction(state)
+        stateCopy = diaryDispatcherFindAction(stateCopy)
+        stateCopy = diaryDispatcherStatementAction(stateCopy)
+        stateCopy = diaryDispatcherAssessmentAction(stateCopy)
+        stateCopy = diaryDispatcherReasonAction(stateCopy)
+        val expectationsState = diaryDispatcherImproveAction(stateCopy)
         val expectationsEffect = WeatherResultContract.Effect.SaveResult(status)
 
         // 実施
         ffsFactViewModel.setEvent(WeatherResultContract.Event.OnClickSaveButton)
 
         // 比較
-        result(expectationsState, expectationsEffect, expectationsAction)
+        result(expectationsState, expectationsEffect)
         coVerify(exactly = 0) { (reportUseCase).saveReport(any()) }
     }
 
@@ -298,19 +273,19 @@ class WeatherResultViewModelTest {
 
         // 期待結果
         val status = Status.Failure(IllegalAccessError("宣言データが入っていません"))
-        var stateCopy = diaryDispatcherFactAction(state).first
-        stateCopy = diaryDispatcherFindAction(stateCopy).first
-        stateCopy = diaryDispatcherLearnAction(stateCopy).first
-        stateCopy = diaryDispatcherAssessmentAction(stateCopy).first
-        stateCopy = diaryDispatcherReasonAction(stateCopy).first
+        var stateCopy = diaryDispatcherFactAction(state)
+        stateCopy = diaryDispatcherFindAction(stateCopy)
+        stateCopy = diaryDispatcherLearnAction(stateCopy)
+        stateCopy = diaryDispatcherAssessmentAction(stateCopy)
+        stateCopy = diaryDispatcherReasonAction(stateCopy)
         val expectationsEffect = WeatherResultContract.Effect.SaveResult(status)
-        val (expectationsState, expectationsAction) = diaryDispatcherImproveAction(stateCopy)
+        val expectationsState = diaryDispatcherImproveAction(stateCopy)
 
         // 実行
         ffsFactViewModel.setEvent(WeatherResultContract.Event.OnClickSaveButton)
 
         // 比較
-        result(expectationsState, expectationsEffect, expectationsAction)
+        result(expectationsState, expectationsEffect)
         coVerify(exactly = 0) { (reportUseCase).saveReport(any()) }
     }
 
@@ -331,22 +306,21 @@ class WeatherResultViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun onClickNextButtonByReasonNull() = testScope.runBlockingTest {
-
         // 期待結果
         val status = Status.Failure(IllegalAccessError("理由データが入っていません"))
-        var stateCopy = diaryDispatcherFactAction(state).first
-        stateCopy = diaryDispatcherFindAction(stateCopy).first
-        stateCopy = diaryDispatcherLearnAction(stateCopy).first
-        stateCopy = diaryDispatcherStatementAction(stateCopy).first
-        stateCopy = diaryDispatcherAssessmentAction(stateCopy).first
+        var stateCopy = diaryDispatcherFactAction(state)
+        stateCopy = diaryDispatcherFindAction(stateCopy)
+        stateCopy = diaryDispatcherLearnAction(stateCopy)
+        stateCopy = diaryDispatcherStatementAction(stateCopy)
+        stateCopy = diaryDispatcherAssessmentAction(stateCopy)
         val expectationsEffect = WeatherResultContract.Effect.SaveResult(status)
-        val (expectationsState, expectationsAction) = diaryDispatcherImproveAction(stateCopy)
+        val expectationsState = diaryDispatcherImproveAction(stateCopy)
 
         // 実行
         ffsFactViewModel.setEvent(WeatherResultContract.Event.OnClickSaveButton)
 
         // 比較
-        result(expectationsState, expectationsEffect, expectationsAction)
+        result(expectationsState, expectationsEffect)
         coVerify(exactly = 0) { (reportUseCase).saveReport(any()) }
     }
 
@@ -370,19 +344,19 @@ class WeatherResultViewModelTest {
 
         // 期待結果
         val status = Status.Failure(IllegalAccessError("改善案データが入っていません"))
-        var stateCopy = diaryDispatcherFactAction(state).first
-        stateCopy = diaryDispatcherFindAction(stateCopy).first
-        stateCopy = diaryDispatcherLearnAction(stateCopy).first
-        stateCopy = diaryDispatcherStatementAction(stateCopy).first
-        stateCopy = diaryDispatcherAssessmentAction(stateCopy).first
+        var stateCopy = diaryDispatcherFactAction(state)
+        stateCopy = diaryDispatcherFindAction(stateCopy)
+        stateCopy = diaryDispatcherLearnAction(stateCopy)
+        stateCopy = diaryDispatcherStatementAction(stateCopy)
+        stateCopy = diaryDispatcherAssessmentAction(stateCopy)
         val expectationsEffect = WeatherResultContract.Effect.SaveResult(status)
-        val (expectationsState, expectationsAction) = diaryDispatcherReasonAction(stateCopy)
+        val expectationsState = diaryDispatcherReasonAction(stateCopy)
 
         // 実行
         ffsFactViewModel.setEvent(WeatherResultContract.Event.OnClickSaveButton)
 
         // 比較
-        result(expectationsState, expectationsEffect, expectationsAction)
+        result(expectationsState, expectationsEffect)
         coVerify(exactly = 0) { (reportUseCase).saveReport(any()) }
     }
 
@@ -403,18 +377,17 @@ class WeatherResultViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun onClickNextButtonByAllInput() = testScope.runBlockingTest {
-
         // 期待結果
         val status = Status.Success(null)
-        var stateCopy = diaryDispatcherFactAction(state).first
-        stateCopy = diaryDispatcherFindAction(stateCopy).first
-        stateCopy = diaryDispatcherLearnAction(stateCopy).first
-        stateCopy = diaryDispatcherStatementAction(stateCopy).first
-        stateCopy = diaryDispatcherAssessmentAction(stateCopy).first
-        stateCopy = diaryDispatcherReasonAction(stateCopy).first
-        stateCopy = diaryDispatcherImproveAction(stateCopy).first
+        var stateCopy = diaryDispatcherFactAction(state)
+        stateCopy = diaryDispatcherFindAction(stateCopy)
+        stateCopy = diaryDispatcherLearnAction(stateCopy)
+        stateCopy = diaryDispatcherStatementAction(stateCopy)
+        stateCopy = diaryDispatcherAssessmentAction(stateCopy)
+        stateCopy = diaryDispatcherReasonAction(stateCopy)
+        stateCopy = diaryDispatcherImproveAction(stateCopy)
         val expectationsEffect = WeatherResultContract.Effect.SaveResult(status)
-        val (expectationsState, expectationsAction) = diaryDispatcherImproveAction(stateCopy)
+        val expectationsState = diaryDispatcherImproveAction(stateCopy)
         val allReportInputDto = AllReportInputDto(
             stateCopy.fact, stateCopy.find, stateCopy.learn, stateCopy.statement, stateCopy.assessment, stateCopy.reason,
             stateCopy.improve
@@ -424,7 +397,7 @@ class WeatherResultViewModelTest {
         ffsFactViewModel.setEvent(WeatherResultContract.Event.OnClickSaveButton)
 
         // 比較
-        result(expectationsState, expectationsEffect, expectationsAction)
+        result(expectationsState, expectationsEffect)
         coVerify(exactly = 1) { (reportUseCase).saveReport(allReportInputDto) }
     }
 
@@ -447,18 +420,16 @@ class WeatherResultViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun actionByChangeFact() = testScope.runBlockingTest {
-
         // 期待結果
         val value = "fact"
         val action = DiaryDispatcherContract.Action.ChangeFact(value)
         val expectationsState = state.copy(fact = value)
-        val expectationsEffect = null
 
         // 実施
         DiaryDispatcher.setActions(action)
 
         // 比較
-        result(expectationsState, expectationsEffect, action)
+        result(expectationsState)
     }
 
     /**
@@ -476,18 +447,16 @@ class WeatherResultViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun actionByChangeFind() = testScope.runBlockingTest {
-
         // 期待結果
         val value = "find"
         val action = DiaryDispatcherContract.Action.ChangeFind(value)
         val expectationsState = state.copy(find = value)
-        val expectationsEffect = null
 
         // 実施
         DiaryDispatcher.setActions(action)
 
         // 比較
-        result(expectationsState, expectationsEffect, action)
+        result(expectationsState)
     }
 
     /**
@@ -505,18 +474,16 @@ class WeatherResultViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun actionByChangeLearn() = testScope.runBlockingTest {
-
         // 期待結果
         val value = "learn"
         val action = DiaryDispatcherContract.Action.ChangeLearn(value)
         val expectationsState = state.copy(learn = value)
-        val expectationsEffect = null
 
         // 実施
         DiaryDispatcher.setActions(action)
 
         // 比較
-        result(expectationsState, expectationsEffect, action)
+        result(expectationsState)
     }
 
     /**
@@ -534,18 +501,16 @@ class WeatherResultViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun actionByChangeStatement() = testScope.runBlockingTest {
-
         // 期待結果
         val value = "statement"
         val action = DiaryDispatcherContract.Action.ChangeStatement(value)
         val expectationsState = state.copy(statement = value)
-        val expectationsEffect = null
 
         // 実施
         DiaryDispatcher.setActions(action)
 
         // 比較
-        result(expectationsState, expectationsEffect, action)
+        result(expectationsState)
     }
 
 
@@ -564,19 +529,17 @@ class WeatherResultViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun actionByChangeAssessment() = testScope.runBlockingTest {
-
         // 期待結果
         val value = 1f
         val value2 = (value * 100).toInt()
         val action = DiaryDispatcherContract.Action.ChangeAssessment(value)
         val expectationsState = state.copy(assessment = value2)
-        val expectationsEffect = null
 
         // 実施
         DiaryDispatcher.setActions(action)
 
         // 比較
-        result(expectationsState, expectationsEffect, action)
+        result(expectationsState)
     }
 
     /**
@@ -594,18 +557,16 @@ class WeatherResultViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun actionByChangeReason() = testScope.runBlockingTest {
-
         // 期待結果
         val value = "reason"
         val action = DiaryDispatcherContract.Action.ChangeReason(value)
         val expectationsState = state.copy(reason = value)
-        val expectationsEffect = null
 
         // 実施
         DiaryDispatcher.setActions(action)
 
         // 比較
-        result(expectationsState, expectationsEffect, action)
+        result(expectationsState)
     }
 
     /**
@@ -623,18 +584,16 @@ class WeatherResultViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun actionByChangeImprove() = testScope.runBlockingTest {
-
         // 期待結果
         val value = "improve"
         val action = DiaryDispatcherContract.Action.ChangeImprove(value)
         val expectationsState = state.copy(improve = value)
-        val expectationsEffect = null
 
         // 実施
         DiaryDispatcher.setActions(action)
 
         // 比較
-        result(expectationsState, expectationsEffect, action)
+        result(expectationsState)
     }
 
     // endregion

@@ -6,6 +6,7 @@ import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.test.*
 import org.junit.*
 import org.junit.Assert.*
@@ -73,20 +74,16 @@ class SignInViewModelTest {
     @ExperimentalCoroutinesApi
     private fun result(
         state: SignInContract.State,
-        effect: SignInContract.Effect?
+        effect: SignInContract.Effect? = null
     ) = testScope.runBlockingTest {
-        val resultState = viewModel.state.value
-        val resultEffect: SignInContract.Effect? = viewModel.effect.value
-
-        // 比較
-        assertEquals(resultState, state)
-        if (resultEffect is SignInContract.Effect.ShowError) {
-            val resultMessage = resultEffect.throwable.message
-            val message = (effect as SignInContract.Effect.ShowError).throwable.message
-            assertEquals(resultMessage, message)
-        } else {
-            assertEquals(resultEffect, effect)
-        }
+        viewModel.effect
+            .stateIn(
+                scope = testScope,
+                started = SharingStarted.Eagerly,
+                initialValue = null
+            )
+            .onEach { assertEquals(effect, it) }
+        assertEquals(state, viewModel.state.value)
     }
 
     // region メールアドレス入力
@@ -109,7 +106,6 @@ class SignInViewModelTest {
     fun onChangeEmailByInput() {
         // 期待値
         val value = "123@com.ne.jp"
-        val expectationsEffect = null
         val expectationsState = state.copy(emailText = value,  isSignInEnable = false)
 
         //実施
@@ -118,7 +114,7 @@ class SignInViewModelTest {
         viewModel.setEvent( SignInContract.Event.OnChangeEmail(value))
 
         // 検証
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     /**
@@ -140,7 +136,6 @@ class SignInViewModelTest {
         // 期待値
         val initPassword = "password"
         val value = "123@com.ne.jp"
-        val expectationsEffect = null
         val expectationsState = state.copy(passwordText = initPassword, emailText = value,  isSignInEnable = true)
 
         //実施
@@ -150,7 +145,7 @@ class SignInViewModelTest {
         viewModel.setEvent( SignInContract.Event.OnChangeEmail(value))
 
         // 検証
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     /**
@@ -173,7 +168,6 @@ class SignInViewModelTest {
         val initPassword = "password"
         val initEmail = "123@com.ne.jp"
         val value = "123@com.ne.jp"
-        val expectationsEffect = null
         val expectationsState = state.copy(passwordText = initPassword, emailText = value,  isSignInEnable = true)
 
         //実施
@@ -184,7 +178,7 @@ class SignInViewModelTest {
         viewModel.setEvent( SignInContract.Event.OnChangeEmail(value))
 
         // 検証
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     /**
@@ -207,7 +201,6 @@ class SignInViewModelTest {
         val initPassword = "password"
         val initEmail = "123@com.ne.jp"
         val value = ""
-        val expectationsEffect = null
         val expectationsState = state.copy(passwordText = initPassword, emailText = value,  isSignInEnable = false)
 
         //実施
@@ -218,7 +211,7 @@ class SignInViewModelTest {
         viewModel.setEvent( SignInContract.Event.OnChangeEmail(value))
 
         // 検証
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     // endregion
@@ -243,7 +236,6 @@ class SignInViewModelTest {
     fun onChangePasswordByInput() {
         // 期待値
         val value = "123@com.ne.jp"
-        val expectationsEffect = null
         val expectationsState = state.copy(passwordText = value,  isSignInEnable = false)
 
         //実施
@@ -252,7 +244,7 @@ class SignInViewModelTest {
         viewModel.setEvent( SignInContract.Event.OnChangePassword(value))
 
         // 検証
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     /**
@@ -274,7 +266,6 @@ class SignInViewModelTest {
         // 期待値
         val initEmail = "password"
         val value = "123@com.ne.jp"
-        val expectationsEffect = null
         val expectationsState = state.copy(passwordText = value, emailText = initEmail,  isSignInEnable = true)
 
         //実施
@@ -284,7 +275,7 @@ class SignInViewModelTest {
         viewModel.setEvent( SignInContract.Event.OnChangeEmail(initEmail))
 
         // 検証
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     /**
@@ -307,7 +298,6 @@ class SignInViewModelTest {
         val initPassword = "password"
         val initEmail = "123@com.ne.jp"
         val value = "pass"
-        val expectationsEffect = null
         val expectationsState = state.copy(passwordText = value, emailText = initEmail,  isSignInEnable = true)
 
         //実施
@@ -318,7 +308,7 @@ class SignInViewModelTest {
         viewModel.setEvent( SignInContract.Event.OnChangePassword(value))
 
         // 検証
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     /**
@@ -341,7 +331,6 @@ class SignInViewModelTest {
         val initPassword = "password"
         val initEmail = "123@com.ne.jp"
         val value = ""
-        val expectationsEffect = null
         val expectationsState = state.copy(passwordText = value, emailText = initEmail,  isSignInEnable = false)
 
         //実施
@@ -352,7 +341,7 @@ class SignInViewModelTest {
         viewModel.setEvent( SignInContract.Event.OnChangePassword(value))
 
         // 検証
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     // endregion

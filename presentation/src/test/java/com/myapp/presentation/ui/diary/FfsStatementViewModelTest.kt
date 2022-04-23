@@ -2,8 +2,9 @@ package com.myapp.presentation.ui.diary
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.test.*
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -17,7 +18,6 @@ class FfsStatementViewModelTest {
 
     private val state = DiaryBaseContract.State()
     private lateinit var ffsFactViewModel: FfsStatementViewModel
-    private var resultAction: DiaryDispatcherContract.Action? = null
 
     @ExperimentalCoroutinesApi
     private val coroutineDispatcher = TestCoroutineDispatcher()
@@ -30,9 +30,6 @@ class FfsStatementViewModelTest {
     fun setUp() {
         Dispatchers.setMain(coroutineDispatcher)
         ffsFactViewModel = FfsStatementViewModel()
-
-        DiaryDispatcher.action.onEach { resultAction = it }
-            .launchIn(testScope)
     }
 
     @ExperimentalCoroutinesApi
@@ -46,23 +43,17 @@ class FfsStatementViewModelTest {
      *
      * @param state Stateの期待値
      * @param effect Effectの期待値
-     * @param action  actionの期待値
      */
     @ExperimentalCoroutinesApi
-    private fun result(
-        state: DiaryBaseContract.State,
-        effect: DiaryBaseContract.Effect?,
-        action: DiaryDispatcherContract.Action?
-    ) = testScope.runBlockingTest {
-        val resultState = ffsFactViewModel.state.value
-        var resultEffect: DiaryBaseContract.Effect? = null
-        ffsFactViewModel.effect.onEach { resultEffect = it }
-            .launchIn(testScope)
-
-        // 比較
-        assertEquals(resultState, state)
-        assertEquals(resultEffect, effect)
-        assertEquals(resultAction, action)
+    private fun result(state: DiaryBaseContract.State, effect: DiaryBaseContract.Effect? = null) = testScope.runBlockingTest {
+        ffsFactViewModel.effect
+            .stateIn(
+                scope = testScope,
+                started = SharingStarted.Eagerly,
+                initialValue = null
+            )
+            .onEach { assertEquals(effect, it) }
+        assertEquals(state, ffsFactViewModel.state.value)
     }
 
     // region テキスト入力
@@ -83,7 +74,6 @@ class FfsStatementViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun changeStatementByInputOK() = testScope.runBlockingTest {
-
         // 期待結果
         val value = "私は成長に貪欲に生きている人間です"
         val hintText = ""
@@ -93,15 +83,14 @@ class FfsStatementViewModelTest {
             inputText = value,
             hintText = hintText,
             hintVisibility = hintVisibility,
-            isButtonEnable = isButtonEnable)
-        val expectationsEffect = null
-        val expectationsAction = DiaryDispatcherContract.Action.ChangeStatement(value)
+            isButtonEnable = isButtonEnable
+        )
 
         // 実施
         ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(value))
 
         // 比較
-        result(expectationsState, expectationsEffect, expectationsAction)
+        result(expectationsState)
     }
 
     /**
@@ -120,7 +109,6 @@ class FfsStatementViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun changeStatementByInputStartOk1() = testScope.runBlockingTest {
-
         // 期待結果
         val value = "私は"
         val hintText = "文章は現在進行形にしてください"
@@ -130,15 +118,14 @@ class FfsStatementViewModelTest {
             inputText = value,
             hintText = hintText,
             hintVisibility = hintVisibility,
-            isButtonEnable = isButtonEnable)
-        val expectationsEffect = null
-        val expectationsAction = DiaryDispatcherContract.Action.ChangeStatement(value)
+            isButtonEnable = isButtonEnable
+        )
 
         // 実施
         ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(value))
 
         // 比較
-        result(expectationsState, expectationsEffect, expectationsAction)
+        result(expectationsState)
     }
 
     /**
@@ -157,7 +144,6 @@ class FfsStatementViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun changeStatementByInputStartOk2() = testScope.runBlockingTest {
-
         // 期待結果
         val value = "わたしは"
         val hintText = "文章は現在進行形にしてください"
@@ -167,15 +153,14 @@ class FfsStatementViewModelTest {
             inputText = value,
             hintText = hintText,
             hintVisibility = hintVisibility,
-            isButtonEnable = isButtonEnable)
-        val expectationsEffect = null
-        val expectationsAction = DiaryDispatcherContract.Action.ChangeStatement(value)
+            isButtonEnable = isButtonEnable
+        )
 
         // 実施
         ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(value))
 
         // 比較
-        result(expectationsState, expectationsEffect, expectationsAction)
+        result(expectationsState)
     }
 
     /**
@@ -194,7 +179,6 @@ class FfsStatementViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun changeStatementByInputStartNG() = testScope.runBlockingTest {
-
         // 期待結果
         val value = "僕は"
         val hintText = "文章の先頭は「わたしは」ではじめてください"
@@ -204,15 +188,14 @@ class FfsStatementViewModelTest {
             inputText = value,
             hintText = hintText,
             hintVisibility = hintVisibility,
-            isButtonEnable = isButtonEnable)
-        val expectationsEffect = null
-        val expectationsAction = DiaryDispatcherContract.Action.ChangeStatement(value)
+            isButtonEnable = isButtonEnable
+        )
 
         // 実施
         ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(value))
 
         // 比較
-        result(expectationsState, expectationsEffect, expectationsAction)
+        result(expectationsState)
     }
 
 
@@ -232,7 +215,6 @@ class FfsStatementViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun changeStatementByInputMiddleOK() = testScope.runBlockingTest {
-
         // 期待結果
         val value = "私は貪欲に成長ている"
         val hintText = "最後は「です」と宣言してください"
@@ -242,15 +224,14 @@ class FfsStatementViewModelTest {
             inputText = value,
             hintText = hintText,
             hintVisibility = hintVisibility,
-            isButtonEnable = isButtonEnable)
-        val expectationsEffect = null
-        val expectationsAction = DiaryDispatcherContract.Action.ChangeStatement(value)
+            isButtonEnable = isButtonEnable
+        )
 
         // 実施
         ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(value))
 
         // 比較
-        result(expectationsState, expectationsEffect, expectationsAction)
+        result(expectationsState)
     }
 
     /**
@@ -269,7 +250,6 @@ class FfsStatementViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun changeStatementByInputMiddleNG1() = testScope.runBlockingTest {
-
         // 期待結果
         val value = "私は貪欲に成長"
         val hintText = "文章は現在進行形にしてください"
@@ -279,15 +259,14 @@ class FfsStatementViewModelTest {
             inputText = value,
             hintText = hintText,
             hintVisibility = hintVisibility,
-            isButtonEnable = isButtonEnable)
-        val expectationsEffect = null
-        val expectationsAction = DiaryDispatcherContract.Action.ChangeStatement(value)
+            isButtonEnable = isButtonEnable
+        )
 
         // 実施
         ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(value))
 
         // 比較
-        result(expectationsState, expectationsEffect, expectationsAction)
+        result(expectationsState)
     }
 
     /**
@@ -306,7 +285,6 @@ class FfsStatementViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun changeStatementByInputMiddleNG2() = testScope.runBlockingTest {
-
         // 期待結果
         val value = "私はている"
         val hintText = "動詞を入れてください"
@@ -316,15 +294,14 @@ class FfsStatementViewModelTest {
             inputText = value,
             hintText = hintText,
             hintVisibility = hintVisibility,
-            isButtonEnable = isButtonEnable)
-        val expectationsEffect = null
-        val expectationsAction = DiaryDispatcherContract.Action.ChangeStatement(value)
+            isButtonEnable = isButtonEnable
+        )
 
         // 実施
         ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(value))
 
         // 比較
-        result(expectationsState, expectationsEffect, expectationsAction)
+        result(expectationsState)
     }
 
     /**
@@ -343,7 +320,6 @@ class FfsStatementViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun changeStatementByInputMiddleNG3() = testScope.runBlockingTest {
-
         // 期待結果
         val value = "私はている"
         val hintText = "動詞を入れてください"
@@ -353,15 +329,14 @@ class FfsStatementViewModelTest {
             inputText = value,
             hintText = hintText,
             hintVisibility = hintVisibility,
-            isButtonEnable = isButtonEnable)
-        val expectationsEffect = null
-        val expectationsAction = DiaryDispatcherContract.Action.ChangeStatement(value)
+            isButtonEnable = isButtonEnable
+        )
 
         // 実施
         ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(value))
 
         // 比較
-        result(expectationsState, expectationsEffect, expectationsAction)
+        result(expectationsState)
     }
 
     /**
@@ -380,7 +355,6 @@ class FfsStatementViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun changeStatementByInputEndNG1() = testScope.runBlockingTest {
-
         // 期待結果
         val value = "私は貪欲に成長しているんだ"
         val hintText = "最後は「です」と宣言してください"
@@ -390,15 +364,14 @@ class FfsStatementViewModelTest {
             inputText = value,
             hintText = hintText,
             hintVisibility = hintVisibility,
-            isButtonEnable = isButtonEnable)
-        val expectationsEffect = null
-        val expectationsAction = DiaryDispatcherContract.Action.ChangeStatement(value)
+            isButtonEnable = isButtonEnable
+        )
 
         // 実施
         ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(value))
 
         // 比較
-        result(expectationsState, expectationsEffect, expectationsAction)
+        result(expectationsState)
     }
 
     /**
@@ -417,7 +390,6 @@ class FfsStatementViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun changeStatementByInputEndNG2() = testScope.runBlockingTest {
-
         // 期待結果
         val value = "私は貪欲に成長しているです"
         val hintText = "あなたは何者ですか？"
@@ -428,14 +400,12 @@ class FfsStatementViewModelTest {
             hintText = hintText,
             hintVisibility = hintVisibility,
             isButtonEnable = isButtonEnable)
-        val expectationsEffect = null
-        val expectationsAction = DiaryDispatcherContract.Action.ChangeStatement(value)
 
         // 実施
         ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(value))
 
         // 比較
-        result(expectationsState, expectationsEffect, expectationsAction)
+        result(expectationsState)
     }
 
     /**
@@ -454,7 +424,6 @@ class FfsStatementViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun changeStatementByInputEndNG3() = testScope.runBlockingTest {
-
         // 期待結果
         val value = "私は貪欲に成長している猫です"
         val hintText = "あなたは何者ですか？"
@@ -464,15 +433,14 @@ class FfsStatementViewModelTest {
             inputText = value,
             hintText = hintText,
             hintVisibility = hintVisibility,
-            isButtonEnable = isButtonEnable)
-        val expectationsEffect = null
-        val expectationsAction = DiaryDispatcherContract.Action.ChangeStatement(value)
+            isButtonEnable = isButtonEnable
+        )
 
         // 実施
         ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(value))
 
         // 比較
-        result(expectationsState, expectationsEffect, expectationsAction)
+        result(expectationsState)
     }
 
     /**
@@ -491,7 +459,6 @@ class FfsStatementViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun changeStatementByInputEndOK1() = testScope.runBlockingTest {
-
         // 期待結果
         val value = "私は貪欲に成長している男です"
         val hintText = ""
@@ -501,15 +468,14 @@ class FfsStatementViewModelTest {
             inputText = value,
             hintText = hintText,
             hintVisibility = hintVisibility,
-            isButtonEnable = isButtonEnable)
-        val expectationsEffect = null
-        val expectationsAction = DiaryDispatcherContract.Action.ChangeStatement(value)
+            isButtonEnable = isButtonEnable
+        )
 
         // 実施
         ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(value))
 
         // 比較
-        result(expectationsState, expectationsEffect, expectationsAction)
+        result(expectationsState)
     }
 
     /**
@@ -528,7 +494,6 @@ class FfsStatementViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun changeStatementByInputEndOK2() = testScope.runBlockingTest {
-
         // 期待結果
         val value = "私は貪欲に成長している女です"
         val hintText = ""
@@ -538,15 +503,14 @@ class FfsStatementViewModelTest {
             inputText = value,
             hintText = hintText,
             hintVisibility = hintVisibility,
-            isButtonEnable = isButtonEnable)
-        val expectationsEffect = null
-        val expectationsAction = DiaryDispatcherContract.Action.ChangeStatement(value)
+            isButtonEnable = isButtonEnable
+        )
 
         // 実施
         ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(value))
 
         // 比較
-        result(expectationsState, expectationsEffect, expectationsAction)
+        result(expectationsState)
     }
 
     /**
@@ -565,7 +529,6 @@ class FfsStatementViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun changeStatementByInputEndOK3() = testScope.runBlockingTest {
-
         // 期待結果
         val value = "私は貪欲に成長している人です"
         val hintText = ""
@@ -575,15 +538,14 @@ class FfsStatementViewModelTest {
             inputText = value,
             hintText = hintText,
             hintVisibility = hintVisibility,
-            isButtonEnable = isButtonEnable)
-        val expectationsEffect = null
-        val expectationsAction = DiaryDispatcherContract.Action.ChangeStatement(value)
+            isButtonEnable = isButtonEnable
+        )
 
         // 実施
         ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(value))
 
         // 比較
-        result(expectationsState, expectationsEffect, expectationsAction)
+        result(expectationsState)
     }
 
     /**
@@ -602,7 +564,6 @@ class FfsStatementViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun changeStatementByInputEndOK4() = testScope.runBlockingTest {
-
         // 期待結果
         val value = "私は貪欲に成長している人間です"
         val hintText = ""
@@ -612,15 +573,14 @@ class FfsStatementViewModelTest {
             inputText = value,
             hintText = hintText,
             hintVisibility = hintVisibility,
-            isButtonEnable = isButtonEnable)
-        val expectationsEffect = null
-        val expectationsAction = DiaryDispatcherContract.Action.ChangeStatement(value)
+            isButtonEnable = isButtonEnable
+        )
 
         // 実施
         ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(value))
 
         // 比較
-        result(expectationsState, expectationsEffect, expectationsAction)
+        result(expectationsState)
     }
 
     /**
@@ -639,7 +599,6 @@ class FfsStatementViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun changeStatementByInputEndDecorate1() = testScope.runBlockingTest {
-
         // 期待結果
         val value = "私は貪欲に成長している人間です!"
         val hintText = ""
@@ -649,15 +608,14 @@ class FfsStatementViewModelTest {
             inputText = value,
             hintText = hintText,
             hintVisibility = hintVisibility,
-            isButtonEnable = isButtonEnable)
-        val expectationsEffect = null
-        val expectationsAction = DiaryDispatcherContract.Action.ChangeStatement(value)
+            isButtonEnable = isButtonEnable
+        )
 
         // 実施
         ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(value))
 
         // 比較
-        result(expectationsState, expectationsEffect, expectationsAction)
+        result(expectationsState)
     }
 
     /**
@@ -676,7 +634,6 @@ class FfsStatementViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun changeStatementByInputEndDecorate2() = testScope.runBlockingTest {
-
         // 期待結果
         val value = "私は貪欲に成長している人間です！"
         val hintText = ""
@@ -686,15 +643,14 @@ class FfsStatementViewModelTest {
             inputText = value,
             hintText = hintText,
             hintVisibility = hintVisibility,
-            isButtonEnable = isButtonEnable)
-        val expectationsEffect = null
-        val expectationsAction = DiaryDispatcherContract.Action.ChangeStatement(value)
+            isButtonEnable = isButtonEnable
+        )
 
         // 実施
         ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(value))
 
         // 比較
-        result(expectationsState, expectationsEffect, expectationsAction)
+        result(expectationsState)
     }
 
     /**
@@ -713,7 +669,6 @@ class FfsStatementViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun changeStatementByInputEndDecorate3() = testScope.runBlockingTest {
-
         // 期待結果
         val value = "私は貪欲に成長しているです."
         val hintText = "あなたは何者ですか？"
@@ -723,15 +678,14 @@ class FfsStatementViewModelTest {
             inputText = value,
             hintText = hintText,
             hintVisibility = hintVisibility,
-            isButtonEnable = isButtonEnable)
-        val expectationsEffect = null
-        val expectationsAction = DiaryDispatcherContract.Action.ChangeStatement(value)
+            isButtonEnable = isButtonEnable
+        )
 
         // 実施
         ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(value))
 
         // 比較
-        result(expectationsState, expectationsEffect, expectationsAction)
+        result(expectationsState)
     }
 
     /**
@@ -750,7 +704,6 @@ class FfsStatementViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun changeStatementByInputEndDecorate4() = testScope.runBlockingTest {
-
         // 期待結果
         val value = "私は貪欲に成長している人間です。"
         val hintText = ""
@@ -760,15 +713,14 @@ class FfsStatementViewModelTest {
             inputText = value,
             hintText = hintText,
             hintVisibility = hintVisibility,
-            isButtonEnable = isButtonEnable)
-        val expectationsEffect = null
-        val expectationsAction = DiaryDispatcherContract.Action.ChangeStatement(value)
+            isButtonEnable = isButtonEnable
+        )
 
         // 実施
         ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(value))
 
         // 比較
-        result(expectationsState, expectationsEffect, expectationsAction)
+        result(expectationsState)
     }
 
     /**
@@ -787,7 +739,6 @@ class FfsStatementViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun changeStatementByInputEndDecorate5() = testScope.runBlockingTest {
-
         // 期待結果
         val value = "私は貪欲に成長している人間です★"
         val hintText = ""
@@ -797,15 +748,14 @@ class FfsStatementViewModelTest {
             inputText = value,
             hintText = hintText,
             hintVisibility = hintVisibility,
-            isButtonEnable = isButtonEnable)
-        val expectationsEffect = null
-        val expectationsAction = DiaryDispatcherContract.Action.ChangeStatement(value)
+            isButtonEnable = isButtonEnable
+        )
 
         // 実施
         ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(value))
 
         // 比較
-        result(expectationsState, expectationsEffect, expectationsAction)
+        result(expectationsState)
     }
 
     /**
@@ -824,7 +774,6 @@ class FfsStatementViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun changeStatementByInputEndDecorate6() = testScope.runBlockingTest {
-
         // 期待結果
         val value = "私は貪欲に成長している人間です☆"
         val hintText = ""
@@ -834,15 +783,14 @@ class FfsStatementViewModelTest {
             inputText = value,
             hintText = hintText,
             hintVisibility = hintVisibility,
-            isButtonEnable = isButtonEnable)
-        val expectationsEffect = null
-        val expectationsAction = DiaryDispatcherContract.Action.ChangeStatement(value)
+            isButtonEnable = isButtonEnable
+        )
 
         // 実施
         ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(value))
 
         // 比較
-        result(expectationsState, expectationsEffect, expectationsAction)
+        result(expectationsState)
     }
 
     /**
@@ -861,7 +809,6 @@ class FfsStatementViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun changeStatementByAllDelete() = testScope.runBlockingTest {
-
         // 期待結果
         val initValue = "learn"
         val value = ""
@@ -872,16 +819,15 @@ class FfsStatementViewModelTest {
             inputText = value,
             hintText = hintText,
             hintVisibility = hintVisibility,
-            isButtonEnable = isButtonEnable)
-        val expectationsEffect = null
-        val expectationsAction = DiaryDispatcherContract.Action.ChangeStatement(value)
+            isButtonEnable = isButtonEnable
+        )
 
         // 実施
         ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(initValue))
         ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnChangeText(value))
 
         // 比較
-        result(expectationsState, expectationsEffect, expectationsAction)
+        result(expectationsState)
     }
 
     // endregion
@@ -907,13 +853,12 @@ class FfsStatementViewModelTest {
         // 期待結果
         val expectationsState = state.copy()
         val expectationsEffect = DiaryBaseContract.Effect.NextNavigation
-        val expectationsAction = null
 
         // 実施
         ffsFactViewModel.setEvent(DiaryBaseContract.Event.OnClickNextButton)
 
         // 比較
-        result(expectationsState, expectationsEffect, expectationsAction)
+        result(expectationsState, expectationsEffect)
     }
 
     // endregion
@@ -935,17 +880,15 @@ class FfsStatementViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun actionByChangeFact() = testScope.runBlockingTest {
-
         // 期待結果
         val action = DiaryDispatcherContract.Action.ChangeFact("fact")
         val expectationsState = state.copy()
-        val expectationsEffect = null
 
         // 実施
         DiaryDispatcher.setActions(action)
 
         // 比較
-        result(expectationsState, expectationsEffect, action)
+        result(expectationsState)
     }
 
     /**
@@ -963,17 +906,15 @@ class FfsStatementViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun actionByChangeFind() = testScope.runBlockingTest {
-
         // 期待結果
         val action = DiaryDispatcherContract.Action.ChangeFind("find")
         val expectationsState = state.copy()
-        val expectationsEffect = null
 
         // 実施
         DiaryDispatcher.setActions(action)
 
         // 比較
-        result(expectationsState, expectationsEffect, action)
+        result(expectationsState)
     }
 
     /**
@@ -991,17 +932,15 @@ class FfsStatementViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun actionByChangeLearn() = testScope.runBlockingTest {
-
         // 期待結果
         val action = DiaryDispatcherContract.Action.ChangeLearn("learn")
         val expectationsState = state.copy()
-        val expectationsEffect = null
 
         // 実施
         DiaryDispatcher.setActions(action)
 
         // 比較
-        result(expectationsState, expectationsEffect, action)
+        result(expectationsState)
     }
 
     /**
@@ -1019,17 +958,15 @@ class FfsStatementViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun actionByChangeStatement() = testScope.runBlockingTest {
-
         // 期待結果
         val action = DiaryDispatcherContract.Action.ChangeStatement("statement")
         val expectationsState = state.copy()
-        val expectationsEffect = null
 
         // 実施
         DiaryDispatcher.setActions(action)
 
         // 比較
-        result(expectationsState, expectationsEffect, action)
+        result(expectationsState)
     }
 
 
@@ -1048,17 +985,15 @@ class FfsStatementViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun actionByChangeAssessment() = testScope.runBlockingTest {
-
         // 期待結果
         val action = DiaryDispatcherContract.Action.ChangeAssessment(1f)
         val expectationsState = state.copy()
-        val expectationsEffect = null
 
         // 実施
         DiaryDispatcher.setActions(action)
 
         // 比較
-        result(expectationsState, expectationsEffect, action)
+        result(expectationsState)
     }
 
     /**
@@ -1076,17 +1011,15 @@ class FfsStatementViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun actionByChangeReason() = testScope.runBlockingTest {
-
         // 期待結果
         val action = DiaryDispatcherContract.Action.ChangeReason("reason")
         val expectationsState = state.copy()
-        val expectationsEffect = null
 
         // 実施
         DiaryDispatcher.setActions(action)
 
         // 比較
-        result(expectationsState, expectationsEffect, action)
+        result(expectationsState)
     }
 
     /**
@@ -1104,17 +1037,15 @@ class FfsStatementViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun actionByChangeImprove() = testScope.runBlockingTest {
-
         // 期待結果
         val action = DiaryDispatcherContract.Action.ChangeImprove("improve")
         val expectationsState = state.copy()
-        val expectationsEffect = null
 
         // 実施
         DiaryDispatcher.setActions(action)
 
         // 比較
-        result(expectationsState, expectationsEffect, action)
+        result(expectationsState)
     }
 
     // endregion

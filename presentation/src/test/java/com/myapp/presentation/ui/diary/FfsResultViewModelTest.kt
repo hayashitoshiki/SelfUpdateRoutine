@@ -2,8 +2,9 @@ package com.myapp.presentation.ui.diary
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.test.*
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -17,7 +18,6 @@ class FfsResultViewModelTest {
 
     private val state = FfsResultContract.State()
     private lateinit var ffsFactViewModel: FfsResultViewModel
-    private var resultAction: DiaryDispatcherContract.Action? = null
 
     @ExperimentalCoroutinesApi
     private val coroutineDispatcher = TestCoroutineDispatcher()
@@ -30,9 +30,6 @@ class FfsResultViewModelTest {
     fun setUp() {
         Dispatchers.setMain(coroutineDispatcher)
         ffsFactViewModel = FfsResultViewModel()
-
-        DiaryDispatcher.action.onEach { resultAction = it }
-            .launchIn(testScope)
     }
 
     @ExperimentalCoroutinesApi
@@ -46,23 +43,17 @@ class FfsResultViewModelTest {
      *
      * @param state Stateの期待値
      * @param effect Effectの期待値
-     * @param action actionの期待値
      */
     @ExperimentalCoroutinesApi
-    private fun result(
-        state: FfsResultContract.State,
-        effect: FfsResultContract.Effect?,
-        action: DiaryDispatcherContract.Action?
-    ) = testScope.runBlockingTest {
-        val resultState = ffsFactViewModel.state.value
-        var resultEffect: FfsResultContract.Effect? = null
-        ffsFactViewModel.effect.onEach { resultEffect = it }
-            .launchIn(testScope)
-
-        // 比較
-        assertEquals(resultState, state)
-        assertEquals(resultAction, action)
-        assertEquals(resultEffect, effect)
+    private fun result(state: FfsResultContract.State, effect: FfsResultContract.Effect? = null) = testScope.runBlockingTest {
+        ffsFactViewModel.effect
+            .stateIn(
+                scope = testScope,
+                started = SharingStarted.Eagerly,
+                initialValue = null
+            )
+            .onEach { assertEquals(effect, it) }
+        assertEquals(state, ffsFactViewModel.state.value)
     }
 
 
@@ -83,17 +74,15 @@ class FfsResultViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun onClickNextButton() = testScope.runBlockingTest {
-
         // 期待結果
         val expectationsState = state.copy()
         val expectationsEffect = FfsResultContract.Effect.NextNavigation
-        val expectationsAction = null
 
         // 実施
         ffsFactViewModel.setEvent(FfsResultContract.Event.OnClickNextButton)
 
         // 比較
-        result(expectationsState, expectationsEffect, expectationsAction)
+        result(expectationsState, expectationsEffect)
     }
 
     // endregion
@@ -115,18 +104,16 @@ class FfsResultViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun actionByChangeFact() = testScope.runBlockingTest {
-
         // 期待結果
         val value = "fact"
         val action = DiaryDispatcherContract.Action.ChangeFact(value)
         val expectationsState = state.copy(fact = value)
-        val expectationsEffect = null
 
         // 実施
         DiaryDispatcher.setActions(action)
 
         // 比較
-        result(expectationsState, expectationsEffect, action)
+        result(expectationsState)
     }
 
     /**
@@ -144,18 +131,16 @@ class FfsResultViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun actionByChangeFind() = testScope.runBlockingTest {
-
         // 期待結果
         val value = "find"
         val action = DiaryDispatcherContract.Action.ChangeFind(value)
         val expectationsState = state.copy(find = value)
-        val expectationsEffect = null
 
         // 実施
         DiaryDispatcher.setActions(action)
 
         // 比較
-        result(expectationsState, expectationsEffect, action)
+        result(expectationsState)
     }
 
     /**
@@ -173,18 +158,16 @@ class FfsResultViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun actionByChangeLearn() = testScope.runBlockingTest {
-
         // 期待結果
         val value = "learn"
         val action = DiaryDispatcherContract.Action.ChangeLearn(value)
         val expectationsState = state.copy(learn = value)
-        val expectationsEffect = null
 
         // 実施
         DiaryDispatcher.setActions(action)
 
         // 比較
-        result(expectationsState, expectationsEffect, action)
+        result(expectationsState)
     }
 
     /**
@@ -202,18 +185,16 @@ class FfsResultViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun actionByChangeStatement() = testScope.runBlockingTest {
-
         // 期待結果
         val value = "statement"
         val action = DiaryDispatcherContract.Action.ChangeStatement(value)
         val expectationsState = state.copy(statement = value)
-        val expectationsEffect = null
 
         // 実施
         DiaryDispatcher.setActions(action)
 
         // 比較
-        result(expectationsState, expectationsEffect, action)
+        result(expectationsState)
     }
 
 
@@ -232,18 +213,16 @@ class FfsResultViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun actionByChangeAssessment() = testScope.runBlockingTest {
-
         // 期待結果
         val value = 1f
         val action = DiaryDispatcherContract.Action.ChangeAssessment(value)
         val expectationsState = state.copy()
-        val expectationsEffect = null
 
         // 実施
         DiaryDispatcher.setActions(action)
 
         // 比較
-        result(expectationsState, expectationsEffect, action)
+        result(expectationsState)
     }
 
     /**
@@ -261,18 +240,16 @@ class FfsResultViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun actionByChangeReason() = testScope.runBlockingTest {
-
         // 期待結果
         val value = "reason"
         val action = DiaryDispatcherContract.Action.ChangeReason(value)
         val expectationsState = state.copy()
-        val expectationsEffect = null
 
         // 実施
         DiaryDispatcher.setActions(action)
 
         // 比較
-        result(expectationsState, expectationsEffect, action)
+        result(expectationsState)
     }
 
     /**
@@ -290,18 +267,16 @@ class FfsResultViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun actionByChangeImprove() = testScope.runBlockingTest {
-
         // 期待結果
         val value = "improve"
         val action = DiaryDispatcherContract.Action.ChangeImprove(value)
         val expectationsState = state.copy()
-        val expectationsEffect = null
 
         // 実施
         DiaryDispatcher.setActions(action)
 
         // 比較
-        result(expectationsState, expectationsEffect, action)
+        result(expectationsState)
     }
 
     // endregion

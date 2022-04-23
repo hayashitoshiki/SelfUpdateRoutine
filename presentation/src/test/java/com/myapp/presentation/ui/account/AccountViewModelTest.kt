@@ -6,8 +6,10 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import junit.framework.Assert.assertEquals
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.test.*
 import org.junit.*
 import org.junit.rules.TestRule
@@ -78,20 +80,16 @@ class AccountViewModelTest {
     @ExperimentalCoroutinesApi
     private fun result(
         state: AccountContract.State,
-        effect: AccountContract.Effect?
+        effect: AccountContract.Effect? = null
     ) = testScope.runBlockingTest {
-        val resultState = viewModel.state.value
-        val resultEffect: AccountContract.Effect? = viewModel.effect.value
-
-        // 比較
-        Assert.assertEquals(resultState, state)
-        if (resultEffect is AccountContract.Effect.ShowError) {
-            val resultMessage = resultEffect.throwable.message
-            val message = (effect as AccountContract.Effect.ShowError).throwable.message
-            Assert.assertEquals(resultMessage, message)
-        } else {
-            Assert.assertEquals(resultEffect, effect)
-        }
+        viewModel.effect
+            .stateIn(
+                scope = testScope,
+                started = SharingStarted.Eagerly,
+                initialValue = null
+            )
+            .onEach { assertEquals(effect, it) }
+        assertEquals(state, viewModel.state.value)
     }
 
     // region ログイン判定
@@ -112,7 +110,6 @@ class AccountViewModelTest {
     @Test
     fun isSignInByTrue() {
         // 期待値
-        val expectationsEffect = null
         val expectationsState = state.copy(isSignIn = true)
 
         //実施
@@ -121,7 +118,7 @@ class AccountViewModelTest {
         viewModel.setEvent( AccountContract.Event.OnViewCreated)
 
         // 検証
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
         coVerify(exactly = 1) { (authUseCase).autoAuth() }
     }
 
@@ -141,7 +138,6 @@ class AccountViewModelTest {
     @Test
     fun isSignInByFalse() {
         // 期待値
-        val expectationsEffect = null
         val expectationsState = state.copy(isSignIn = false)
 
         //実施
@@ -150,7 +146,7 @@ class AccountViewModelTest {
         viewModel.setEvent( AccountContract.Event.OnViewCreated)
 
         // 検証
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
         coVerify(exactly = 1) { (authUseCase).autoAuth() }
     }
 
@@ -174,17 +170,16 @@ class AccountViewModelTest {
     @Test
     fun signOutByTrue() {
         // 期待値
-        val expectationsEffect = null
         val expectationsState = state.copy(isSignIn = false)
 
         //実施
         setStateSignInMock()
         initViewModel()
-        viewModel.setEvent( AccountContract.Event.OnViewCreated)
-        viewModel.setEvent( AccountContract.Event.OnClickSignOutButton)
+        viewModel.setEvent(AccountContract.Event.OnViewCreated)
+        viewModel.setEvent(AccountContract.Event.OnClickSignOutButton)
 
         // 検証
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
         coVerify(exactly = 1) { (authUseCase).signOut() }
     }
 
@@ -210,8 +205,8 @@ class AccountViewModelTest {
         //実施
         setStateSignOutMock()
         initViewModel()
-        viewModel.setEvent( AccountContract.Event.OnViewCreated)
-        viewModel.setEvent( AccountContract.Event.OnClickSignOutButton)
+        viewModel.setEvent(AccountContract.Event.OnViewCreated)
+        viewModel.setEvent(AccountContract.Event.OnClickSignOutButton)
 
         // 検証
         result(expectationsState, expectationsEffect)
@@ -244,8 +239,8 @@ class AccountViewModelTest {
         //実施
         setStateSignInMock()
         initViewModel()
-        viewModel.setEvent( AccountContract.Event.OnViewCreated)
-        viewModel.setEvent( AccountContract.Event.OnClickDeleteButton)
+        viewModel.setEvent(AccountContract.Event.OnViewCreated)
+        viewModel.setEvent(AccountContract.Event.OnClickDeleteButton)
 
         // 検証
         result(expectationsState, expectationsEffect)
@@ -267,17 +262,16 @@ class AccountViewModelTest {
     @Test
     fun deleteByTrue() {
         // 期待値
-        val expectationsEffect = null
         val expectationsState = state.copy(isSignIn = false)
 
         //実施
         setStateSignInMock()
         initViewModel()
-        viewModel.setEvent( AccountContract.Event.OnViewCreated)
-        viewModel.setEvent( AccountContract.Event.OnClickDeleteConfirmOkButton)
+        viewModel.setEvent(AccountContract.Event.OnViewCreated)
+        viewModel.setEvent(AccountContract.Event.OnClickDeleteConfirmOkButton)
 
         // 検証
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
         coVerify(exactly = 1) { (authUseCase).delete() }
     }
 
@@ -303,8 +297,8 @@ class AccountViewModelTest {
         //実施
         setStateSignOutMock()
         initViewModel()
-        viewModel.setEvent( AccountContract.Event.OnViewCreated)
-        viewModel.setEvent( AccountContract.Event.OnClickDeleteConfirmOkButton)
+        viewModel.setEvent(AccountContract.Event.OnViewCreated)
+        viewModel.setEvent(AccountContract.Event.OnClickDeleteConfirmOkButton)
 
         // 検証
         result(expectationsState, expectationsEffect)
@@ -338,7 +332,7 @@ class AccountViewModelTest {
         //実施
         setStateSignInMock()
         initViewModel()
-        viewModel.setEvent( AccountContract.Event.OnClickSignInButton)
+        viewModel.setEvent(AccountContract.Event.OnClickSignInButton)
 
         // 検証
         result(expectationsState, expectationsEffect)
@@ -370,7 +364,7 @@ class AccountViewModelTest {
         //実施
         setStateSignInMock()
         initViewModel()
-        viewModel.setEvent( AccountContract.Event.OnClickSignUpButton)
+        viewModel.setEvent(AccountContract.Event.OnClickSignUpButton)
 
         // 検証
         result(expectationsState, expectationsEffect)

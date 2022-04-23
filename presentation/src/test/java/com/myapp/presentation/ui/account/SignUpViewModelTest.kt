@@ -10,6 +10,9 @@ import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.test.*
 import org.junit.*
 import org.junit.Assert.*
@@ -72,19 +75,18 @@ class SignUpViewModelTest {
      * @param effect Effectの期待値
      */
     @ExperimentalCoroutinesApi
-    private fun result(state: SignUpContract.State, effect: SignUpContract.Effect?) = testScope.runBlockingTest {
-        val resultState = viewModel.state.value
-        val resultEffect = viewModel.effect.value
-
-        // 比較
-        assertEquals(resultState, state)
-        if (resultEffect is SignUpContract.Effect.ShowError) {
-            val resultMessage = resultEffect.throwable.message
-            val message = (effect as SignUpContract.Effect.ShowError).throwable.message
-            assertEquals(resultMessage, message)
-        } else {
-            assertEquals(resultEffect, effect)
-        }
+    private fun result(
+        state: SignUpContract.State,
+        effect: SignUpContract.Effect? = null
+    ) = testScope.runBlockingTest {
+        viewModel.effect
+            .stateIn(
+                scope = testScope,
+                started = SharingStarted.Eagerly,
+                initialValue = null
+            )
+            .onEach { assertEquals(effect, it) }
+        assertEquals(state, viewModel.state.value)
     }
 
     // region メールアドレス１変更
@@ -107,7 +109,6 @@ class SignUpViewModelTest {
 
         // 期待結果
         val value = "123@com.ne.jp"
-        val expectationsEffect = null
         val expectationsState = state.copy(email1Text= value)
 
         // 実施
@@ -115,7 +116,7 @@ class SignUpViewModelTest {
         viewModel.setEvent(SignUpContract.Event.OnChangeEmail1(value))
 
         // 比較
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     // endregion
@@ -140,7 +141,6 @@ class SignUpViewModelTest {
 
         // 期待結果
         val value = "123@com.ne.jp"
-        val expectationsEffect = null
         val expectationsState = state.copy(email2Text = value)
 
         // 実施
@@ -148,7 +148,7 @@ class SignUpViewModelTest {
         viewModel.setEvent(SignUpContract.Event.OnChangeEmail2(value))
 
         // 比較
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     // endregion
@@ -173,7 +173,6 @@ class SignUpViewModelTest {
 
         // 期待結果
         val value = "123Abc"
-        val expectationsEffect = null
         val expectationsState = state.copy(password1Text = value)
 
         // 実施
@@ -181,7 +180,7 @@ class SignUpViewModelTest {
         viewModel.setEvent(SignUpContract.Event.OnChangePassword1(value))
 
         // 比較
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     // endregion
@@ -206,7 +205,6 @@ class SignUpViewModelTest {
 
         // 期待結果
         val value = "123Abc"
-        val expectationsEffect = null
         val expectationsState = state.copy(password2Text = value)
 
         // 実施
@@ -214,7 +212,7 @@ class SignUpViewModelTest {
         viewModel.setEvent(SignUpContract.Event.OnChangePassword2(value))
 
         // 比較
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     // endregion
@@ -242,7 +240,6 @@ class SignUpViewModelTest {
         // 期待結果
         val email = "123@com.ne.jp"
         val password = "123Abc"
-        val expectationsEffect = null
         val expectationsState = state.copy(
             email1Text= email,
             email2Text = email,
@@ -259,7 +256,7 @@ class SignUpViewModelTest {
         viewModel.setEvent(SignUpContract.Event.OnChangePassword2(password))
 
         // 比較
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     // region メールアドレス変更
@@ -286,7 +283,6 @@ class SignUpViewModelTest {
         val email1 = "123@com.ne.jp"
         val email2 = "124@com.ne.jp"
         val password = "123Abc"
-        val expectationsEffect = null
         val expectationsState = state.copy(
             email1Text= email1,
             email2Text = email2,
@@ -303,7 +299,7 @@ class SignUpViewModelTest {
         viewModel.setEvent(SignUpContract.Event.OnChangePassword2(password))
 
         // 比較
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     /**
@@ -326,7 +322,6 @@ class SignUpViewModelTest {
         // 期待結果
         val email = "123"
         val password = "123Abc"
-        val expectationsEffect = null
         val expectationsState = state.copy(
             email1Text= email,
             email2Text = email,
@@ -343,7 +338,7 @@ class SignUpViewModelTest {
         viewModel.setEvent(SignUpContract.Event.OnChangePassword2(password))
 
         // 比較
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     /**
@@ -366,7 +361,6 @@ class SignUpViewModelTest {
         // 期待結果
         val email = "@"
         val password = "123Abc"
-        val expectationsEffect = null
         val expectationsState = state.copy(
             email1Text= email,
             email2Text = email,
@@ -383,7 +377,7 @@ class SignUpViewModelTest {
         viewModel.setEvent(SignUpContract.Event.OnChangePassword2(password))
 
         // 比較
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     /**
@@ -406,7 +400,6 @@ class SignUpViewModelTest {
         // 期待結果
         val email = "ezweb.ne.jp"
         val password = "123Abc"
-        val expectationsEffect = null
         val expectationsState = state.copy(
             email1Text= email,
             email2Text = email,
@@ -423,7 +416,7 @@ class SignUpViewModelTest {
         viewModel.setEvent(SignUpContract.Event.OnChangePassword2(password))
 
         // 比較
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     /**
@@ -446,7 +439,6 @@ class SignUpViewModelTest {
         // 期待結果
         val email = "@ezweb.ne.jp"
         val password = "123Abc"
-        val expectationsEffect = null
         val expectationsState = state.copy(
             email1Text= email,
             email2Text = email,
@@ -463,7 +455,7 @@ class SignUpViewModelTest {
         viewModel.setEvent(SignUpContract.Event.OnChangePassword2(password))
 
         // 比較
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     /**
@@ -486,7 +478,6 @@ class SignUpViewModelTest {
         // 期待結果
         val email = "123@"
         val password = "123Abc"
-        val expectationsEffect = null
         val expectationsState = state.copy(
             email1Text= email,
             email2Text = email,
@@ -503,7 +494,7 @@ class SignUpViewModelTest {
         viewModel.setEvent(SignUpContract.Event.OnChangePassword2(password))
 
         // 比較
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     /**
@@ -526,7 +517,6 @@ class SignUpViewModelTest {
         // 期待結果
         val email = "123@com"
         val password = "123Abc"
-        val expectationsEffect = null
         val expectationsState = state.copy(
             email1Text= email,
             email2Text = email,
@@ -543,7 +533,7 @@ class SignUpViewModelTest {
         viewModel.setEvent(SignUpContract.Event.OnChangePassword2(password))
 
         // 比較
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     /**
@@ -566,7 +556,6 @@ class SignUpViewModelTest {
         // 期待結果
         val email = "123@com.jp"
         val password = "123Abc"
-        val expectationsEffect = null
         val expectationsState = state.copy(
             email1Text= email,
             email2Text = email,
@@ -583,7 +572,7 @@ class SignUpViewModelTest {
         viewModel.setEvent(SignUpContract.Event.OnChangePassword2(password))
 
         // 比較
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     /**
@@ -606,7 +595,6 @@ class SignUpViewModelTest {
         // 期待結果
         val email = "123@ezweb.ne.jp"
         val password = "123Abc"
-        val expectationsEffect = null
         val expectationsState = state.copy(
             email1Text= email,
             email2Text = email,
@@ -623,7 +611,7 @@ class SignUpViewModelTest {
         viewModel.setEvent(SignUpContract.Event.OnChangePassword2(password))
 
         // 比較
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     /**
@@ -648,7 +636,6 @@ class SignUpViewModelTest {
         val email = "123@com.ne.jp"
         val after = "123@com"
         val password = "123Abc"
-        val expectationsEffect = null
         val expectationsState = state.copy(
             email1Text= after,
             email2Text = email,
@@ -666,7 +653,7 @@ class SignUpViewModelTest {
         viewModel.setEvent(SignUpContract.Event.OnChangeEmail1(after))
 
         // 比較
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
 
@@ -692,7 +679,6 @@ class SignUpViewModelTest {
         val email = "123@com"
         val after = "123@com.ne.jp"
         val password = "123Abc"
-        val expectationsEffect = null
         val expectationsState = state.copy(
             email1Text= after,
             email2Text = after,
@@ -710,7 +696,7 @@ class SignUpViewModelTest {
         viewModel.setEvent(SignUpContract.Event.OnChangeEmail1(after))
 
         // 比較
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     /**
@@ -735,7 +721,6 @@ class SignUpViewModelTest {
         val email = "123@com.ne.jp"
         val after = "123@com"
         val password = "123Abc"
-        val expectationsEffect = null
         val expectationsState = state.copy(
             email1Text= email,
             email2Text = after,
@@ -753,7 +738,7 @@ class SignUpViewModelTest {
         viewModel.setEvent(SignUpContract.Event.OnChangeEmail2(after))
 
         // 比較
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     /**
@@ -778,7 +763,6 @@ class SignUpViewModelTest {
         val email = "123@com"
         val after = "123@com.ne.jp"
         val password = "123Abc"
-        val expectationsEffect = null
         val expectationsState = state.copy(
             email1Text= after,
             email2Text = after,
@@ -796,7 +780,7 @@ class SignUpViewModelTest {
         viewModel.setEvent(SignUpContract.Event.OnChangeEmail2(after))
 
         // 比較
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     // endregion
@@ -825,7 +809,6 @@ class SignUpViewModelTest {
         val email = "123@com.ne.jp"
         val password1 = "123Abc"
         val password2 = "123Ab"
-        val expectationsEffect = null
         val expectationsState = state.copy(
             email1Text= email,
             email2Text = email,
@@ -842,7 +825,7 @@ class SignUpViewModelTest {
         viewModel.setEvent(SignUpContract.Event.OnChangePassword2(password2))
 
         // 比較
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     /**
@@ -866,7 +849,6 @@ class SignUpViewModelTest {
         // 期待結果
         val email = "123@com.ne.jp"
         val password = "123Ab"
-        val expectationsEffect = null
         val expectationsState = state.copy(
             email1Text= email,
             email2Text = email,
@@ -883,7 +865,7 @@ class SignUpViewModelTest {
         viewModel.setEvent(SignUpContract.Event.OnChangePassword2(password))
 
         // 比較
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     /**
@@ -907,7 +889,6 @@ class SignUpViewModelTest {
         // 期待結果
         val email = "123@com.ne.jp"
         val password = "123456"
-        val expectationsEffect = null
         val expectationsState = state.copy(
             email1Text= email,
             email2Text = email,
@@ -924,7 +905,7 @@ class SignUpViewModelTest {
         viewModel.setEvent(SignUpContract.Event.OnChangePassword2(password))
 
         // 比較
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     /**
@@ -948,7 +929,6 @@ class SignUpViewModelTest {
         // 期待結果
         val email = "123@com.ne.jp"
         val password = "password"
-        val expectationsEffect = null
         val expectationsState = state.copy(
             email1Text= email,
             email2Text = email,
@@ -965,7 +945,7 @@ class SignUpViewModelTest {
         viewModel.setEvent(SignUpContract.Event.OnChangePassword2(password))
 
         // 比較
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     /**
@@ -989,7 +969,6 @@ class SignUpViewModelTest {
         // 期待結果
         val email = "123@com.ne.jp"
         val password = "PASSWORD"
-        val expectationsEffect = null
         val expectationsState = state.copy(
             email1Text= email,
             email2Text = email,
@@ -1006,7 +985,7 @@ class SignUpViewModelTest {
         viewModel.setEvent(SignUpContract.Event.OnChangePassword2(password))
 
         // 比較
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     /**
@@ -1030,7 +1009,6 @@ class SignUpViewModelTest {
         // 期待結果
         val email = "123@com.ne.jp"
         val password = "PassWord"
-        val expectationsEffect = null
         val expectationsState = state.copy(
             email1Text= email,
             email2Text = email,
@@ -1047,7 +1025,7 @@ class SignUpViewModelTest {
         viewModel.setEvent(SignUpContract.Event.OnChangePassword2(password))
 
         // 比較
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     /**
@@ -1071,7 +1049,6 @@ class SignUpViewModelTest {
         // 期待結果
         val email = "123@com.ne.jp"
         val password = "123PASS"
-        val expectationsEffect = null
         val expectationsState = state.copy(
             email1Text= email,
             email2Text = email,
@@ -1088,7 +1065,7 @@ class SignUpViewModelTest {
         viewModel.setEvent(SignUpContract.Event.OnChangePassword2(password))
 
         // 比較
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     /**
@@ -1112,7 +1089,6 @@ class SignUpViewModelTest {
         // 期待結果
         val email = "123@com.ne.jp"
         val password = "123pass"
-        val expectationsEffect = null
         val expectationsState = state.copy(
             email1Text= email,
             email2Text = email,
@@ -1129,7 +1105,7 @@ class SignUpViewModelTest {
         viewModel.setEvent(SignUpContract.Event.OnChangePassword2(password))
 
         // 比較
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     /**
@@ -1154,7 +1130,6 @@ class SignUpViewModelTest {
         val email = "123@com.ne.jp"
         val password = "123Pass"
         val after = "123pass"
-        val expectationsEffect = null
         val expectationsState = state.copy(
             email1Text= email,
             email2Text = email,
@@ -1172,7 +1147,7 @@ class SignUpViewModelTest {
         viewModel.setEvent(SignUpContract.Event.OnChangePassword1(after))
 
         // 比較
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
     /**
      * バリデーション
@@ -1196,7 +1171,6 @@ class SignUpViewModelTest {
         val email = "123@com.ne.jp"
         val password = "123pass"
         val after = "123Pass"
-        val expectationsEffect = null
         val expectationsState = state.copy(
             email1Text= email,
             email2Text = email,
@@ -1214,7 +1188,7 @@ class SignUpViewModelTest {
         viewModel.setEvent(SignUpContract.Event.OnChangePassword1(after))
 
         // 比較
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     /**
@@ -1239,7 +1213,6 @@ class SignUpViewModelTest {
         val email = "123@com.ne.jp"
         val password = "123Pass"
         val after = "123pass"
-        val expectationsEffect = null
         val expectationsState = state.copy(
             email1Text= email,
             email2Text = email,
@@ -1257,7 +1230,7 @@ class SignUpViewModelTest {
         viewModel.setEvent(SignUpContract.Event.OnChangePassword2(after))
 
         // 比較
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     /**
@@ -1282,7 +1255,6 @@ class SignUpViewModelTest {
         val email = "123@com.ne.jp"
         val password = "123pass"
         val after = "123Pass"
-        val expectationsEffect = null
         val expectationsState = state.copy(
             email1Text= email,
             email2Text = email,
@@ -1300,7 +1272,7 @@ class SignUpViewModelTest {
         viewModel.setEvent(SignUpContract.Event.OnChangePassword2(after))
 
         // 比較
-        result(expectationsState, expectationsEffect)
+        result(expectationsState)
     }
 
     // endregion
@@ -1388,7 +1360,7 @@ class SignUpViewModelTest {
         viewModel.setEvent(SignUpContract.Event.OnChangeEmail2(email))
         viewModel.setEvent(SignUpContract.Event.OnChangePassword1(password))
         viewModel.setEvent(SignUpContract.Event.OnChangePassword2(password))
-       viewModel.setEvent(SignUpContract.Event.OnClickSignUpButton)
+        viewModel.setEvent(SignUpContract.Event.OnClickSignUpButton)
 
         // 比較
         result(expectationsState, expectationsEffect)
